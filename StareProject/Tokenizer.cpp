@@ -13,5 +13,7 @@ Tokenizer::~Tokenizer()
 
 vector<string> Tokenizer::getNextSentence()
 {
+	vector<string> words;
 
+	return words;
 }

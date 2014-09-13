@@ -44,7 +44,7 @@ void HMMengine::compare(MetaData metaData)
 	rankingList.push_back(sentenceRanking(compareDoc, 8, 33));
 
 	// pass to the HTMLgenerator all of the sentences that are found to be similiar 
-	HTMLgenerator hGen = HTMLgenerator(rankingList, )
+	HTMLgenerator hGen = HTMLgenerator("cmp.html", rankingList);
 
 }
 
