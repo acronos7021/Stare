@@ -8,8 +8,8 @@ public:
 	Tokenizer(string Document);
 	~Tokenizer();
 
-	// returns a single sentence
-	// returns an empty vector i
+	// returns a single sentence from the Document
+	// returns an empty vector if there is no next sentence.
 	vector<string> getNextSentence();
 
 private:
