@@ -12,7 +12,7 @@ MetaData CMDparser::parseCMD(int argc, char *argv[])
 	//for (int i = 0; i < argc; i++)
 	//	cout << argv[i] << endl; 
 
-	//// Here is an example of how to use the MetaData struct
+	//// Here is an example of how  to use the MetaData struct
 
 	//metaData.action = ActionType::Create;
 	//metaData.Author = "Brian Davis";
