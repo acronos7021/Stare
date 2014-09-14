@@ -81,6 +81,8 @@
     <ClCompile Include="HMMengine.cpp" />
     <ClCompile Include="HTMLgenerator.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="shell.c" />
+    <ClCompile Include="sqlite3.c" />
     <ClCompile Include="Tokenizer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -89,6 +91,8 @@
     <ClInclude Include="DataStructs.h" />
     <ClInclude Include="HMMengine.h" />
     <ClInclude Include="HTMLgenerator.h" />
+    <ClInclude Include="sqlite3.h" />
+    <ClInclude Include="sqlite3ext.h" />
     <ClInclude Include="Tokenizer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

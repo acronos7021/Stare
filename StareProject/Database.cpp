@@ -1,4 +1,5 @@
 #include "Database.h"
+#include "sqlite3.h"
 
 
 StyleDatabase::StyleDatabase(void)
@@ -23,6 +24,24 @@ StyleDatabase::~StyleDatabase(void)
 int StyleDatabase::insertDocument(string Author, string Title, string publishDate)
 {
 	// CALL insertDocument(Author,Title,publishDate)
+	//string query = "SELECT id from `DatabaseName`.`TableName` where author='" + Author + "' and title='" + Title + "' and publishDate='" + publishDate + "';";
+	string query = "SELECT id from `DatabaseName`.`TableName` where title='"+Title+"';";
+	int qId = 0; // Query ID or Document ID
+	bool doesExist = false; // Temporary just for the template so it can be easily replaced
+	if (doesExist == true)
+	{
+		return qId;
+	}
+	else {
+		query = "SELECT id from `DatabaseName`.`TableName` where author='" + Author + "';";
+		if (doesExist == true)
+		{
+			// Do Nothing
+		}
+		else {
+			query = "INSERT INTO `DatabaseName`.`TableName` (ColumnName,ColumnName,ColumnName) VALUES('','','');";
+		}
+	}
 	return 0;
 }
 
