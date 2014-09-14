@@ -10,7 +10,7 @@ MetaData CMDparser::parseCMD(int argc, char *argv[])
 	
 	//// for texting purposes, this prints all of the arguments to the console.
 	//for (int i = 0; i < argc; i++)
-	//	cout << argv[i] << endl;
+	//	cout << argv[i] << endl; 
 
 	//// Here is an example of how to use the MetaData struct
 
