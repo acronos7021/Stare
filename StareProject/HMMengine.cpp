@@ -26,9 +26,11 @@ int HMMengine::learn(MetaData metaData)
 	// do learn
 	Tokenizer tokenizer = Tokenizer(metaData.DocumentText);
 	StyleDatabase styleDB;
+	vector<string> words;
 
 	int documentID = styleDB.insertDocument(metaData.Author, metaData.Title, metaData.PublishDate);
-	styleDB.insertSentence(documentID, tokenizer.getNextSentence());
+	while ((words = tokenizer.getNextSentence()).size() > 0)
+		styleDB.insertSentence(documentID, words);
 
 	return documentID;
 }
