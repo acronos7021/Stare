@@ -7,7 +7,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-	MetaData md = CMDparser::parseCMD(argc,argv);
+	MetaData md = CMDparser::parseCMD(argc, argv);
 
 	HMMengine hGen = HMMengine(md);
 
