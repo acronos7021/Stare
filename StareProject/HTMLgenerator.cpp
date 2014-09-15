@@ -38,6 +38,7 @@ HTMLgenerator::HTMLgenerator(string DestinationFilename, int documentID, vector<
 			// this is a normal sentence so it doesn't need any special formatting.
 			output << sentence;
 		}
+		sentenceID++;
 	}
 	// write output to file.
 }
