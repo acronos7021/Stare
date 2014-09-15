@@ -67,7 +67,7 @@ string StyleDatabase::getSentence(int sentenceID)
 	// SELECT Tokens.Word FROM HMMtokenPaths 
 	//    JOIN Tokens ON Tokens.TokenID = HMMtokenPaths.CurrentToken
 	//    WHERE HMMtokenPaths.SentenceID = sentenceID
-	//    ORDER BY HMMtokenPaths.CurrentToken  // this assumes the tokens were added in the database in order.
+	//    ORDER BY HMMtokenPaths.TokenPathID  // this assumes the tokens were added in the database in order.
 	return "";
 }
 
