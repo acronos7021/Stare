@@ -1,5 +1,4 @@
 #include "Database.h"
-#include "sqlite3.h"
 
 
 StyleDatabase::StyleDatabase(void)
