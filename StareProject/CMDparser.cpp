@@ -2,6 +2,8 @@ using namespace std;
 
 
 #include "CMDparser.h"
+#include <sstream> 
+#include <fstream>
 
 MetaData CMDparser::parseCMD(int argc, char *argv[])
 {
@@ -40,8 +42,20 @@ MetaData CMDparser::parseCMD(int argc, char *argv[])
 	else
 		// throw serious error and kill the app.
 
-    // use argv[2] to read the file and load it into metaData.DocumentText in all three versions
+		// use argv[2] to read the file and load it into metaData.DocumentText in all three versions
+		using std::ifstream;
+	ifstream t(argv[2]);
 
+	std::stringstream buffer;
+
+	if (!t.is_open())
+	{
+		cout << "can't open" << argv[2] << "file for input/n";
+	}
+	buffer << t.rdbuf();
+
+
+	metaData.DocumentText = buffer.str();
 
 	metaData.action = ActionType::Create;
 
