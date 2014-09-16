@@ -5,28 +5,49 @@ StyleDatabase::StyleDatabase(void)
 {
 	if (sqlite3_open("aisql.db3", &db) == SQLITE_OK)
 	{
-		//string query = "insert into Tokens (Word) VALUES('test');";
-		stringstream strm;
-		strm << "insert into Tokens(Word) VALUES('test');";
-		string s = strm.str();
-		char *str = &s[0];
+		////string query = "insert into Tokens (Word) VALUES('test');";
+		//strm << "insert into Tokens(Word) VALUES('test');";
+		//string s = strm.str();
+		//char *str = &s[0];
 
-		sqlite3_stmt *statement;
-		int result;
-		//char *query="insert into student(roll,name,cgpa)values(4,'uuu',6.6)";
-		char *query = str;
-		{
-			if (sqlite3_prepare(db, query, -1, &statement, 0) == SQLITE_OK)
-			{
-				int res = sqlite3_step(statement);
-				result = res;
-				sqlite3_finalize(statement);
-			}
+		//int result;
+		////char *query="insert into student(roll,name,cgpa)values(4,'uuu',6.6)";
+		//char *query = str;
+		//{
+		//	if (sqlite3_prepare(db, query, -1, &statement, 0) == SQLITE_OK)
+		//	{
+		//		int res = sqlite3_step(statement);
+		//		result = res;
+		//		sqlite3_finalize(statement);
+		//	}
 
+		//}
+
+		//char *query2 = "select * from Tokens where TokenID=1";
+		//if (sqlite3_prepare(db, query2, -1, &statement, 0) == SQLITE_OK)
+		//{
+		//	int coltotal = sqlite3_column_count(statement);
+		//	int res = 0;
+		//	while (1)
+		//	{
+		//		res = sqlite3_step(statement);
+		//		if (res == SQLITE_ROW)
+		//		{
+		//			for (int i = 0; i < coltotal; i++)
+		//			{
+		//				string s = (char*)sqlite3_column_text(statement, i);
+		//				cout << s << endl;
+		//			}
+		//		}
+		//		if (res == SQLITE_DONE || res == SQLITE_ERROR)
+		//		{
+		//			break;
+		//		}
+		//	}
 		}
 
+
 		//sqlite3_prepare(db, query,-1,&statement,0)
-	}
 	else {
 		throw exception("SQLite database failed to open");
 	}
@@ -52,25 +73,33 @@ int StyleDatabase::insertDocument(bool &alreadyExists, string Author, string Tit
 {
 	// CALL insertDocument(Author,Title,publishDate)
 	//string query = "SELECT id from `DatabaseName`.`TableName` where author='" + Author + "' and title='" + Title + "' and publishDate='" + publishDate + "';";
-	string query = "SELECT id from `DatabaseName`.`TableName` where title='"+Title+"';";
-	int qId = 0; // Query ID or Document ID
-	bool doesExist = false; // Temporary just for the template so it can be easily replaced
-	if (doesExist == true)
-	{
-		alreadyExists = true;
-		return -1;  // informs the calling function that the document already exists. 
-	}
-	else {
-		query = "SELECT id from `DatabaseName`.`TableName` where author='" + Author + "';";
-		if (doesExist == true)
-		{
-			// Do Nothing
-		}
-		else {
-			query = "INSERT INTO `DatabaseName`.`TableName` (ColumnName,ColumnName,ColumnName) VALUES('','','');";
-		}
-	}
+	char *query2 = "select id from Documents where ";
+
+
+
+	//if (sqlite3_prepare(db, query2, -1, &statement, 0) == SQLITE_OK)
+	//{
+	//	int coltotal = sqlite3_column_count(statement);
+	//	int res = 0;
+	//	while (1)
+	//	{
+	//		res = sqlite3_step(statement);
+	//		if (res == SQLITE_ROW)
+	//		{
+	//			for (int i = 0; i < coltotal; i++)
+	//			{
+	//				string s = (char*)sqlite3_column_text(statement, i);
+	//				cout << s << endl;
+	//			}
+	//		}
+	//		if (res == SQLITE_DONE || res == SQLITE_ERROR)
+	//		{
+	//			break;
+	//		}
+	//	}
+	//}
 	return 0;
+	
 }
 
 // Used to add a sentence
