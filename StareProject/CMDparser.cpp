@@ -10,9 +10,9 @@ MetaData CMDparser::parseCMD(int argc, char *argv[])
 	MetaData metaData;
 
 
-	// for texting purposes, this prints all of the arguments to the console.
-	for (int i = 0; i < argc; i++)
-		cout << argv[i] << endl;
+	//// for texting purposes, this prints all of the arguments to the console.
+	//for (int i = 0; i < argc; i++)
+	//	cout << argv[i] << endl;
 
 	//// Here is an example of how  to use the MetaData struct
 	if (argv[1] == "-learn")
@@ -26,7 +26,7 @@ MetaData CMDparser::parseCMD(int argc, char *argv[])
 	else if (argv[1] == "-compare")
 	{
 		// do compare stuff
-		metaData.action = ActionType::Learn;
+		metaData.action = ActionType::Compare;
 		metaData.Author = argv[3];//"Brian Davis";
 		metaData.Title = argv[4];// "My Test Doc";
 		metaData.PublishDate = argv[5];// "2014";
@@ -35,7 +35,7 @@ MetaData CMDparser::parseCMD(int argc, char *argv[])
 	else if (argv[1] == "-create")
 	{
 		// do compare stuff
-		metaData.action = ActionType::Learn;
+		metaData.action = ActionType::Create;
 		metaData.Author = argv[3];//"Brian Davis";
 
 	}

@@ -92,6 +92,7 @@
     <ClInclude Include="DataStructs.h" />
     <ClInclude Include="HMMengine.h" />
     <ClInclude Include="HTMLgenerator.h" />
+    <ClInclude Include="sqlite3.h" />
     <ClInclude Include="Tokenizer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

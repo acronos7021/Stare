@@ -3,11 +3,39 @@
 
 StyleDatabase::StyleDatabase(void)
 {
+	if (sqlite3_open("aisql.db3", &db) == SQLITE_OK)
+	{
+		//string query = "insert into Tokens (Word) VALUES('test');";
+		stringstream strm;
+		strm << "insert into Tokens(Word) VALUES('test');";
+		string s = strm.str();
+		char *str = &s[0];
+
+		sqlite3_stmt *statement;
+		int result;
+		//char *query="insert into student(roll,name,cgpa)values(4,'uuu',6.6)";
+		char *query = str;
+		{
+			if (sqlite3_prepare(db, query, -1, &statement, 0) == SQLITE_OK)
+			{
+				int res = sqlite3_step(statement);
+				result = res;
+				sqlite3_finalize(statement);
+			}
+
+		}
+
+		//sqlite3_prepare(db, query,-1,&statement,0)
+	}
+	else {
+		throw exception("SQLite database failed to open");
+	}
 }
 
 
 StyleDatabase::~StyleDatabase(void)
 {
+	sqlite3_close(db); // Try to close the database
 }
 
 

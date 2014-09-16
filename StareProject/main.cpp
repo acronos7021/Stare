@@ -11,5 +11,8 @@ int main(int argc, char *argv[])
 
 	HMMengine hGen = HMMengine(md);
 
+	StyleDatabase myDb;
+
+
 	system("pause");
 }
