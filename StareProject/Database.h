@@ -4,7 +4,10 @@ using namespace std;
 
 #include <string>
 #include <vector>
-
+#include "sqlite3.h"
+#include <stdexcept>
+#include <iostream>
+#include <sstream>
 class StyleDatabase
 {
 public:
@@ -40,5 +43,6 @@ public:
 		
 	//Returns a list of all of the SentenceIDs where that combination of words exists in all documents of the selected style. 
 	vector<int> getWordGroupListByStyle(int StyleID, string prevWord, string currWord, string nextWord);
-
+private:
+	sqlite3* db;
 };
