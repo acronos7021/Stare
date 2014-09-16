@@ -45,4 +45,6 @@ public:
 	vector<int> getWordGroupListByStyle(int StyleID, string prevWord, string currWord, string nextWord);
 private:
 	sqlite3* db;
+	sqlite3_stmt *statement;
+	stringstream strm;
 };
