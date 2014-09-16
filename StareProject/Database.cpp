@@ -48,7 +48,7 @@ StyleDatabase::~StyleDatabase(void)
 // if not, add it to the Style table then create new document.  
 // returns the DocumentID of the new Document.
 // I believe this will be best handled on the server side using a stored procedure
-int StyleDatabase::insertDocument(string Author, string Title, string publishDate)
+int StyleDatabase::insertDocument(bool &alreadyExists, string Author, string Title, string publishDate)
 {
 	// CALL insertDocument(Author,Title,publishDate)
 	//string query = "SELECT id from `DatabaseName`.`TableName` where author='" + Author + "' and title='" + Title + "' and publishDate='" + publishDate + "';";
@@ -57,7 +57,8 @@ int StyleDatabase::insertDocument(string Author, string Title, string publishDat
 	bool doesExist = false; // Temporary just for the template so it can be easily replaced
 	if (doesExist == true)
 	{
-		return qId;
+		alreadyExists = true;
+		return -1;  // informs the calling function that the document already exists. 
 	}
 	else {
 		query = "SELECT id from `DatabaseName`.`TableName` where author='" + Author + "';";

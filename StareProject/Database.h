@@ -17,7 +17,7 @@ public:
 	//Use this to create a new Document
 	//  if a Style (author) doesn’t exist and add it to the Style table.  
 	//returns the DocumentID of the new Document.
-	int insertDocument(string Author, string Title, string publishDate);
+	int insertDocument(bool &alreadyExists, string Author, string Title, string publishDate);
 
 	// Used to add a sentence
 	// This would:
