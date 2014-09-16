@@ -9,41 +9,40 @@ MetaData CMDparser::parseCMD(int argc, char *argv[])
 {
 	MetaData metaData;
 
-
-	//// for texting purposes, this prints all of the arguments to the console.
-	//for (int i = 0; i < argc; i++)
-	//	cout << argv[i] << endl;
-
-	//// Here is an example of how  to use the MetaData struct
+	// Select the task
 	if (argv[1] == "-learn")
 	{
-		//do learn stuff
+		//Load learn
 		metaData.action = ActionType::Learn;
-		metaData.Author = argv[3];//"Brian Davis";
-		metaData.Title = argv[4];// "My Test Doc";
-		metaData.PublishDate = argv[5];// "2014";
+		metaData.Author = argv[3];
+		metaData.Title = argv[4];
+		metaData.PublishDate = argv[5];
 	}
 	else if (argv[1] == "-compare")
 	{
-		// do compare stuff
+		// Load compare
 		metaData.action = ActionType::Compare;
-		metaData.Author = argv[3];//"Brian Davis";
-		metaData.Title = argv[4];// "My Test Doc";
-		metaData.PublishDate = argv[5];// "2014";
+		metaData.Author = argv[3];
+		metaData.Title = argv[4];
+		metaData.PublishDate = argv[5];
 	}
 
 	else if (argv[1] == "-create")
 	{
-		// do compare stuff
+		// Load create
 		metaData.action = ActionType::Create;
-		metaData.Author = argv[3];//"Brian Davis";
+		metaData.Author = argv[3];
 
 	}
 	else
+	{
 		// throw serious error and kill the app.
+		// Brian needs to deal with this.  He's ignoring it for now.
+	}
 
-		// use argv[2] to read the file and load it into metaData.DocumentText in all three versions
-		using std::ifstream;
+	// load the file from the database and insert it into DocumentText
+	using std::ifstream;
+
 	ifstream t(argv[2]);
 
 	std::stringstream buffer;
@@ -54,13 +53,7 @@ MetaData CMDparser::parseCMD(int argc, char *argv[])
 	}
 	buffer << t.rdbuf();
 
-
 	metaData.DocumentText = buffer.str();
-
-	metaData.action = ActionType::Create;
-
-	metaData.DocumentText = "This will probably be loaded from a file instead of pulled directly from the command line";
-	
 
 	return metaData;
 }
