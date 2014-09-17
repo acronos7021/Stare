@@ -62,8 +62,6 @@ void StyleDatabase::insert(string q)
 // Use this if you want to check to see if something exists in the database
 int StyleDatabase::retrieve(string table, string data, string searchType, string searchData)
 {
-	//strm << "SELECT " << data << " from " << table << " LIMIT 1;";
-	//char *query2 = "select " + data + " from Tokens where TokenID=1";
 	string str = "select " + data + " from " + table + " where " + searchType + " = '" + searchData + "';";
 	char *query2 = &str[0];
 	int retAns = 0;
