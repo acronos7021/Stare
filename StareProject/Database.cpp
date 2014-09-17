@@ -106,11 +106,26 @@ int StyleDatabase::retrieve(string table, string data, string searchType, string
 // I believe this will be best handled on the server side using a stored procedure
 int StyleDatabase::insertDocument(bool &alreadyExists, string Author, string Title, string publishDate)
 {
-	// CALL insertDocument(Author,Title,publishDate)
-	//string query = "SELECT id from `DatabaseName`.`TableName` where author='" + Author + "' and title='" + Title + "' and publishDate='" + publishDate + "';";
 	int check = retrieve("Documents", "id", "title", Title);
+	int retInt = 0; /* The actual return value */
+	if (check == 0)
+	{
+		int checkTwo = retrieve("Styles", "id", "Author", Author);
+		if (checkTwo == 0)
+		{
+			// Add Author
+			// Add Document
+			// Return DocID
+		}
+		else {
+			// Return Doc ID
+		}
+	}
+	else {
+		retInt = check;
+	}
 
-	return 0;
+	return retInt;
 	
 }
 
