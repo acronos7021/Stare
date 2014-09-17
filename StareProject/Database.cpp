@@ -59,9 +59,44 @@ void StyleDatabase::insert(string q)
 	}
 }
 
-void StyleDatabase::retrieve(string table, string data)
+// Use this if you want to check to see if something exists in the database
+int StyleDatabase::retrieve(string table, string data, string searchType, string searchData)
 {
+	//strm << "SELECT " << data << " from " << table << " LIMIT 1;";
+	//char *query2 = "select " + data + " from Tokens where TokenID=1";
+	string str = "select " + data + " from " + table + " where " + searchType + " = '" + searchData + "';";
+	char *query2 = &str[0];
+	int retAns = 0;
 
+	if (sqlite3_prepare(db, query2, -1, &statement, 0) == SQLITE_OK)
+	{
+		int coltotal = sqlite3_column_count(statement);
+		int res = 0;
+		while (1)
+		{
+			res = sqlite3_step(statement);
+			if (res == SQLITE_ROW)
+			{
+				for (int i = 0; i < coltotal; i++)
+				{
+					string s = (char*)sqlite3_column_text(statement, i);
+					if (s.empty() == true)
+					{
+						retAns = 0;
+					}
+					else {
+						retAns = 1;
+					}
+				}
+			}
+			if (res == SQLITE_DONE || res == SQLITE_ERROR)
+			{
+				break;
+			}
+		}
+	}
+
+	return retAns;
 }
 
 //Use this to create a new Document
@@ -75,31 +110,8 @@ int StyleDatabase::insertDocument(bool &alreadyExists, string Author, string Tit
 {
 	// CALL insertDocument(Author,Title,publishDate)
 	//string query = "SELECT id from `DatabaseName`.`TableName` where author='" + Author + "' and title='" + Title + "' and publishDate='" + publishDate + "';";
-	char *query2 = "select id from Documents where ";
+	int check = retrieve("Documents", "id", "title", Title);
 
-
-
-	//if (sqlite3_prepare(db, query2, -1, &statement, 0) == SQLITE_OK)
-	//{
-	//	int coltotal = sqlite3_column_count(statement);
-	//	int res = 0;
-	//	while (1)
-	//	{
-	//		res = sqlite3_step(statement);
-	//		if (res == SQLITE_ROW)
-	//		{
-	//			for (int i = 0; i < coltotal; i++)
-	//			{
-	//				string s = (char*)sqlite3_column_text(statement, i);
-	//				cout << s << endl;
-	//			}
-	//		}
-	//		if (res == SQLITE_DONE || res == SQLITE_ERROR)
-	//		{
-	//			break;
-	//		}
-	//	}
-	//}
 	return 0;
 	
 }

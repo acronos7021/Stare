@@ -49,5 +49,9 @@ private:
 	stringstream strm;
 
 	void insert(string query);
-	void retrieve(string table, string data);
+	int retrieve(string table, string data, string searchType, string searchData);
+	int retrieve(string table, string data, int id);
+	string retrieve(string table, string data) const;
+	string retrieve(string table, string data, int id) const;
+
 };
