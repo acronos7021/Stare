@@ -47,4 +47,7 @@ private:
 	sqlite3* db;
 	sqlite3_stmt *statement;
 	stringstream strm;
+
+	void insert(string query);
+	void retrieve(string table, string data);
 };

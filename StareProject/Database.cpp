@@ -5,23 +5,6 @@ StyleDatabase::StyleDatabase(void)
 {
 	if (sqlite3_open("aisql.db3", &db) == SQLITE_OK)
 	{
-		////string query = "insert into Tokens (Word) VALUES('test');";
-		//strm << "insert into Tokens(Word) VALUES('test');";
-		//string s = strm.str();
-		//char *str = &s[0];
-
-		//int result;
-		////char *query="insert into student(roll,name,cgpa)values(4,'uuu',6.6)";
-		//char *query = str;
-		//{
-		//	if (sqlite3_prepare(db, query, -1, &statement, 0) == SQLITE_OK)
-		//	{
-		//		int res = sqlite3_step(statement);
-		//		result = res;
-		//		sqlite3_finalize(statement);
-		//	}
-
-		//}
 
 		//char *query2 = "select * from Tokens where TokenID=1";
 		//if (sqlite3_prepare(db, query2, -1, &statement, 0) == SQLITE_OK)
@@ -59,8 +42,27 @@ StyleDatabase::~StyleDatabase(void)
 	sqlite3_close(db); // Try to close the database
 }
 
+void StyleDatabase::insert(string q)
+{
+	strm << q;
+	string s = strm.str();
+	char *str = &s[0];
+	int result;
+	char *query = str;
+	{
+		if (sqlite3_prepare(db, query, -1, &statement, 0) == SQLITE_OK)
+		{
+			int res = sqlite3_step(statement);
+			result = res;
+			sqlite3_finalize(statement);
+		}
+	}
+}
 
+void StyleDatabase::retrieve(string table, string data)
+{
 
+}
 
 //Use this to create a new Document
 //  First check if the document already exists in the database.
