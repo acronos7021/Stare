@@ -28,7 +28,30 @@
 			#highlight-blue{
 				background-color:#47FFFF;
 			}
-		
+            
+            #popup { 
+                position: relative; 
+                display: inline;
+            }
+            #popup span { 
+                display: none;  
+            }
+            #popup:hover span {    
+                text-decoration: none; 
+                display: block; 
+                position: absolute; 
+                width: 200px; 
+                color: black;
+                background-color: white; 
+                height: 50px; 
+                left: 0px; 
+                top: -68px; 
+                padding: 5 5 0 5; 
+                text-align:center;
+                border-style: solid;
+                border-width: 2px;
+            }
+                    
 		</style>
     </head>
     <div id="wrapper">
@@ -42,7 +65,7 @@
 
 				<span id="highlight-blue">Vivamus pulvinar, dui pellentesque imperdiet mollis, nisi tortor ornare metus, non fringilla lacus diam nec arcu.</span> Morbi tincidunt, purus a tincidunt consequat, massa felis congue elit, a imperdiet dui mauris nec dui. Quisque mattis neque vel augue cursus, in gravida orci varius. Sed volutpat enim quis convallis vulputate. Nulla laoreet aliquam nisi, id malesuada tellus rutrum ut. Nam tincidunt rutrum tincidunt. Aenean sagittis dictum ligula quis tempor. Proin at tellus pulvinar, lobortis arcu in, efficitur risus. Duis ultrices vestibulum ex. Sed malesuada tincidunt justo convallis pretium. Pellentesque mattis ligula sit amet tellus finibus, id porta risus malesuada. Suspendisse hendrerit erat augue, ac efficitur massa venenatis nec. Ut vestibulum sapien non metus sollicitudin, id blandit lectus eleifend. Duis rutrum quis nibh sit amet pellentesque. Aenean suscipit a metus eu aliquet.
 
-				Donec aliquam mollis lectus vitae congue. <span id="highlight-yellow">Vestibulum lacus lorem, viverra sit amet tincidunt a, pharetra vitae mi. Quisque iaculis tincidunt volutpat. Fusce dictum, ante ac facilisis tincidunt, felis nulla faucibus lorem, vel viverra risus tortor molestie massa.</span> Aliquam egestas rutrum tincidunt. Proin malesuada lacinia ex ac dapibus. Morbi quis tempor ligula, rhoncus convallis tellus. Maecenas ac ante ut nulla aliquam tristique et sed lacus. Duis maximus velit finibus, fermentum neque lacinia, mollis turpis.
+				Donec aliquam mollis lectus vitae congue.  <div id="popup" onmouseover="connect(d1, d2, '#0F0', 5);" style="background-color: yellow;">Vestibulum lacus lorem, viverra sit amet tincidunt a, pharetra vitae mi. Quisque iaculis tincidunt volutpat. Fusce dictum, ante ac facilisis tincidunt, felis nulla faucibus lorem, vel viverra risus tortor molestie massa.<span>This section was plagiarized: <b>100%</b></span></div> Aliquam egestas rutrum tincidunt. Proin malesuada lacinia ex ac dapibus. Morbi quis tempor ligula, rhoncus convallis tellus. Maecenas ac ante ut nulla aliquam tristique et sed lacus. Duis maximus velit finibus, fermentum neque lacinia, mollis turpis.
 
 				Cras interdum vitae purus a mattis. Aenean eu dolor eget diam auctor rutrum at nec neque. Aliquam sagittis tortor eu purus interdum interdum. Phasellus dapibus vel turpis in porttitor. Aenean venenatis tincidunt lobortis. Sed maximus nulla quis libero tempor sodales. Ut fermentum felis non diam fringilla faucibus.
 
@@ -62,7 +85,7 @@
 
 				<span id="highlight-blue">Vivamus pulvinar, dui pellentesque imperdiet mollis, nisi tortor ornare metus, non fringilla lacus diam nec arcu.</span> Morbi tincidunt, purus a tincidunt consequat, massa felis congue elit, a imperdiet dui mauris nec dui. Quisque mattis neque vel augue cursus, in gravida orci varius. Sed volutpat enim quis convallis vulputate. Nulla laoreet aliquam nisi, id malesuada tellus rutrum ut. Nam tincidunt rutrum tincidunt. Aenean sagittis dictum ligula quis tempor. Proin at tellus pulvinar, lobortis arcu in, efficitur risus. Duis ultrices vestibulum ex. Sed malesuada tincidunt justo convallis pretium. Pellentesque mattis ligula sit amet tellus finibus, id porta risus malesuada. Suspendisse hendrerit erat augue, ac efficitur massa venenatis nec. Ut vestibulum sapien non metus sollicitudin, id blandit lectus eleifend. Duis rutrum quis nibh sit amet pellentesque. Aenean suscipit a metus eu aliquet.
 
-				Donec aliquam mollis lectus vitae congue. <span id="highlight-yellow">Vestibulum lacus lorem, viverra sit amet tincidunt a, pharetra vitae mi. Quisque iaculis tincidunt volutpat. Fusce dictum, ante ac facilisis tincidunt, felis nulla faucibus lorem, vel viverra risus tortor molestie massa.</span> Aliquam egestas rutrum tincidunt. Proin malesuada lacinia ex ac dapibus. Morbi quis tempor ligula, rhoncus convallis tellus. Maecenas ac ante ut nulla aliquam tristique et sed lacus. Duis maximus velit finibus, fermentum neque lacinia, mollis turpis.
+				Donec aliquam mollis lectus vitae congue. <div id="popup" style="background-color: yellow;">Vestibulum lacus lorem, viverra sit amet tincidunt a, pharetra vitae mi. Quisque iaculis tincidunt volutpat. Fusce dictum, ante ac facilisis tincidunt, felis nulla faucibus lorem, vel viverra risus tortor molestie massa.<span>This section was plagiarized: <b style="color: red">100%</b></span></div> Aliquam egestas rutrum tincidunt. Proin malesuada lacinia ex ac dapibus. Morbi quis tempor ligula, rhoncus convallis tellus. Maecenas ac ante ut nulla aliquam tristique et sed lacus. Duis maximus velit finibus, fermentum neque lacinia, mollis turpis.
 
 				Cras interdum vitae purus a mattis. Aenean eu dolor eget diam auctor rutrum at nec neque. Aliquam sagittis tortor eu purus interdum interdum. Phasellus dapibus vel turpis in porttitor. Aenean venenatis tincidunt lobortis. Sed maximus nulla quis libero tempor sodales. Ut fermentum felis non diam fringilla faucibus.
 
