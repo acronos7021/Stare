@@ -80,6 +80,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CMDparser.cpp" />
+    <ClCompile Include="Console.cpp" />
     <ClCompile Include="Database.cpp" />
     <ClCompile Include="HMMengine.cpp" />
     <ClCompile Include="HTMLgenerator.cpp" />
@@ -88,6 +89,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CMDparser.h" />
+    <ClInclude Include="Console.h" />
     <ClInclude Include="Database.h" />
     <ClInclude Include="DataStructs.h" />
     <ClInclude Include="HMMengine.h" />

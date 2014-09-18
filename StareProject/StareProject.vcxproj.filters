@@ -33,6 +33,9 @@
     <ClCompile Include="HTMLgenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Console.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CMDparser.h">
@@ -54,6 +57,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="sqlite3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Console.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -4,56 +4,95 @@ using namespace std;
 #include "CMDparser.h"
 #include <sstream> 
 #include <fstream>
+//#include <algorithm>
 
-MetaData CMDparser::parseCMD(int argc, char *argv[])
+bool CMDparser::parseCMD(vector<string> cmdList)
 {
-	MetaData metaData;
+	//MetaData metaData;
+
+	// Change command string to lower case
+	//std::transform(cmdList[0].begin(), cmdList[0].end(), cmdList[0] , (int(*)(int))tolower);
 
 	// Select the task
-	if (argv[1] == "-learn")
+	if (cmdList[0] == "learn")
+		Learn(cmdList);
+	else if (cmdList[0] == "compare")
+		Compare(cmdList);
+	else if (cmdList[0] == "create")
+		Create(cmdList);
+	else if (cmdList[0] == "quit")
+		// return false to end message loop
+		return false;
+	else 
 	{
-		//Load learn
-		metaData.action = ActionType::Learn;
-		metaData.Author = argv[3];
-		metaData.Title = argv[4];
-		metaData.PublishDate = argv[5];
+		cout << "'" << cmdList[0] << "'" << " is not a valid command.  Type 'help' for a list of commands." << endl;
 	}
-	else if (argv[1] == "-compare")
-	{
-		// Load compare
-		metaData.action = ActionType::Compare;
-		metaData.Author = argv[3];
-		metaData.Title = argv[4];
-		metaData.PublishDate = argv[5];
-	}
-
-	else if (argv[1] == "-create")
-	{
-		// Load create
-		metaData.action = ActionType::Create;
-		metaData.Author = argv[3];
-
-	}
-	else
-	{
-		// throw serious error and kill the app.
-		// Brian needs to deal with this.  He's ignoring it for now.
-	}
-
 	// load the file from the database and insert it into DocumentText
+	return true;
+}
+
+void CMDparser::Learn(vector<string> cmdList)
+{
+	if (cmdList.size() != 5)
+	{
+		cout << "Invalid Parameters" << endl;
+		cout << "example: learn [filename][Author][Title][PublishDate]";
+		return;
+	}
+	MetaData metaData;
+	metaData.DocumentText = ReadFile(cmdList[1]);
+	metaData.action = ActionType::Learn;
+	metaData.Author = cmdList[2];
+	metaData.Title = cmdList[3];
+	metaData.PublishDate = cmdList[4];
+
+}
+void CMDparser::Compare(vector<string> cmdList)
+{
+	if (cmdList.size() != 5)
+	{
+		cout << "Invalid Parameters" << endl;
+		cout << "example: compare [filename][Author][Title][PublishDate]";
+		return;
+	}
+	MetaData metaData;
+	metaData.DocumentText = ReadFile(cmdList[1]);
+	metaData.action = ActionType::Learn;
+	metaData.Author = cmdList[2];
+	metaData.Title = cmdList[3];
+	metaData.PublishDate = cmdList[4];
+}
+void CMDparser::Create(vector<string> cmdList)
+{
+	if (cmdList.size() != 3)
+	{
+		cout << "Invalid Parameters" << endl;
+		cout << "example: learn [filename][Author]";
+		return;
+	}
+
+	MetaData metaData;
+	metaData.DocumentText = ReadFile(cmdList[1]);
+	metaData.action = ActionType::Learn;
+	metaData.Author = cmdList[2];
+}
+
+string CMDparser::ReadFile(string fileName)
+{
 	using std::ifstream;
 
-	ifstream t(argv[2]);
-
+	ifstream t(fileName);
 	std::stringstream buffer;
 
 	if (!t.is_open())
 	{
-		cout << "can't open" << argv[2] << "file for input/n";
+		cout << "can't open" << fileName << "file for input/n" << endl;
+		return "";
 	}
-	buffer << t.rdbuf();
+	else
+	{
+		buffer << t.rdbuf();
+		return buffer.str();
+	}
 
-	metaData.DocumentText = buffer.str();
-
-	return metaData;
 }

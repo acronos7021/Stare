@@ -8,6 +8,7 @@ using namespace std;
 #include <stdexcept>
 #include <iostream>
 #include <sstream>
+
 class StyleDatabase
 {
 public:
@@ -55,3 +56,4 @@ private:
 	string retrieve(string table, string data, int id) const;
 
 };
+
