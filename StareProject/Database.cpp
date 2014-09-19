@@ -1,6 +1,4 @@
 #include "Database.h"
-
-
 StyleDatabase::StyleDatabase(void)
 {
 	if (sqlite3_open("aisql.db3", &db) == SQLITE_OK)
@@ -33,6 +31,54 @@ void StyleDatabase::insert(string q)
 			sqlite3_finalize(statement);
 		}
 	}
+}
+
+void StyleDatabase::clearDatabase()
+{
+	insert("DELETE FROM Documents");
+	insert("DELETE FROM HMMTokenPaths");
+	insert("DELETE FROM Sentences");
+	insert("DELETE FROM Styles");
+	insert("DELETE FROM Tokens");
+}
+
+/* gets a Word ID */
+int StyleDatabase::getWordID(string word)
+{
+	string str = "select TokenID from Tokens where word = '" + word + "';";
+	char *query2 = &str[0];
+	int retAns = 0;
+
+	if (sqlite3_prepare(db, query2, -1, &statement, 0) == SQLITE_OK)
+	{
+		int coltotal = sqlite3_column_count(statement);
+		int res = 0;
+		while (1)
+		{
+			res = sqlite3_step(statement);
+			if (res == SQLITE_ROW)
+			{
+				for (int i = 0; i < coltotal; i++)
+				{
+					string s = (char*)sqlite3_column_text(statement, i);
+					retAns = atoi(s.c_str());
+				}
+			}
+			if (res == SQLITE_DONE || res == SQLITE_ERROR)
+			{
+				break;
+			}
+		}
+	}
+	return retAns;
+}
+
+/* Adds a Document into the Sentences DB */
+void StyleDatabase::insertIntoSentences(int docid)
+{
+	char *intStr = itoa(docid);
+	string str = string(intStr);
+	insert("INSERT INTO Sentences (DocumentID) VALUES(" + str + ");");
 }
 
 /* Adds a word into the Database */
@@ -82,6 +128,7 @@ bool StyleDatabase::doesWordExist(string word)
 	}
 }
 
+/* Inserts an Author into the Database */
 void StyleDatabase::insertAuthor(string author)
 {
 	insert("INSERT INTO Styles (Author) VALUES('" + author + "');");
@@ -118,7 +165,7 @@ int StyleDatabase::retrieveAuthorStyleID(string author)
 }
 
 
-// Use this if you want to check to see if something exists in the database
+/* Use this if you want to check to see if something exists in the database */
 int StyleDatabase::retrieve(string table, string data, string searchType, string searchData)
 {
 	string str = "select " + data + " from " + table + " where " + searchType + " = '" + searchData + "';";
@@ -206,7 +253,36 @@ int StyleDatabase::insertDocument(bool &alreadyExists, string Author, string Tit
 // I believe this will be best handled on the server side using a stored procedure
 int StyleDatabase::insertSentence(int DocumentID, vector<string> words)
 {
-	// CALL insertSentence(DocumentID, words)
+	int count = 0;
+	while (count < words.size())
+	{
+		if (words[count - 1].compare(NULL))
+		{
+			if (words[count + 1].compare(NULL))
+			{
+				// Add words[count] only
+			}
+			else {
+				// Add words[count] and words[count]+1
+			}
+		}
+		else if (words[count + 1].compare(NULL))
+		{
+			if (words[count - 1].compare(NULL))
+			{
+				// Add words[count] only
+			}
+			else {
+				// Add words[count] and words[count]-1
+			}
+		}
+		else {
+			// add words[count], words[count+1], words[count-1]
+		}
+
+		insertIntoSentences(DocumentID);
+		count = count + 1;
+	}
 	return 0;
 }
 

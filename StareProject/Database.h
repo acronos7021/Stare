@@ -44,6 +44,9 @@ public:
 		
 	//Returns a list of all of the SentenceIDs where that combination of words exists in all documents of the selected style. 
 	vector<int> getWordGroupListByStyle(int StyleID, string prevWord, string currWord, string nextWord);
+
+	void clearDatabase();
+
 private:
 	sqlite3* db;
 	sqlite3_stmt *statement;
@@ -57,6 +60,8 @@ private:
 	void insertAuthor(string author);
 	int retrieveAuthorStyleID(string author);
 	void insertDocument( int styleID, string title);
+	void insertIntoSentences(int docId);
+
 
 	bool doesWordExist(string word);
 	void addWord(string word);
