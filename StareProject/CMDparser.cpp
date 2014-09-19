@@ -155,5 +155,8 @@ void CMDparser::Leven(vector<string> cmdParams)
 
 void CMDparser::Brian(vector<string> cmdParams)
 {
+	cout << "The int on our platform is " << (sizeof(int)*8) << " bits" << endl;
+	cout << "The long on our platform is " << (sizeof(long)* 8) << " bits" << endl; 
+	cout << "The long long on our platform is " << (sizeof(long long)* 8) << " bits" << endl;
 
 }
