@@ -35,3 +35,4 @@ void Console::MessageLoop(int argc, char *argv[])
 	} while (cmdParser.parseCMD(cmdLst));
 
 }
+
