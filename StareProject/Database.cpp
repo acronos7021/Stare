@@ -6,31 +6,7 @@ StyleDatabase::StyleDatabase(void)
 	if (sqlite3_open("aisql.db3", &db) == SQLITE_OK)
 	{
 
-		//char *query2 = "select * from Tokens where TokenID=1";
-		//if (sqlite3_prepare(db, query2, -1, &statement, 0) == SQLITE_OK)
-		//{
-		//	int coltotal = sqlite3_column_count(statement);
-		//	int res = 0;
-		//	while (1)
-		//	{
-		//		res = sqlite3_step(statement);
-		//		if (res == SQLITE_ROW)
-		//		{
-		//			for (int i = 0; i < coltotal; i++)
-		//			{
-		//				string s = (char*)sqlite3_column_text(statement, i);
-		//				cout << s << endl;
-		//			}
-		//		}
-		//		if (res == SQLITE_DONE || res == SQLITE_ERROR)
-		//		{
-		//			break;
-		//		}
-		//	}
-		}
-
-
-		//sqlite3_prepare(db, query,-1,&statement,0)
+	}
 	else {
 		throw exception("SQLite database failed to open");
 	}
@@ -58,6 +34,89 @@ void StyleDatabase::insert(string q)
 		}
 	}
 }
+
+/* Adds a word into the Database */
+void StyleDatabase::addWord(string word)
+{
+	insert("INSERT INTO Tokens (Word) VALUES('" + word + "');");
+}
+
+/* Checks to see if a Word exists; true if it does -- false if it doesn't */
+bool StyleDatabase::doesWordExist(string word)
+{
+	string str = "select TokenID from Tokens where word = '" + word + "';";
+	char *query2 = &str[0];
+	bool retAns = false;
+
+	if (sqlite3_prepare(db, query2, -1, &statement, 0) == SQLITE_OK)
+	{
+		int coltotal = sqlite3_column_count(statement);
+		int res = 0;
+		while (1)
+		{
+			res = sqlite3_step(statement);
+			if (res == SQLITE_ROW)
+			{
+				for (int i = 0; i < coltotal; i++)
+				{
+					string s = (char*)sqlite3_column_text(statement, i);
+					retAns = atoi(s.c_str());
+				}
+			}
+			if (res == SQLITE_DONE || res == SQLITE_ERROR)
+			{
+				break;
+			}
+		}
+
+		/* retAns is set to false if the word isn't found; otherwise it's set to true */
+		if (retAns == NULL)
+		{
+			retAns = false;
+		}
+		else {
+			retAns = true;
+		}
+
+		return retAns;
+	}
+}
+
+void StyleDatabase::insertAuthor(string author)
+{
+	insert("INSERT INTO Styles (Author) VALUES('" + author + "');");
+}
+
+/* Retrieve the Author Style */
+int StyleDatabase::retrieveAuthorStyleID(string author)
+{
+	string str = "select StyleID from Styles where author = '" + author + "';";
+	char *query2 = &str[0];
+	int retAns = 0;
+
+	if (sqlite3_prepare(db, query2, -1, &statement, 0) == SQLITE_OK)
+	{
+		int coltotal = sqlite3_column_count(statement);
+		int res = 0;
+		while (1)
+		{
+			res = sqlite3_step(statement);
+			if (res == SQLITE_ROW)
+			{
+				for (int i = 0; i < coltotal; i++)
+				{
+					string s = (char*)sqlite3_column_text(statement, i);
+					retAns = atoi(s.c_str());
+				}
+			}
+			if (res == SQLITE_DONE || res == SQLITE_ERROR)
+			{
+				break;
+			}
+		}
+	}
+}
+
 
 // Use this if you want to check to see if something exists in the database
 int StyleDatabase::retrieve(string table, string data, string searchType, string searchData)
@@ -97,6 +156,12 @@ int StyleDatabase::retrieve(string table, string data, string searchType, string
 	return retAns;
 }
 
+void StyleDatabase::insertDocument(int styleID, string title)
+{
+	insert("INSERT INTO Documents (StyleID,Title) VALUES('" + styleID + "','" + title + "');");
+}
+
+
 //Use this to create a new Document
 //  First check if the document already exists in the database.
 // if it does, just return that ID.
@@ -113,12 +178,12 @@ int StyleDatabase::insertDocument(bool &alreadyExists, string Author, string Tit
 		int checkTwo = retrieve("Styles", "id", "Author", Author);
 		if (checkTwo == 0)
 		{
-			// Add Author
-			// Add Document
-			// Return DocID
+			insertAuthor(Author);
+			retInt = retrieveAuthorStyleID(Author);
+			insertDocument(retInt, Title);
 		}
 		else {
-			// Return Doc ID
+			retInt = retrieveAuthorStyleID(Author);
 		}
 	}
 	else {

@@ -48,10 +48,18 @@ private:
 	sqlite3_stmt *statement;
 	stringstream strm;
 
+	/* Use these minimally -- use the wrapper functions instead */
 	void insert(string query);
 	int retrieve(string table, string data, string searchType, string searchData);
-	int retrieve(string table, string data, int id);
-	string retrieve(string table, string data) const;
-	string retrieve(string table, string data, int id) const;
+
+	/* Wrapper Functions */
+	void insertAuthor(string author);
+	int retrieveAuthorStyleID(string author);
+	void insertDocument( int styleID, string title);
+
+	bool doesWordExist(string word);
+	void addWord(string word);
+	int getWordID(string word);
+
 
 };
