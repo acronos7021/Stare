@@ -24,6 +24,12 @@ vector<string> Tokenizer::getCommands(string cmdStr)
 	vector<string> words;
 	stringstream ss;
 
+	// I was too lazy to implement a full state machine.  However...
+	// Uses 3 states to determine the action at a character position.  They are:
+	// inWord==false, inQuotes==false :  this state means that any non Alphanums are dumped until a proper alphanum is encountered
+	// inWord==true, inQuotes==false  :  This state meant that any alphanums are added to the current word until a non-alphanum is encountered
+	// inWord==true, inQuotes==false  :  Anything, whether alphanum or not, is added to the current word until another '"' is encountered.
+
 	bool inWord = false;   // if inWord, all alphanumeric 
 	bool inQuotes = false; // if inQuotes is true, all characters are recorded into the current ss until another quote is encountered.
 

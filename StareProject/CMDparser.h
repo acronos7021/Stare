@@ -19,5 +19,13 @@ public:
 
 	string ReadFile(string fileName);
 
+	void Brandon(vector<string> cmdList);
+	void Blake(vector<string> cmdList);
+	void Sam(vector<string> cmdList);
+	void Hiep(vector<string> cmdList);
+	void Leven(vector<string> cmdList);
+	void Brian(vector<string> cmdList);
+
+
 };
 

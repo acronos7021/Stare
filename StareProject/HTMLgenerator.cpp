@@ -63,7 +63,7 @@ HTMLgenerator::HTMLgenerator(string DestinationFilename, int documentID, vector<
 
 	//Basically I just want to take the contents of the footer.txt file and put it in the output stream here
 	// If you can do it better, please do.
-	ifstream infile;
+//	ifstream infile;
 	string footer;
 	infile.open("html/footer.txt");
 	infile >> footer;

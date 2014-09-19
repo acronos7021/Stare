@@ -76,15 +76,19 @@ int StyleDatabase::getWordID(string word)
 /* Adds a Document into the Sentences DB */
 void StyleDatabase::insertIntoSentences(int docid)
 {
-	char *intStr = itoa(docid);
-	string str = string(intStr);
-	insert("INSERT INTO Sentences (DocumentID) VALUES(" + str + ");");
+//	char *intStr = itoa(docid);
+//	string str = string(intStr);
+//	insert("INSERT INTO Sentences (DocumentID) VALUES(" + str + ");");
+	string str = "INSERT INTO Sentences (DocumentID) VALUES(" + std::to_string(docid) + ");";
+	insert(str);
 }
 
 /* Adds a word into the Database */
 void StyleDatabase::addWord(string word)
 {
-	insert("INSERT INTO Tokens (Word) VALUES('" + word + "');");
+//	insert("INSERT INTO Tokens (Word) VALUES('" + word + "');");
+	string str = "INSERT INTO Sentences (DocumentID) VALUES(" + word + "');";
+	insert(str);
 }
 
 /* Checks to see if a Word exists; true if it does -- false if it doesn't */
@@ -131,7 +135,9 @@ bool StyleDatabase::doesWordExist(string word)
 /* Inserts an Author into the Database */
 void StyleDatabase::insertAuthor(string author)
 {
-	insert("INSERT INTO Styles (Author) VALUES('" + author + "');");
+//	insert("INSERT INTO Styles (Author) VALUES('" + author + "');");
+	string str = "INSERT INTO Styles (Author) VALUES('" + author + "');";
+	insert(str);
 }
 
 /* Retrieve the Author Style */
@@ -162,6 +168,7 @@ int StyleDatabase::retrieveAuthorStyleID(string author)
 			}
 		}
 	}
+	return retAns;
 }
 
 
@@ -205,7 +212,8 @@ int StyleDatabase::retrieve(string table, string data, string searchType, string
 
 void StyleDatabase::insertDocument(int styleID, string title)
 {
-	insert("INSERT INTO Documents (StyleID,Title) VALUES('" + styleID + "','" + title + "');");
+	string str = "INSERT INTO Documents (StyleID,Title) VALUES('" + std::to_string(styleID) + "','" + title + "');";
+	insert(str);
 }
 
 
