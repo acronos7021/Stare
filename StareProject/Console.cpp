@@ -1,7 +1,7 @@
 #include "Console.h"
 #include "CMDparser.h"
 #include "Tokenizer.h"
-
+#include "Database.h"
 
 Console::Console()
 {
@@ -15,6 +15,8 @@ Console::~Console()
 void Console::MessageLoop(int argc, char *argv[])
 {
 	std::cout << "Welcome to the Stare plagerism detector." << endl;
+
+
 	CMDparser cmdParser;
 	if (argc > 1)
 	{
@@ -33,6 +35,7 @@ void Console::MessageLoop(int argc, char *argv[])
 		std::getline(std::cin, cmdStr);
 		cmdLst = Tokenizer::getCommands(cmdStr);
 	} while (cmdParser.parseCMD(cmdLst));
+	system("pause");
 
 }
 

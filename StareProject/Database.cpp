@@ -18,8 +18,9 @@ StyleDatabase::~StyleDatabase(void)
 
 void StyleDatabase::insert(string q)
 {
-	strm << q;
-	string s = strm.str();
+	stringstream b;
+	b << q;
+	string s = b.str();
 	char *str = &s[0];
 	int result;
 	char *query = str;
@@ -44,7 +45,7 @@ void StyleDatabase::clearDatabase()
 
 void StyleDatabase::addHMMTokenPath(int SentID, int StyleID, int CurToken, int NextToken, int PrevToken)
 {
-	insert("INSERT INTO HMMTokenPaths (SentenceID,StyleID,CurrentToken,NextToken,PreviousToken) VALUES('" + std::to_string(SentID) + "','" + std::to_string(StyleID) + "','" + std::to_string(CurToken) + "','" + std::to_string(NextToken) + "','"+std::to_string(PrevToken)+"');");
+	insert("INSERT INTO HMMTokenPaths (SentenceID,StyleID,CurrentToken,NextToken,PreviousToken) VALUES(" + std::to_string(SentID) + "," + std::to_string(StyleID) + "," + std::to_string(CurToken) + "," + std::to_string(NextToken) + ","+std::to_string(PrevToken)+");");
 }
 
 /* gets a Word ID */
@@ -81,9 +82,6 @@ int StyleDatabase::getWordID(string word)
 /* Adds a Document into the Sentences DB */
 void StyleDatabase::insertIntoSentences(int docid)
 {
-//	char *intStr = itoa(docid);
-//	string str = string(intStr);
-//	insert("INSERT INTO Sentences (DocumentID) VALUES(" + str + ");");
 	string str = "INSERT INTO Sentences (DocumentID) VALUES(" + std::to_string(docid) + ");";
 	insert(str);
 }
@@ -91,8 +89,7 @@ void StyleDatabase::insertIntoSentences(int docid)
 /* Adds a word into the Database */
 void StyleDatabase::addWord(string word)
 {
-//	insert("INSERT INTO Tokens (Word) VALUES('" + word + "');");
-	string str = "INSERT INTO Sentences (DocumentID) VALUES(" + word + "');";
+	string str = "INSERT INTO Tokens (Word) VALUES('" + word + "');";
 	insert(str);
 }
 
@@ -140,7 +137,6 @@ bool StyleDatabase::doesWordExist(string word)
 /* Inserts an Author into the Database */
 void StyleDatabase::insertAuthor(string author)
 {
-//	insert("INSERT INTO Styles (Author) VALUES('" + author + "');");
 	string str = "INSERT INTO Styles (Author) VALUES('" + author + "');";
 	insert(str);
 }
@@ -236,12 +232,43 @@ int StyleDatabase::getSentenceID(int docid)
 	return retAns;
 }
 
+int StyleDatabase::getDocumentID(string title)
+{
+	string str = "select DocumentID from Documents where title = '" + title + "';";
+	char *query2 = &str[0];
+	int retAns = 0;
+
+	if (sqlite3_prepare(db, query2, -1, &statement, 0) == SQLITE_OK)
+	{
+		int coltotal = sqlite3_column_count(statement);
+		int res = 0;
+		while (1)
+		{
+			res = sqlite3_step(statement);
+			if (res == SQLITE_ROW)
+			{
+				for (int i = 0; i < coltotal; i++)
+				{
+					string s = (char*)sqlite3_column_text(statement, i);
+					retAns = atoi(s.c_str());
+				}
+			}
+			if (res == SQLITE_DONE || res == SQLITE_ERROR)
+			{
+				break;
+			}
+		}
+	}
+	return retAns;
+}
+
 /* Use this if you want to check to see if something exists in the database */
 int StyleDatabase::retrieve(string table, string data, string searchType, string searchData)
 {
 	string str = "select " + data + " from " + table + " where " + searchType + " = '" + searchData + "';";
 	char *query2 = &str[0];
 	int retAns = 0;
+	//cout << &str[0] << endl;
 
 	if (sqlite3_prepare(db, query2, -1, &statement, 0) == SQLITE_OK)
 	{
@@ -270,7 +297,9 @@ int StyleDatabase::retrieve(string table, string data, string searchType, string
 			}
 		}
 	}
-
+	else {
+		cout << "Possible SQL Error" << endl;
+	}
 	return retAns;
 }
 
@@ -288,13 +317,13 @@ void StyleDatabase::insertDocument(int styleID, string title)
 // if not, add it to the Style table then create new document.  
 // returns the DocumentID of the new Document.
 // I believe this will be best handled on the server side using a stored procedure
-int StyleDatabase::insertDocument(bool &alreadyExists, string Author, string Title, string publishDate)
+int StyleDatabase::insertDocument(string Author, string Title, string publishDate)
 {
-	int check = retrieve("Documents", "id", "title", Title);
+	int check = retrieve("Documents", "DocumentID", "title", Title);
 	int retInt = 0; /* The actual return value */
 	if (check == 0)
 	{
-		int checkTwo = retrieve("Styles", "id", "Author", Author);
+		int checkTwo = retrieve("Styles", "StyleID", "Author", Author);
 		if (checkTwo == 0)
 		{
 			insertAuthor(Author);
@@ -306,7 +335,7 @@ int StyleDatabase::insertDocument(bool &alreadyExists, string Author, string Tit
 		}
 	}
 	else {
-		retInt = check;
+		retInt = getDocumentID(Title);
 	}
 
 	return retInt;
@@ -326,10 +355,13 @@ int StyleDatabase::insertDocument(bool &alreadyExists, string Author, string Tit
 int StyleDatabase::insertSentence(int DocumentID, vector<string> words)
 {
 	int count = 0;
+	insertIntoSentences(DocumentID);
+	int sentID = getSentenceID(DocumentID);
+	int styleID = getStyleID(DocumentID);
+
 	while (count < words.size())
 	{
 
-		insertIntoSentences(DocumentID);
 		/* Check for tokens and add */
 		bool checkToken = doesWordExist(words[count]);
 		if (checkToken == true)
@@ -340,27 +372,35 @@ int StyleDatabase::insertSentence(int DocumentID, vector<string> words)
 			addWord(words[count]);
 		}
 
+		string curToken = words[count];
+
 		if (count - 1 < 0 || count + 1 > words.size())
 		{
-			string curToken = words[count];
 			if (count + 1 > words.size())
 			{
-				addHMMTokenPath(getSentenceID(DocumentID), getStyleID(DocumentID), getWordID(curToken), -1, -1);
+				addHMMTokenPath(sentID, styleID, getWordID(curToken), -1, -1);
 			}
 			else {
 				string nextToken = words[count + 1];
-				addHMMTokenPath(getSentenceID(DocumentID), getStyleID(DocumentID), getWordID(curToken), getWordID(nextToken), -1);
+				addHMMTokenPath(sentID, styleID, getWordID(curToken), getWordID(nextToken), -1);
 			}
-
 		}
 		else {
-			string curToken = words[count];
-			string nextToken = words[count + 1];
-			string prevToken = words[count - 1];
-			addHMMTokenPath(getSentenceID(DocumentID), getStyleID(DocumentID), getWordID(curToken), getWordID(nextToken), getWordID(prevToken));
+
+			if (count + 1 > words.size())
+			{
+				string curToken = words[count];
+				string prevToken = words[count - 1];
+				addHMMTokenPath(getSentenceID(DocumentID), getStyleID(DocumentID), getWordID(curToken), -1, getWordID(prevToken));
+			}
+			else {
+				string curToken = words[count];
+				string nextToken = words[count + 1];
+				string prevToken = words[count - 1];
+				addHMMTokenPath(getSentenceID(DocumentID), getStyleID(DocumentID), getWordID(curToken), getWordID(nextToken), getWordID(prevToken));
+
+			}
 		}
-
-
 		count = count + 1;
 	}
 	return getSentenceID(DocumentID);
@@ -500,4 +540,15 @@ vector<int> StyleDatabase::getWordGroupListByStyle(int StyleID, string prevWord,
 	}
 
 	return tokens;
+}
+
+// Test function
+vector<string> StyleDatabase::testFunc()
+{
+	vector<string> test;
+	test[0] = "this";
+	test[1] = "is";
+	test[2] = "a";
+	test[3] = "test";
+	return test;
 }

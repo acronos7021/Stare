@@ -18,7 +18,7 @@ public:
 	//Use this to create a new Document
 	//  if a Style (author) doesn’t exist and add it to the Style table.  
 	//returns the DocumentID of the new Document.
-	int insertDocument(bool &alreadyExists, string Author, string Title, string publishDate);
+	int insertDocument(string Author, string Title, string publishDate);
 
 	// Used to add a sentence
 	// This would:
@@ -46,11 +46,12 @@ public:
 	vector<int> getWordGroupListByStyle(int StyleID, string prevWord, string currWord, string nextWord);
 
 	void clearDatabase();
+	vector<string> testFunc(); // Remove after testing
 
 private:
 	sqlite3* db;
 	sqlite3_stmt *statement;
-	stringstream strm;
+	//stringstream strm;
 
 	/* Use these minimally -- use the wrapper functions instead */
 	void insert(string query);
@@ -67,7 +68,7 @@ private:
 	bool doesWordExist(string word);
 	void addWord(string word);
 	int getWordID(string word);
-
+	int getDocumentID(string title);
 
 
 };

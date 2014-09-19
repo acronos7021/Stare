@@ -30,7 +30,7 @@ int HMMengine::learn(MetaData metaData)
 
 	// add the metadata to the database.
 	bool alreadyExists;
-	int documentID = styleDB.insertDocument(alreadyExists, metaData.Author, metaData.Title, metaData.PublishDate);
+	int documentID = styleDB.insertDocument( metaData.Author, metaData.Title, metaData.PublishDate);
 	// add the document's sentences to the database.
 	if (!alreadyExists)
 	{
