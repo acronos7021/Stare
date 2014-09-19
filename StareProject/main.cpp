@@ -4,6 +4,7 @@ using namespace std;
 #include <vector>
 #include "CMDparser.h"
 #include "HMMengine.h"
+#include "Console.h"
 
 int main(int argc, char *argv[])
 {
@@ -11,7 +12,10 @@ int main(int argc, char *argv[])
 
 	//HMMengine hGen = HMMengine(md);
 
-	StyleDatabase myDb;
+	Console c;
+	c.MessageLoop(argc, argv);
 
-	system("pause");
+	//StyleDatabase myDb;
+
+	//system("pause");
 }

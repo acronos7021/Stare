@@ -25,7 +25,8 @@ bool CMDparser::parseCMD(vector<string> cmdList)
 		return false;
 	else 
 	{
-		cout << "'" << cmdList[0] << "'" << " is not a valid command.  Type 'help' for a list of commands." << endl;
+		cout << "'" << cmdList[0] << "'" << " is not a valid command." << endl;
+		cout << "Type 'help' for a list of commands." << endl;
 	}
 	// load the file from the database and insert it into DocumentText
 	return true;
@@ -52,7 +53,7 @@ void CMDparser::Compare(vector<string> cmdList)
 	if (cmdList.size() != 5)
 	{
 		cout << "Invalid Parameters" << endl;
-		cout << "example: compare [filename][Author][Title][PublishDate]";
+		cout << "example: compare [filename][Author][Title][PublishDate]" << endl;
 		return;
 	}
 	MetaData metaData;
@@ -67,7 +68,7 @@ void CMDparser::Create(vector<string> cmdList)
 	if (cmdList.size() != 3)
 	{
 		cout << "Invalid Parameters" << endl;
-		cout << "example: learn [filename][Author]";
+		cout << "example: learn [filename][Author]" << endl;
 		return;
 	}
 

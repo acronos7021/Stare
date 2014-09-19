@@ -14,7 +14,7 @@ Console::~Console()
 
 void Console::MessageLoop(int argc, char *argv[])
 {
-	std::cout << "Welcome to the Stare plagerism detector.";
+	std::cout << "Welcome to the Stare plagerism detector." << endl;
 	CMDparser cmdParser;
 	if (argc > 1)
 	{
@@ -28,7 +28,7 @@ void Console::MessageLoop(int argc, char *argv[])
 	string cmdStr;
 	do
 	{
-		std::cout << ">>" << endl;
+		std::cout << ">>  " ;
 		std::cin >> cmdStr;
 	} while (cmdParser.parseCMD(Tokenizer(cmdStr).getNextSentence()));
 
