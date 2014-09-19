@@ -42,6 +42,11 @@ void StyleDatabase::clearDatabase()
 	insert("DELETE FROM Tokens");
 }
 
+void StyleDatabase::addHMMTokenPath(int SentID, int StyleID, int CurToken, int NextToken, int PrevToken)
+{
+	insert("INSERT INTO HMMTokenPaths (SentenceID,StyleID,CurrentToken,NextToken,PreviousToken) VALUES('','','','','','')");
+}
+
 /* gets a Word ID */
 int StyleDatabase::getWordID(string word)
 {
@@ -264,6 +269,18 @@ int StyleDatabase::insertSentence(int DocumentID, vector<string> words)
 	int count = 0;
 	while (count < words.size())
 	{
+		/* Check for tokens and add */
+		bool checkToken = doesWordExist(words[count]);
+
+		if (checkToken == true)
+		{
+			// Do Nothing
+		}
+		else {
+			addWord(words[count]);
+		}
+
+		// HMMTokenPath
 		if (words[count - 1].compare(NULL))
 		{
 			if (words[count + 1].compare(NULL))

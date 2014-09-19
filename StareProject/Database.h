@@ -61,7 +61,7 @@ private:
 	int retrieveAuthorStyleID(string author);
 	void insertDocument( int styleID, string title);
 	void insertIntoSentences(int docId);
-
+	void addHMMTokenPath(int SentID, int StyleID, int CurToken, int NextToken, int PrevToken);
 
 	bool doesWordExist(string word);
 	void addWord(string word);
