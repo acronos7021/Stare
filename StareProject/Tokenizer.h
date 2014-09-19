@@ -12,6 +12,9 @@ public:
 	// returns an empty vector if there is no next sentence.
 	vector<string> getNextSentence();
 
+	static vector<string> getCommands(string cmdStr);
+	static bool isAlphaNumeric(char c);
+
 private:
 	int nextChar;
 

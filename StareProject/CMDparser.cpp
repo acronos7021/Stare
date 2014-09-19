@@ -12,6 +12,8 @@ bool CMDparser::parseCMD(vector<string> cmdList)
 
 	// Change command string to lower case
 	//std::transform(cmdList[0].begin(), cmdList[0].end(), cmdList[0] , (int(*)(int))tolower);
+	if (cmdList.size() <= 0)
+		return true;  // The string was empty.
 
 	// Select the task
 	if (cmdList[0] == "learn")
@@ -20,6 +22,11 @@ bool CMDparser::parseCMD(vector<string> cmdList)
 		Compare(cmdList);
 	else if (cmdList[0] == "create")
 		Create(cmdList);
+	else if (cmdList[0] == "help")
+	{
+		cout << "The commands are : 'quit', 'learn', 'compare', 'create', 'help'" << endl;
+		cout << "For help on a specific command, type the command without arguments." << endl;
+	}
 	else if (cmdList[0] == "quit")
 		// return false to end message loop
 		return false;
@@ -36,8 +43,10 @@ void CMDparser::Learn(vector<string> cmdList)
 {
 	if (cmdList.size() != 5)
 	{
-		cout << "Invalid Parameters" << endl;
-		cout << "example: learn [filename][Author][Title][PublishDate]";
+		if (cmdList.size() != 1) // it is not a request for help
+			cout << "Invalid Parameters" << endl;
+		cout << "example: learn [filename][Author][Title][PublishDate]" << endl;
+		cout << "All arguements should be in quotes." << endl;
 		return;
 	}
 	MetaData metaData;
@@ -52,8 +61,10 @@ void CMDparser::Compare(vector<string> cmdList)
 {
 	if (cmdList.size() != 5)
 	{
-		cout << "Invalid Parameters" << endl;
+		if (cmdList.size() != 1) // it is not a request for help
+			cout << "Invalid Parameters" << endl;
 		cout << "example: compare [filename][Author][Title][PublishDate]" << endl;
+		cout << "All arguements should be in quotes." << endl;
 		return;
 	}
 	MetaData metaData;
@@ -67,8 +78,10 @@ void CMDparser::Create(vector<string> cmdList)
 {
 	if (cmdList.size() != 3)
 	{
-		cout << "Invalid Parameters" << endl;
+		if (cmdList.size() != 1) // it is not a request for help
+			cout << "Invalid Parameters" << endl;
 		cout << "example: learn [filename][Author]" << endl;
+		cout << "All arguements should be in quotes." << endl;
 		return;
 	}
 
@@ -87,7 +100,7 @@ string CMDparser::ReadFile(string fileName)
 
 	if (!t.is_open())
 	{
-		cout << "can't open" << fileName << "file for input/n" << endl;
+		cout << "can't open '" << fileName << "' file for input" << endl;
 		return "";
 	}
 	else

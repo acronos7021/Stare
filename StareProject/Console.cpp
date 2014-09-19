@@ -25,11 +25,13 @@ void Console::MessageLoop(int argc, char *argv[])
 			commandList.push_back(argv[i]);
 		cmdParser.parseCMD(commandList);
 	}
+	vector<string> cmdLst;
 	string cmdStr;
 	do
 	{
-		std::cout << ">>  " ;
-		std::cin >> cmdStr;
-	} while (cmdParser.parseCMD(Tokenizer(cmdStr).getNextSentence()));
+		std::cout << endl << ">>  " ;
+		std::getline(std::cin, cmdStr);
+		cmdLst = Tokenizer::getCommands(cmdStr);
+	} while (cmdParser.parseCMD(cmdLst));
 
 }
