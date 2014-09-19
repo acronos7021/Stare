@@ -387,7 +387,7 @@ int StyleDatabase::insertSentence(int DocumentID, vector<string> words)
 		}
 		else {
 
-			if (count + 1 > words.size())
+			if (count + 1 >= words.size())
 			{
 				string curToken = words[count];
 				string prevToken = words[count - 1];
