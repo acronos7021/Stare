@@ -44,7 +44,7 @@ void StyleDatabase::clearDatabase()
 
 void StyleDatabase::addHMMTokenPath(int SentID, int StyleID, int CurToken, int NextToken, int PrevToken)
 {
-	insert("INSERT INTO HMMTokenPaths (SentenceID,StyleID,CurrentToken,NextToken,PreviousToken) VALUES('" + std::to_string(SentID) + "','" + std::to_string(StyleID) + "','" + std::to_string(CurToken) + "','" + std::to_string(NextToken) + "','"std::to_string(PrevToken)"');");
+	insert("INSERT INTO HMMTokenPaths (SentenceID,StyleID,CurrentToken,NextToken,PreviousToken) VALUES('" + std::to_string(SentID) + "','" + std::to_string(StyleID) + "','" + std::to_string(CurToken) + "','" + std::to_string(NextToken) + "','"+std::to_string(PrevToken)+"');");
 }
 
 /* gets a Word ID */
@@ -176,6 +176,65 @@ int StyleDatabase::retrieveAuthorStyleID(string author)
 	return retAns;
 }
 
+int StyleDatabase::getStyleID(int docID)
+{
+	string str = "select StyleID from Documents where DocumentID = " + std::to_string(docID) + ";";
+	char *query2 = &str[0];
+	int retAns = 0;
+
+	if (sqlite3_prepare(db, query2, -1, &statement, 0) == SQLITE_OK)
+	{
+		int coltotal = sqlite3_column_count(statement);
+		int res = 0;
+		while (1)
+		{
+			res = sqlite3_step(statement);
+			if (res == SQLITE_ROW)
+			{
+				for (int i = 0; i < coltotal; i++)
+				{
+					string s = (char*)sqlite3_column_text(statement, i);
+					retAns = atoi(s.c_str());
+				}
+			}
+			if (res == SQLITE_DONE || res == SQLITE_ERROR)
+			{
+				break;
+			}
+		}
+	}
+	return retAns;
+}
+
+int StyleDatabase::getSentenceID(int docid)
+{
+	string str = "select SentenceID from Sentences where DocumentID = " + std::to_string(docid) + ";";
+	char *query2 = &str[0];
+	int retAns = 0;
+
+	if (sqlite3_prepare(db, query2, -1, &statement, 0) == SQLITE_OK)
+	{
+		int coltotal = sqlite3_column_count(statement);
+		int res = 0;
+		while (1)
+		{
+			res = sqlite3_step(statement);
+			if (res == SQLITE_ROW)
+			{
+				for (int i = 0; i < coltotal; i++)
+				{
+					string s = (char*)sqlite3_column_text(statement, i);
+					retAns = atoi(s.c_str());
+				}
+			}
+			if (res == SQLITE_DONE || res == SQLITE_ERROR)
+			{
+				break;
+			}
+		}
+	}
+	return retAns;
+}
 
 /* Use this if you want to check to see if something exists in the database */
 int StyleDatabase::retrieve(string table, string data, string searchType, string searchData)
@@ -269,9 +328,10 @@ int StyleDatabase::insertSentence(int DocumentID, vector<string> words)
 	int count = 0;
 	while (count < words.size())
 	{
+
+		insertIntoSentences(DocumentID);
 		/* Check for tokens and add */
 		bool checkToken = doesWordExist(words[count]);
-
 		if (checkToken == true)
 		{
 			// Do Nothing
@@ -280,69 +340,129 @@ int StyleDatabase::insertSentence(int DocumentID, vector<string> words)
 			addWord(words[count]);
 		}
 
-		// HMMTokenPath
-		if (words[count - 1].compare(NULL))
+		if (count - 1 < 0 || count + 1 > words.size())
 		{
-			if (words[count + 1].compare(NULL))
+			string curToken = words[count];
+			if (count + 1 > words.size())
 			{
-				// Add words[count] only
+				addHMMTokenPath(getSentenceID(DocumentID), getStyleID(DocumentID), getWordID(curToken), -1, -1);
 			}
 			else {
-				// Add words[count] and words[count]+1
+				string nextToken = words[count + 1];
+				addHMMTokenPath(getSentenceID(DocumentID), getStyleID(DocumentID), getWordID(curToken), getWordID(nextToken), -1);
 			}
-		}
-		else if (words[count + 1].compare(NULL))
-		{
-			if (words[count - 1].compare(NULL))
-			{
-				// Add words[count] only
-			}
-			else {
-				// Add words[count] and words[count]-1
-			}
+
 		}
 		else {
-			// add words[count], words[count+1], words[count-1]
+			string curToken = words[count];
+			string nextToken = words[count + 1];
+			string prevToken = words[count - 1];
+			addHMMTokenPath(getSentenceID(DocumentID), getStyleID(DocumentID), getWordID(curToken), getWordID(nextToken), getWordID(prevToken));
 		}
 
-		insertIntoSentences(DocumentID);
+
 		count = count + 1;
 	}
-	return 0;
+	return getSentenceID(DocumentID);
 }
 
 // Returns the string of the selected sentence. 
 string StyleDatabase::getSentence(int sentenceID)
 {
-	// SELECT Tokens.Word FROM HMMtokenPaths 
-	//    JOIN Tokens ON Tokens.TokenID = HMMtokenPaths.CurrentToken
-	//    WHERE HMMtokenPaths.SentenceID = sentenceID
-	//    ORDER BY HMMtokenPaths.TokenPathID  // this assumes the tokens were added in the database in order.
-	return "";
+	string str = "SELECT Tokens.Word FROM HMMtokenPaths JOIN Tokens ON Tokens.TokenID = HMMtokenPaths.CurrentToken WHERE HMMtokenPaths.SentenceID = sentenceID ORDER BY HMMtokenPaths.TokenPathID;";
+	string s;
+	char *query2 = &str[0];
+	int retAns = 0;
+
+	if (sqlite3_prepare(db, query2, -1, &statement, 0) == SQLITE_OK)
+	{
+		int coltotal = sqlite3_column_count(statement);
+		int res = 0;
+		while (1)
+		{
+			res = sqlite3_step(statement);
+			if (res == SQLITE_ROW)
+			{
+				for (int i = 0; i < coltotal; i++)
+				{
+					 s = (char*)sqlite3_column_text(statement, i);
+				}
+			}
+			if (res == SQLITE_DONE || res == SQLITE_ERROR)
+			{
+				break;
+			}
+		}
+	}
+
+	return s;
 }
 
 // returns the number of instances (the count) in all documents of that series of 3 words.
 //	Returns a list of the SentenceID’s for every occurance of that string. 
 int StyleDatabase::getWordGroupCount(string prevWord, string currWord, string nextWord)
 {
-	//SELECT COUNT(CurrentToken) FROM HMMtokenPaths
-	//	WHERE CurrentToken = currWord
-	//	AND NextToken = nextWord
-	//	AND PreviousToken = prevWord;
+	string str = "SELECT COUNT(CurrentToken) FROM HMMtokenPaths	WHERE CurrentToken = currWord AND NextToken = nextWord AND PreviousToken = prevWord;";
+	string s;
+	char *query2 = &str[0];
+	int retAns = 0;
 
-	return 0;
+	if (sqlite3_prepare(db, query2, -1, &statement, 0) == SQLITE_OK)
+	{
+		int coltotal = sqlite3_column_count(statement);
+		int res = 0;
+		while (1)
+		{
+			res = sqlite3_step(statement);
+			if (res == SQLITE_ROW)
+			{
+				for (int i = 0; i < coltotal; i++)
+				{
+					s = (char*)sqlite3_column_text(statement, i);
+					retAns = atoi(s.c_str());
+				}
+			}
+			if (res == SQLITE_DONE || res == SQLITE_ERROR)
+			{
+				break;
+			}
+		}
+	}
+
+	return retAns;
 }
 
 //	same as above but restricts the count to a specific style.
 int StyleDatabase::getWordGroupCountByStyle(int StyleID, string prevWord, string currWord, string nextWord)
 {
-	//SELECT COUNT(CurrentToken) FROM HMMtokenPaths
-	//	WHERE StyleID = styleID
-	//	AND CurrentToken = currWord
-	//	AND NextToken = nextWord
-	//	AND PreviousToken = prevWord;
+	//SELECT COUNT(CurrentToken) FROM HMMtokenPaths WHERE StyleID = styleID AND CurrentToken = currWord AND NextToken = nextWord AND PreviousToken = prevWord;
+	string str = "SELECT COUNT(CurrentToken) FROM HMMtokenPaths WHERE StyleID = styleID AND CurrentToken = currWord AND NextToken = nextWord AND PreviousToken = prevWord";
+	string s;
+	char *query2 = &str[0];
+	int retAns = 0;
 
-	return 0;
+	if (sqlite3_prepare(db, query2, -1, &statement, 0) == SQLITE_OK)
+	{
+		int coltotal = sqlite3_column_count(statement);
+		int res = 0;
+		while (1)
+		{
+			res = sqlite3_step(statement);
+			if (res == SQLITE_ROW)
+			{
+				for (int i = 0; i < coltotal; i++)
+				{
+					s = (char*)sqlite3_column_text(statement, i);
+					retAns = atoi(s.c_str());
+				}
+			}
+			if (res == SQLITE_DONE || res == SQLITE_ERROR)
+			{
+				break;
+			}
+		}
+	}
+	return retAns;
 }
 
 //Returns a list of all of the SentenceIDs where that combination of words exists in all documents of the selected style. 

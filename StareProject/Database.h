@@ -62,10 +62,12 @@ private:
 	void insertDocument( int styleID, string title);
 	void insertIntoSentences(int docId);
 	void addHMMTokenPath(int SentID, int StyleID, int CurToken, int NextToken, int PrevToken);
-
+	int getStyleID(int docID);
+	int getSentenceID(int docID);
 	bool doesWordExist(string word);
 	void addWord(string word);
 	int getWordID(string word);
+
 
 
 };
