@@ -51,8 +51,8 @@ void HMMengine::compare(MetaData metaData)
 
 	// do my compare thing to get sentence rankings.
 	// execut the following as a case of plagerism is discovered.
-	rankingList.push_back(sentenceRanking(compareDoc, 2, 14));
-	rankingList.push_back(sentenceRanking(compareDoc, 8, 33));
+	rankingList.push_back(sentenceRanking(compareDoc, 2, 14, 0.1));
+	rankingList.push_back(sentenceRanking(compareDoc, 8, 33, 0.2));
 
 	// pass to the HTMLgenerator all of the sentences that are found to be similiar 
 	// and the information it needs to format the output.
