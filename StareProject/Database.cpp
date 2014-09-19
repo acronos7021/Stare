@@ -468,12 +468,36 @@ int StyleDatabase::getWordGroupCountByStyle(int StyleID, string prevWord, string
 //Returns a list of all of the SentenceIDs where that combination of words exists in all documents of the selected style. 
 vector<int> StyleDatabase::getWordGroupListByStyle(int StyleID, string prevWord, string currWord, string nextWord)
 {
-	//SELECT CurrentToken FROM HMMtokenPaths
-	//	WHERE StyleID = styleID
-	//	AND CurrentToken = currWord
-	//	AND NextToken = nextWord
-	//	AND PreviousToken = prevWord;
+	string str = "SELECT CurrentToken FROM HMMtokenPaths WHERE StyleID = styleID AND CurrentToken = currWord AND NextToken = nextWord AND PreviousToken = prevWord;";
+	char *query2 = &str[0];
+	int retAns = 0;
+
 
 	vector<int> tokens;
+
+	if (sqlite3_prepare(db, query2, -1, &statement, 0) == SQLITE_OK)
+	{
+		int coltotal = sqlite3_column_count(statement);
+		int res = 0;
+		int count = 0;
+		while (1)
+		{
+			res = sqlite3_step(statement);
+			if (res == SQLITE_ROW)
+			{
+				for (int i = 0; i < coltotal; i++)
+				{
+					string s = (char*)sqlite3_column_text(statement, i);
+					tokens[count] = atoi(s.c_str());
+					count = count + 1;
+				}
+			}
+			if (res == SQLITE_DONE || res == SQLITE_ERROR)
+			{
+				break;
+			}
+		}
+	}
+
 	return tokens;
 }
