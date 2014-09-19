@@ -44,7 +44,8 @@ void StyleDatabase::clearDatabase()
 
 void StyleDatabase::addHMMTokenPath(int SentID, int StyleID, int CurToken, int NextToken, int PrevToken)
 {
-	insert("INSERT INTO HMMTokenPaths (SentenceID,StyleID,CurrentToken,NextToken,PreviousToken) VALUES('" + std::to_string(SentID) + "','" + std::to_string(StyleID) + "','" + std::to_string(CurToken) + "','" + std::to_string(NextToken) + "','"std::to_string(PrevToken)"');");
+	string str = "INSERT INTO HMMTokenPaths (SentenceID,StyleID,CurrentToken,NextToken,PreviousToken) VALUES('" + std::to_string(SentID) + "','" + std::to_string(StyleID) + "','" + std::to_string(CurToken) + "','" + std::to_string(NextToken) + "','" + std::to_string(PrevToken) + "');";
+	insert(str);
 }
 
 /* gets a Word ID */
