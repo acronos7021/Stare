@@ -149,7 +149,7 @@ int StyleDatabase::retrieveAuthorStyleID(string author)
 {
 	string str = "select StyleID from Styles where author = '" + author + "';";
 	char *query2 = &str[0];
-	int retAns = 0;
+	int retAns = -1;  // if the style isn't found, return this.
 
 	if (sqlite3_prepare(db, query2, -1, &statement, 0) == SQLITE_OK)
 	{
@@ -235,11 +235,17 @@ int StyleDatabase::getSentenceID(int docid)
 	return retAns;
 }
 
-int StyleDatabase::getDocumentID(string title)
+int StyleDatabase::getDocumentID(string Author, string title)
 {
-	string str = "select DocumentID from Documents where title = '" + title + "';";
+	int styleID = retrieveAuthorStyleID(Author);
+	return getDocumentID(styleID, title);
+}
+
+int StyleDatabase::getDocumentID(int StyleID, string title)
+{
+	string str = "select DocumentID from Documents where title = '" + title + "' AND StyleID = '" + std::to_string(StyleID) + "';";
 	char *query2 = &str[0];
-	int retAns = 0;
+	int retAns = -1; // if the document isn't found, return this.
 
 	if (sqlite3_prepare(db, query2, -1, &statement, 0) == SQLITE_OK)
 	{
@@ -306,9 +312,9 @@ int StyleDatabase::retrieve(string table, string data, string searchType, string
 	return retAns;
 }
 
-void StyleDatabase::insertDocument(int styleID, string title)
+void StyleDatabase::insertDocument(int styleID, string title, string publishDate)
 {
-	string str = "INSERT INTO Documents (StyleID,Title) VALUES('" + std::to_string(styleID) + "','" + title + "');";
+	string str = "INSERT INTO Documents (StyleID,Title,PublishDate) VALUES('" + std::to_string(styleID) + "','" + title + "','" + publishDate + "');";
 	insert(str);
 }
 
@@ -319,30 +325,49 @@ void StyleDatabase::insertDocument(int styleID, string title)
 //  Second, check if a Style (author) doesn’t exist 
 // if not, add it to the Style table then create new document.  
 // returns the DocumentID of the new Document.
-// I believe this will be best handled on the server side using a stored procedure
-int StyleDatabase::insertDocument(string Author, string Title, string publishDate)
+
+//int StyleDatabase::insertDocument(string Author, string Title, string PublishDate)
+//{
+//	int check = retrieve("Documents", "DocumentID", "title", Title);
+//	int documentID = 0; /* The actual return value */
+//	if (check == 0)
+//	{
+//		int checkTwo = retrieve("Styles", "StyleID", "Author", Author);
+//		if (checkTwo == 0)
+//		{
+//			insertAuthor(Author);
+//			int styleID = retrieveAuthorStyleID(Author);
+//			insertDocument(styleID, Title, PublishDate);
+//			documentID = getDocumentID(styleID, Title);
+//		}
+//		else {
+//			int styleID = retrieveAuthorStyleID(Author);
+//			insertDocument(styleID, Title, PublishDate);
+//			documentID = getDocumentID(styleID, Title);
+//		}
+//	}
+//	else {
+//		documentID = getDocumentID(Author, Title);
+//	}
+//	return documentID;
+//}
+
+int StyleDatabase::insertDocument(string Author, string Title, string PublishDate)
 {
-	int check = retrieve("Documents", "DocumentID", "title", Title);
-	int retInt = 0; /* The actual return value */
-	if (check == 0)
+	int documentID = getDocumentID(Author, Title);
+	if (documentID >= 0)
+		return documentID;
+	else
 	{
-		int checkTwo = retrieve("Styles", "StyleID", "Author", Author);
-		if (checkTwo == 0)
+		int styleID = retrieveAuthorStyleID(Author);
+		if (styleID < 0)
 		{
 			insertAuthor(Author);
-			retInt = retrieveAuthorStyleID(Author);
-			insertDocument(retInt, Title);
+			styleID = retrieveAuthorStyleID(Author);
 		}
-		else {
-			retInt = retrieveAuthorStyleID(Author);
-		}
-	}
-	else {
-		retInt = getDocumentID(Title);
-	}
+		insertDocument(styleID, Title, PublishDate);
 
-	return retInt;
-	
+	}
 }
 
 // Used to add a sentence

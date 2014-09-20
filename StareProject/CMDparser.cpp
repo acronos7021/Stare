@@ -170,5 +170,8 @@ void CMDparser::Brian(vector<string> cmdParams)
 	//cout << "The long long on our platform is " << (sizeof(long long)* 8) << " bits" << endl;
 	StyleDatabase test("BrianAIsql.db3");
 	test.clearDatabase();
-
+	test.insertAuthor("Brian");
+	int StyleID = test.retrieveAuthorStyleID("Brian");
+	test.insertDocument(1, "Brian book", "1996");
+	test.retrieve("Styles", "Author", "Author", "Sam");
 }

@@ -48,7 +48,7 @@ public:
 	void clearDatabase();
 	vector<string> testFunc(); // Remove after testing
 
-private:
+//private:
 	sqlite3* db;
 	sqlite3_stmt *statement;
 	//stringstream strm;
@@ -60,7 +60,7 @@ private:
 	/* Wrapper Functions */
 	void insertAuthor(string author);
 	int retrieveAuthorStyleID(string author);
-	void insertDocument( int styleID, string title);
+	void insertDocument( int styleID, string title, string publishDate);
 	void insertIntoSentences(int docId);
 	void addHMMTokenPath(int SentID, int StyleID, int CurToken, int NextToken, int PrevToken);
 	int getStyleID(int docID);
@@ -68,7 +68,9 @@ private:
 	bool doesWordExist(string word);
 	void addWord(string word);
 	int getWordID(string word);
-	int getDocumentID(string title);
+
+	int getDocumentID(string Author, string title);
+	int getDocumentID(int styleID,string title);
 
 
 };
