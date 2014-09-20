@@ -1,10 +1,12 @@
 using namespace std;
 
 
-#include "CMDparser.h"
+
 #include <sstream> 
 #include <fstream>
-//#include <algorithm>
+#include "Database.h"
+#include "CMDparser.h"
+
 
 bool CMDparser::parseCMD(vector<string> cmdList)
 {
@@ -130,7 +132,15 @@ string CMDparser::ReadFile(string fileName)
 
 void CMDparser::Brandon(vector<string> cmdParams)
 {
+	StyleDatabase test("aisql.db3");
+	int t = test.insertDocument("Test", "Test", "Test");
 
+	vector<string> testVec;
+	testVec.push_back("This");
+	testVec.push_back("is");
+	testVec.push_back("a");
+	testVec.push_back("test");
+	test.insertSentence(t, testVec);
 }
 
 void CMDparser::Blake(vector<string> cmdParams)
@@ -155,8 +165,10 @@ void CMDparser::Leven(vector<string> cmdParams)
 
 void CMDparser::Brian(vector<string> cmdParams)
 {
-	cout << "The int on our platform is " << (sizeof(int)*8) << " bits" << endl;
-	cout << "The long on our platform is " << (sizeof(long)* 8) << " bits" << endl; 
-	cout << "The long long on our platform is " << (sizeof(long long)* 8) << " bits" << endl;
+	//cout << "The int on our platform is " << (sizeof(int)*8) << " bits" << endl;
+	//cout << "The long on our platform is " << (sizeof(long)* 8) << " bits" << endl; 
+	//cout << "The long long on our platform is " << (sizeof(long long)* 8) << " bits" << endl;
+	StyleDatabase test("BrianAIsql.db3");
+	test.clearDatabase();
 
 }

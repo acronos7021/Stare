@@ -12,7 +12,7 @@ using namespace std;
 class StyleDatabase
 {
 public:
-	StyleDatabase(void);
+	StyleDatabase(string dbName);
 	~StyleDatabase(void);
 
 	//Use this to create a new Document

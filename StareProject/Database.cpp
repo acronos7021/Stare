@@ -1,7 +1,10 @@
 #include "Database.h"
-StyleDatabase::StyleDatabase(void)
+StyleDatabase::StyleDatabase(string dbName)
 {
-	if (sqlite3_open("aisql.db3", &db) == SQLITE_OK)
+	// Convert the dbName string to a format sqlite3_open needs
+	const char * c = dbName.c_str();
+
+	if (sqlite3_open(c, &db) == SQLITE_OK)
 	{
 
 	}
