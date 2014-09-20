@@ -320,7 +320,7 @@ int StyleDatabase::retrieve(string table, string data, string searchType, string
 	return retAns;
 }
 
-void StyleDatabase::insertDocument(int styleID, string title, string publishDate)
+void StyleDatabase::insertDocumentIntoDB(int styleID, string title, string publishDate)
 {
 	string str = "INSERT INTO Documents (StyleID,Title,PublishDate) VALUES('" + std::to_string(styleID) + "','" + title + "','" + publishDate + "');";
 	insert(str);
@@ -337,21 +337,23 @@ void StyleDatabase::insertDocument(int styleID, string title, string publishDate
 int StyleDatabase::insertDocument(string Author, string Title, string PublishDate)
 {
 	int documentID = getDocumentID(Author, Title);
-	if (documentID >= 0)
-		// The documnet is already in the database, so do nothing.
-		return documentID;
-	else
+	if (documentID == -1)
 	{
-		int styleID = retrieveAuthorStyleID(Author);
-		if (styleID < 0)
+		int styleID = getStyleID(documentID);
+		if (styleID == -1)
 		{
-			// the Author is not in the database.
 			insertAuthor(Author);
-			styleID = retrieveAuthorStyleID(Author);
+			insertDocumentIntoDB(getStyleID(documentID), Title, PublishDate);
 		}
-		insertDocument(styleID, Title, PublishDate);
-
+		else {
+			insertDocumentIntoDB(styleID, Title, PublishDate);
+		}
 	}
+	else {
+		// Just Return DocumentID
+	}
+
+	return documentID;
 }
 
 // Used to add a sentence

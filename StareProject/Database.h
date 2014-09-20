@@ -60,7 +60,8 @@ public:
 	/* Wrapper Functions */
 	void insertAuthor(string author);
 	int retrieveAuthorStyleID(string author);
-	void insertDocument( int styleID, string title, string publishDate);
+	void insertDocument(string author, string title, string publishDate);
+	void insertDocumentIntoDB(int styleID, string title, string publishDate);
 	void insertIntoSentences(int docId);
 	void addHMMTokenPath(int SentID, int StyleID, int CurToken, int NextToken, int PrevToken);
 	int getStyleID(int docID);

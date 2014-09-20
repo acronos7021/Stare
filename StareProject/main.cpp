@@ -16,7 +16,8 @@ int main(int argc, char *argv[])
 	Console c;
 	c.MessageLoop(argc, argv);
 
-	
+	//StyleDatabase test("aisql.db3");
+
 
 
 	//system("pause");
