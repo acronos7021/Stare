@@ -427,7 +427,7 @@ int StyleDatabase::insertSentence(int DocumentID, vector<string> words)
 		}
 		else {
 
-			if (count + 1 >= words.size()) // Didn't we already do this?  Actually, no.  You've already checked for ( count + 1 > words.size) but that didn't do anything because you needed ==.
+			if (count + 1 >= words.size()) // Didn't we already do this?  Actually, no.  You've already checked for ( count + 1 > words.size) but that didn't do anything because you needed >=.
 			{
 				string curToken = words[count];
 				string prevToken = words[count - 1]; 
@@ -467,7 +467,7 @@ int StyleDatabase::insertSentence(int DocumentID, vector<string> words)
 		}
 		*/
 	}
-	return getSentenceID(DocumentID);
+	return getSentenceID(DocumentID);  //You already have this as sentID.  The extra query is unneeded.
 }
 
 
