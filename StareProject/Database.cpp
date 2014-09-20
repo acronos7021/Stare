@@ -238,7 +238,8 @@ int StyleDatabase::getSentenceID(int docid)
 int StyleDatabase::getDocumentID(string Author, string title)
 {
 	int styleID = retrieveAuthorStyleID(Author);
-	return getDocumentID(styleID, title);
+	if (styleID == -1) return -1;
+	else return getDocumentID(styleID, title);
 }
 
 int StyleDatabase::getDocumentID(int StyleID, string title)
@@ -356,12 +357,14 @@ int StyleDatabase::insertDocument(string Author, string Title, string PublishDat
 {
 	int documentID = getDocumentID(Author, Title);
 	if (documentID >= 0)
+		// The documnet is already in the database, so do nothing.
 		return documentID;
 	else
 	{
 		int styleID = retrieveAuthorStyleID(Author);
 		if (styleID < 0)
 		{
+			// the Author is not in the database.
 			insertAuthor(Author);
 			styleID = retrieveAuthorStyleID(Author);
 		}
