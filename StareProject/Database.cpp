@@ -462,7 +462,7 @@ string StyleDatabase::getSentence(int sentenceID)
 //	Returns a list of the SentenceID’s for every occurance of that string. 
 int StyleDatabase::getWordGroupCount(string prevWord, string currWord, string nextWord)
 {
-	string str = "SELECT COUNT(CurrentToken) FROM HMMtokenPaths	WHERE CurrentToken = currWord AND NextToken = nextWord AND PreviousToken = prevWord;";
+	string str = "SELECT COUNT(CurrentToken) FROM HMMtokenPaths	WHERE CurrentToken = '"+currWord+"' AND NextToken = '"+nextWord+"' AND PreviousToken = '"+prevWord+"';";
 	string s;
 	char *query2 = &str[0];
 	int retAns = 0;
@@ -496,7 +496,7 @@ int StyleDatabase::getWordGroupCount(string prevWord, string currWord, string ne
 int StyleDatabase::getWordGroupCountByStyle(int StyleID, string prevWord, string currWord, string nextWord)
 {
 	//SELECT COUNT(CurrentToken) FROM HMMtokenPaths WHERE StyleID = styleID AND CurrentToken = currWord AND NextToken = nextWord AND PreviousToken = prevWord;
-	string str = "SELECT COUNT(CurrentToken) FROM HMMtokenPaths WHERE StyleID = styleID AND CurrentToken = currWord AND NextToken = nextWord AND PreviousToken = prevWord";
+	string str = "SELECT COUNT(CurrentToken) FROM HMMtokenPaths WHERE StyleID = "+ std::to_string(StyleID) +" AND CurrentToken = '"+ currWord +"' AND NextToken = '"+nextWord+"' AND PreviousToken = '"+nextWord+"'";
 	string s;
 	char *query2 = &str[0];
 	int retAns = 0;
@@ -528,7 +528,7 @@ int StyleDatabase::getWordGroupCountByStyle(int StyleID, string prevWord, string
 //Returns a list of all of the SentenceIDs where that combination of words exists in all documents of the selected style. 
 vector<int> StyleDatabase::getWordGroupListByStyle(int StyleID, string prevWord, string currWord, string nextWord)
 {
-	string str = "SELECT CurrentToken FROM HMMtokenPaths WHERE StyleID = styleID AND CurrentToken = currWord AND NextToken = nextWord AND PreviousToken = prevWord;";
+	string str = "SELECT CurrentToken FROM HMMtokenPaths WHERE StyleID = " + std::to_string(StyleID) + " AND CurrentToken = '"+currWord+"' AND NextToken = '"+nextWord+"' AND PreviousToken = '"+prevWord+"';";
 	char *query2 = &str[0];
 	int retAns = 0;
 
