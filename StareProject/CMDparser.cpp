@@ -175,6 +175,6 @@ void CMDparser::Brian(vector<string> cmdParams)
 	test.insertDocument(StyleID, "Brian book", "1996");
 	test.retrieve("Styles", "Author", "Author", "Sam");
 	int DocumentID = test.insertDocument("Sam", "Sams Book", "1900");  // test new path
-	DocumentID = test.insertDocument("Brian", "Brian's other book.", "1998"); // test same author, new book
+	DocumentID = test.insertDocument("Brian", "Brians other book.", "1998"); // test same author, new book
 	DocumentID = test.insertDocument("Brian", "Brian book", "1996"); // test same author, same book.
 }

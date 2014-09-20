@@ -28,11 +28,18 @@ void StyleDatabase::insert(string q)
 	int result;
 	char *query = str;
 	{
-		if (sqlite3_prepare(db, query, -1, &statement, 0) == SQLITE_OK)
+		int prepCode = sqlite3_prepare(db, query, -1, &statement, 0);
+		if (prepCode == SQLITE_OK)
 		{
 			int res = sqlite3_step(statement);
 			result = res;
 			sqlite3_finalize(statement);
+		}
+		else
+		{
+			cout << "Error executing the following SQL command" << endl;
+			cout << q << endl;
+			cout << "Error Code:" << prepCode;
 		}
 	}
 }
