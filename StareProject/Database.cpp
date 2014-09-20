@@ -428,10 +428,10 @@ int StyleDatabase::insertSentence(int DocumentID, vector<string> words)
 // Returns the string of the selected sentence. 
 string StyleDatabase::getSentence(int sentenceID)
 {
-	string str = "SELECT Tokens.Word FROM HMMtokenPaths JOIN Tokens ON Tokens.TokenID = HMMtokenPaths.CurrentToken WHERE HMMtokenPaths.SentenceID = sentenceID ORDER BY HMMtokenPaths.TokenPathID;";
+	string str = "SELECT Tokens.Word FROM HMMtokenPaths JOIN Tokens ON Tokens.TokenID = HMMtokenPaths.CurrentToken WHERE HMMtokenPaths.SentenceID = "+ std::to_string(sentenceID) +" ORDER BY HMMtokenPaths.TokenPathID;";
 	char* s;
 	char *query2 = &str[0];
-	int retAns = 0;
+	stringstream tmp;
 
 	if (sqlite3_prepare(db, query2, -1, &statement, 0) == SQLITE_OK)
 	{
@@ -445,6 +445,7 @@ string StyleDatabase::getSentence(int sentenceID)
 				for (int i = 0; i < coltotal; i++)
 				{
 					 s = (char*)sqlite3_column_text(statement, i);
+					 tmp << s << " ";
 				}
 			}
 			if (res == SQLITE_DONE || res == SQLITE_ERROR)
@@ -454,7 +455,7 @@ string StyleDatabase::getSentence(int sentenceID)
 		}
 	}
 
-	return s;
+	return tmp.str();
 }
 
 // returns the number of instances (the count) in all documents of that series of 3 words.
