@@ -339,11 +339,11 @@ int StyleDatabase::insertDocument(string Author, string Title, string PublishDat
 	int documentID = getDocumentID(Author, Title);
 	if (documentID == -1)
 	{
-		int styleID = getStyleID(documentID);
+		int styleID = retrieveAuthorStyleID(Author);
 		if (styleID == -1)
 		{
 			insertAuthor(Author);
-			insertDocumentIntoDB(getStyleID(documentID), Title, PublishDate);
+			insertDocumentIntoDB(retrieveAuthorStyleID(Author), Title, PublishDate);
 		}
 		else {
 			insertDocumentIntoDB(styleID, Title, PublishDate);
@@ -374,19 +374,22 @@ int StyleDatabase::insertSentence(int DocumentID, vector<string> words)
 	int styleID = getStyleID(DocumentID);
 	vector<int> wordIDs;
 
+
 	while (count < words.size())
 	{
-		if (doesWordExist(words[count]) == true)
+		bool dWE = doesWordExist(words[count]);
+		if (dWE == true)
 		{
 			// Just get the word id if its already in the db
-			wordIDs[count] = getWordID(words[count]);
+			wordIDs.push_back(getWordID(words[count]));
 		}
 		else {
 			addWord(words[count]); // add the word to the database
-			wordIDs[count] = getWordID(words[count]);
+			wordIDs.push_back(getWordID(words[count]));
 		}
 		count = count + 1;
 	}
+
 
 	count = 0; // reset counter
 	while (count < wordIDs.size())
@@ -403,7 +406,7 @@ int StyleDatabase::insertSentence(int DocumentID, vector<string> words)
 			}
 		}
 		else {
-			if (count + 1 > wordIDs.size())
+			if (count + 1 >= wordIDs.size())
 			{
 				// just add prev token and cur token
 				addHMMTokenPath(sentID, styleID, wordIDs[count], -1, wordIDs[count - 1]);
@@ -557,13 +560,3 @@ vector<int> StyleDatabase::getWordGroupListByStyle(int StyleID, string prevWord,
 	return tokens;
 }
 
-// Test function
-vector<string> StyleDatabase::testFunc()
-{
-	vector<string> test;
-	test[0] = "this";
-	test[1] = "is";
-	test[2] = "a";
-	test[3] = "test";
-	return test;
-}
