@@ -412,37 +412,65 @@ int StyleDatabase::insertSentence(int DocumentID, vector<string> words)
 
 		string curToken = words[count];
 
-		if (count - 1 < 0 || count + 1 > words.size())
+		//// What if both of these statements are true? eg. a sentence of 1 word.  
+		if ((count - 1 < 0) || (count + 1 > words.size()))
 		{
+
 			if (count + 1 > words.size())
 			{
-				addHMMTokenPath(sentID, styleID, getWordID(curToken), -1, -1);
+				addHMMTokenPath(sentID, styleID, getWordID(curToken), -1, -1);  // never happens.
 			}
 			else {
-				string nextToken = words[count + 1];
+				string nextToken = words[count + 1];  // crashes if count+1 >= words.size();
 				addHMMTokenPath(sentID, styleID, getWordID(curToken), getWordID(nextToken), -1);
 			}
 		}
 		else {
 
-			if (count + 1 >= words.size())
+			if (count + 1 >= words.size()) // Didn't we already do this?  Actually, no.  You've already checked for ( count + 1 > words.size) but that didn't do anything because you needed ==.
 			{
 				string curToken = words[count];
-				string prevToken = words[count - 1];
-				addHMMTokenPath(getSentenceID(DocumentID), getStyleID(DocumentID), getWordID(curToken), -1, getWordID(prevToken));
+				string prevToken = words[count - 1]; 
+				addHMMTokenPath(getSentenceID(DocumentID), getStyleID(DocumentID), getWordID(curToken), -1, getWordID(prevToken));//another call to database for getSentenceID and getStyleID?
 			}
 			else {
 				string curToken = words[count];
 				string nextToken = words[count + 1];
 				string prevToken = words[count - 1];
-				addHMMTokenPath(getSentenceID(DocumentID), getStyleID(DocumentID), getWordID(curToken), getWordID(nextToken), getWordID(prevToken));
-
+				addHMMTokenPath(getSentenceID(DocumentID), getStyleID(DocumentID), getWordID(curToken), getWordID(nextToken), getWordID(prevToken)); 
+				// getWordID(nextToken) is not defined yet since it hasn't be inserted into the database.
+				// this problem is solved if you tokenize the whole vector before you start inserting into HMMtokenPath.
+				// As mentioned in my text message, tokenizing at the beginning is also dramatically more efficient, since
+				// it eliminates tons of getWordIDs
 			}
 		}
 		count = count + 1;
+
+		/*
+		// instead of nested if statements, I would do: 
+		vector<int> tokens;  // you would need to convert the sentence into a tokens vector first using another loop before starting this loop.
+		if ((count - 1 < 0) && (count + 1 >= tokens.size())) {
+			// one word sentence 
+			addHMMTokenPath(sentID, styleID, tokens[count], -1, -1);
+		}
+		else if (count - 1 < 0) {
+			// start of sentence 
+			addHMMTokenPath(sentID, styleID, tokens[count], tokens[count+1], -1);
+		}
+		else if (count + 1 >= tokens.size()) {
+			// end of sentence 
+			addHMMTokenPath(sentID, styleID, tokens[count], -1, tokens[count-1]);
+		}
+		else {
+			// middle of sentence 
+			addHMMTokenPath(sentID, styleID, tokens[count], tokens[count + 1], tokens[count - 1]);
+		}
+		*/
 	}
 	return getSentenceID(DocumentID);
 }
+
+
 
 // Returns the string of the selected sentence. 
 string StyleDatabase::getSentence(int sentenceID)

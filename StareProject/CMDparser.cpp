@@ -177,4 +177,14 @@ void CMDparser::Brian(vector<string> cmdParams)
 	int DocumentID = test.insertDocument("Sam", "Sams Book", "1900");  // test new path
 	DocumentID = test.insertDocument("Brian", "Brians other book.", "1998"); // test same author, new book
 	DocumentID = test.insertDocument("Brian", "Brian book", "1996"); // test same author, same book.
+	vector<string> sentVect1;
+	sentVect1.push_back("This");
+	sentVect1.push_back("is");
+	sentVect1.push_back("a");
+	sentVect1.push_back("test");
+	test.insertSentence(DocumentID, sentVect1);
+	test.insertSentence(DocumentID, sentVect1); // test duplicate words.
+	vector<string> sentVect2;
+	sentVect2.push_back(".");
+	test.insertSentence(DocumentID, sentVect2); // test short sentence.
 }
