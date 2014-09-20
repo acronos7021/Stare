@@ -334,32 +334,6 @@ void StyleDatabase::insertDocument(int styleID, string title, string publishDate
 // if not, add it to the Style table then create new document.  
 // returns the DocumentID of the new Document.
 
-//int StyleDatabase::insertDocument(string Author, string Title, string PublishDate)
-//{
-//	int check = retrieve("Documents", "DocumentID", "title", Title);
-//	int documentID = 0; /* The actual return value */
-//	if (check == 0)
-//	{
-//		int checkTwo = retrieve("Styles", "StyleID", "Author", Author);
-//		if (checkTwo == 0)
-//		{
-//			insertAuthor(Author);
-//			int styleID = retrieveAuthorStyleID(Author);
-//			insertDocument(styleID, Title, PublishDate);
-//			documentID = getDocumentID(styleID, Title);
-//		}
-//		else {
-//			int styleID = retrieveAuthorStyleID(Author);
-//			insertDocument(styleID, Title, PublishDate);
-//			documentID = getDocumentID(styleID, Title);
-//		}
-//	}
-//	else {
-//		documentID = getDocumentID(Author, Title);
-//	}
-//	return documentID;
-//}
-
 int StyleDatabase::insertDocument(string Author, string Title, string PublishDate)
 {
 	int documentID = getDocumentID(Author, Title);
@@ -396,78 +370,51 @@ int StyleDatabase::insertSentence(int DocumentID, vector<string> words)
 	insertIntoSentences(DocumentID);
 	int sentID = getSentenceID(DocumentID);
 	int styleID = getStyleID(DocumentID);
+	vector<int> wordIDs;
 
 	while (count < words.size())
 	{
-
-		/* Check for tokens and add */
-		bool checkToken = doesWordExist(words[count]);
-		if (checkToken == true)
+		if (doesWordExist(words[count]) == true)
 		{
-			// Do Nothing
+			// Just get the word id if its already in the db
+			wordIDs[count] = getWordID(words[count]);
 		}
 		else {
-			addWord(words[count]);
+			addWord(words[count]); // add the word to the database
+			wordIDs[count] = getWordID(words[count]);
 		}
+		count = count + 1;
+	}
 
-		string curToken = words[count];
-
-		//// What if both of these statements are true? eg. a sentence of 1 word.  
-		if ((count - 1 < 0) || (count + 1 > words.size()))
+	count = 0; // reset counter
+	while (count < wordIDs.size())
+	{
+		if ((count - 1) < 0)
 		{
-
-			if (count + 1 > words.size())
+			if ((count + 1) > wordIDs.size())
 			{
-				addHMMTokenPath(sentID, styleID, getWordID(curToken), -1, -1);  // never happens.
+				addHMMTokenPath(sentID, styleID, wordIDs[count],-1,-1);
 			}
 			else {
-				string nextToken = words[count + 1];  // crashes if count+1 >= words.size();
-				addHMMTokenPath(sentID, styleID, getWordID(curToken), getWordID(nextToken), -1);
+				// add current word and next token
+				addHMMTokenPath(sentID, styleID, wordIDs[count], wordIDs[count + 1], -1);
 			}
 		}
 		else {
-
-			if (count + 1 >= words.size()) // Didn't we already do this?  Actually, no.  You've already checked for ( count + 1 > words.size) but that didn't do anything because you needed >=.
+			if (count + 1 > wordIDs.size())
 			{
-				string curToken = words[count];
-				string prevToken = words[count - 1]; 
-				addHMMTokenPath(getSentenceID(DocumentID), getStyleID(DocumentID), getWordID(curToken), -1, getWordID(prevToken));//another call to database for getSentenceID and getStyleID?
+				// just add prev token and cur token
+				addHMMTokenPath(sentID, styleID, wordIDs[count], -1, wordIDs[count - 1]);
 			}
 			else {
-				string curToken = words[count];
-				string nextToken = words[count + 1];
-				string prevToken = words[count - 1];
-				addHMMTokenPath(getSentenceID(DocumentID), getStyleID(DocumentID), getWordID(curToken), getWordID(nextToken), getWordID(prevToken)); 
-				// getWordID(nextToken) is not defined yet since it hasn't be inserted into the database.
-				// this problem is solved if you tokenize the whole vector before you start inserting into HMMtokenPath.
-				// As mentioned in my text message, tokenizing at the beginning is also dramatically more efficient, since
-				// it eliminates tons of getWordIDs
+				// add all three
+				addHMMTokenPath(sentID, styleID, wordIDs[count], wordIDs[count + 1], wordIDs[count - 1]);
 			}
 		}
 		count = count + 1;
-
-		/*
-		// instead of nested if statements, I would do: 
-		vector<int> tokens;  // you would need to convert the sentence into a tokens vector first using another loop before starting this loop.
-		if ((count - 1 < 0) && (count + 1 >= tokens.size())) {
-			// one word sentence 
-			addHMMTokenPath(sentID, styleID, tokens[count], -1, -1);
-		}
-		else if (count - 1 < 0) {
-			// start of sentence 
-			addHMMTokenPath(sentID, styleID, tokens[count], tokens[count+1], -1);
-		}
-		else if (count + 1 >= tokens.size()) {
-			// end of sentence 
-			addHMMTokenPath(sentID, styleID, tokens[count], -1, tokens[count-1]);
-		}
-		else {
-			// middle of sentence 
-			addHMMTokenPath(sentID, styleID, tokens[count], tokens[count + 1], tokens[count - 1]);
-		}
-		*/
 	}
-	return getSentenceID(DocumentID);  //You already have this as sentID.  The extra query is unneeded.
+
+	return sentID;  
 }
 
 
@@ -476,7 +423,7 @@ int StyleDatabase::insertSentence(int DocumentID, vector<string> words)
 string StyleDatabase::getSentence(int sentenceID)
 {
 	string str = "SELECT Tokens.Word FROM HMMtokenPaths JOIN Tokens ON Tokens.TokenID = HMMtokenPaths.CurrentToken WHERE HMMtokenPaths.SentenceID = sentenceID ORDER BY HMMtokenPaths.TokenPathID;";
-	string s;
+	char* s;
 	char *query2 = &str[0];
 	int retAns = 0;
 
