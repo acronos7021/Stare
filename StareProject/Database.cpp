@@ -122,7 +122,7 @@ bool StyleDatabase::doesWordExist(string word)
 				for (int i = 0; i < coltotal; i++)
 				{
 					string s = (char*)sqlite3_column_text(statement, i);
-					retAns = atoi(s.c_str());
+					retAns =  atoi(s.c_str())>0;
 				}
 			}
 			if (res == SQLITE_DONE || res == SQLITE_ERROR)
@@ -139,9 +139,8 @@ bool StyleDatabase::doesWordExist(string word)
 		else {
 			retAns = true;
 		}
-
-		return retAns;
 	}
+	return retAns;
 }
 
 /* Inserts an Author into the Database */
@@ -376,7 +375,7 @@ int StyleDatabase::insertSentence(int DocumentID, vector<string> words)
 	vector<int> wordIDs;
 
 
-	while (count < words.size())
+	while (count < (int) words.size())
 	{
 		bool dWE = doesWordExist(words[count]);
 		if (dWE == true)
@@ -393,11 +392,11 @@ int StyleDatabase::insertSentence(int DocumentID, vector<string> words)
 
 
 	count = 0; // reset counter
-	while (count < wordIDs.size())
+	while (count < (int) wordIDs.size())
 	{
 		if ((count - 1) < 0)
 		{
-			if ((count + 1) > wordIDs.size())
+			if ((count + 1) > (int)wordIDs.size())
 			{
 				addHMMTokenPath(sentID, styleID, wordIDs[count],-1,-1);
 			}
@@ -407,7 +406,7 @@ int StyleDatabase::insertSentence(int DocumentID, vector<string> words)
 			}
 		}
 		else {
-			if (count + 1 >= wordIDs.size())
+			if (count + 1 >= (int) wordIDs.size())
 			{
 				// just add prev token and cur token
 				addHMMTokenPath(sentID, styleID, wordIDs[count], -1, wordIDs[count - 1]);
