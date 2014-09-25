@@ -4,6 +4,7 @@ using namespace std;
 
 #include <sstream> 
 #include <fstream>
+#include "Stopwatch.h"
 #include "Database.h"
 #include "CMDparser.h"
 #include "Tokenizer.h"
@@ -179,18 +180,31 @@ void CMDparser::Leven(vector<string> cmdParams)
 
 void CMDparser::Brian(vector<string> cmdParams)
 {
+	Stopwatch sw;
 	StyleDatabase db("AIsql.db3");
 	db.clearDatabase();
 //	string doc = ReadFile();
+
+	sw.start();
 	Tokenizer tokenizer = Tokenizer("../StareProject/Documents/AMidsummerNightsDream.txt");
 	tokenizer.tokenizeDoc();
+	sw.end();
+
+	int tokenizerTime = sw.getTimeInMicroseconds();
+
 	vector<string> sentenceVect;
+	sw.start();
+
 	int docID = db.insertDocument("Shakespere", "A Midnight Summer Dream", "a long long ago");
 	do
 	{
 		sentenceVect = tokenizer.getNextSentence();
 		db.insertSentence(docID, sentenceVect);
 	} while (sentenceVect.size() > 0);
+	sw.end();
+
+	int dbTime = sw.getTimeInMicroseconds();
+
 	//int sentID = 
 	//string sent = db.getSentence(sentID);
 	Tokenizer tokenizer2 = Tokenizer("../StareProject/Documents/AChristmasCarol.txt");

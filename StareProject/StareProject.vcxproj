@@ -85,6 +85,7 @@
     <ClCompile Include="HMMengine.cpp" />
     <ClCompile Include="HTMLgenerator.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Stopwatch.cpp" />
     <ClCompile Include="Tokenizer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -95,6 +96,7 @@
     <ClInclude Include="HMMengine.h" />
     <ClInclude Include="HTMLgenerator.h" />
     <ClInclude Include="sqlite3.h" />
+    <ClInclude Include="Stopwatch.h" />
     <ClInclude Include="Tokenizer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
