@@ -61,6 +61,13 @@ void Tokenizer::tokenizeDoc()
 		curr.push_back(currline);
 		for (unsigned i = 0; i < currline.size(); i++)
 		{
+			if (currline[i] == 39 || currline[i] == 239 || currline[i] == 96)
+			{
+				curr.pop_back();
+				currline[i] = 'Z';
+				curr.push_back(currline);
+			}
+
 			if (checkIgnore((char)currline[i]) || checkPunctuation((char)currline[i]))
 			{
 				curr.pop_back();
@@ -93,7 +100,7 @@ vector<string> Tokenizer::getWord(string word)
 	string temp;
 
 	for (int i = 0; i < word.size(); i++)
-	{
+	{	
 		letters.push_back(word[i]);
 	}
 	for (int i = 0; i < letters.size(); i++)

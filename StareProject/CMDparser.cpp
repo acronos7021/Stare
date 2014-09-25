@@ -184,7 +184,23 @@ void CMDparser::Brian(vector<string> cmdParams)
 //	string doc = ReadFile();
 	Tokenizer tokenizer = Tokenizer("../StareProject/Documents/AMidsummerNightsDream.txt");
 	tokenizer.tokenizeDoc();
+	vector<string> sentenceVect;
 	int docID = db.insertDocument("Shakespere", "A Midnight Summer Dream", "a long long ago");
-	db.insertSentence(docID,tokenizer.getNextSentence());
+	do
+	{
+		sentenceVect = tokenizer.getNextSentence();
+		db.insertSentence(docID, sentenceVect);
+	} while (sentenceVect.size() > 0);
+	//int sentID = 
+	//string sent = db.getSentence(sentID);
+	Tokenizer tokenizer2 = Tokenizer("../StareProject/Documents/AChristmasCarol.txt");
+	tokenizer2.tokenizeDoc();
+	int docID2 = db.insertDocument("Charles Dickens", "A Christmas Carol", "1864");
+	do
+	{
+		sentenceVect = tokenizer2.getNextSentence();
+		db.insertSentence(docID2, sentenceVect);
+	} while (sentenceVect.size() > 0);
+
 
 }
