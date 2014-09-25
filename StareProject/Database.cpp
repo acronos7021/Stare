@@ -368,6 +368,9 @@ int StyleDatabase::insertDocument(string Author, string Title, string PublishDat
 // I believe this will be best handled on the server side using a stored procedure
 int StyleDatabase::insertSentence(int DocumentID, vector<string> words)
 {
+
+	char* errorMessage;
+	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &errorMessage);
 	int count = 0;
 	insertIntoSentences(DocumentID);
 	int sentID = getSentenceID(DocumentID);
@@ -377,11 +380,12 @@ int StyleDatabase::insertSentence(int DocumentID, vector<string> words)
 
 	while (count < (int) words.size())
 	{
-		bool dWE = doesWordExist(words[count]);
-		if (dWE == true)
+		//bool dWE = doesWordExist(words[count]);
+		int tokenID = getWordID(words[count]);
+		if (tokenID > 0)
 		{
 			// Just get the word id if its already in the db
-			wordIDs.push_back(getWordID(words[count]));
+			wordIDs.push_back(tokenID);
 		}
 		else {
 			addWord(words[count]); // add the word to the database
@@ -418,7 +422,7 @@ int StyleDatabase::insertSentence(int DocumentID, vector<string> words)
 		}
 		count = count + 1;
 	}
-
+	sqlite3_exec(db, "COMMIT TRANSACTION", NULL, NULL, &errorMessage);
 	return sentID;  
 }
 
