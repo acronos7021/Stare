@@ -216,7 +216,7 @@ int StyleDatabase::getSentenceID(int docid)
 	string str = "select SentenceID from Sentences where DocumentID = " + std::to_string(docid) + ";";
 	char *query2 = &str[0];
 	int retAns = 0;
-
+	 
 	if (sqlite3_prepare(db, query2, -1, &statement, 0) == SQLITE_OK)
 	{
 		int coltotal = sqlite3_column_count(statement);
