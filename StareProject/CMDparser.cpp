@@ -6,6 +6,7 @@ using namespace std;
 #include <fstream>
 #include "Database.h"
 #include "CMDparser.h"
+#include "Tokenizer.h"
 
 
 bool CMDparser::parseCMD(vector<string> cmdList)
@@ -132,15 +133,28 @@ string CMDparser::ReadFile(string fileName)
 
 void CMDparser::Brandon(vector<string> cmdParams)
 {
-	StyleDatabase test("aisql.db3");
-	int t = test.insertDocument("Test", "Test", "Test");
-
-	vector<string> testVec;
-	testVec.push_back("This");
-	testVec.push_back("is");
-	testVec.push_back("a");
-	testVec.push_back("test");
-	test.insertSentence(t, testVec);
+	//cout << "The int on our platform is " << (sizeof(int)*8) << " bits" << endl;
+	//cout << "The long on our platform is " << (sizeof(long)* 8) << " bits" << endl; 
+	//cout << "The long long on our platform is " << (sizeof(long long)* 8) << " bits" << endl;
+	StyleDatabase test("BrianAIsql.db3");
+	test.clearDatabase();
+	test.insertAuthor("Brian");
+	int StyleID = test.retrieveAuthorStyleID("Brian");
+	//test.insertDocument(StyleID, "Brian book", "1996");
+	test.retrieve("Styles", "Author", "Author", "Sam");
+	int DocumentID = test.insertDocument("Sam", "Sams Book", "1900");  // test new path
+	DocumentID = test.insertDocument("Brian", "Brians other book.", "1998"); // test same author, new book
+	DocumentID = test.insertDocument("Brian", "Brian book", "1996"); // test same author, same book.
+	vector<string> sentVect1;
+	sentVect1.push_back("This");
+	sentVect1.push_back("is");
+	sentVect1.push_back("a");
+	sentVect1.push_back("test");
+	test.insertSentence(DocumentID, sentVect1);
+	test.insertSentence(DocumentID, sentVect1); // test duplicate words.
+	vector<string> sentVect2;
+	sentVect2.push_back(".");
+	test.insertSentence(DocumentID, sentVect2); // test short sentence.
 }
 
 void CMDparser::Blake(vector<string> cmdParams)
@@ -165,26 +179,12 @@ void CMDparser::Leven(vector<string> cmdParams)
 
 void CMDparser::Brian(vector<string> cmdParams)
 {
-	//cout << "The int on our platform is " << (sizeof(int)*8) << " bits" << endl;
-	//cout << "The long on our platform is " << (sizeof(long)* 8) << " bits" << endl; 
-	//cout << "The long long on our platform is " << (sizeof(long long)* 8) << " bits" << endl;
-	StyleDatabase test("BrianAIsql.db3");
-	test.clearDatabase();
-	test.insertAuthor("Brian");
-	int StyleID = test.retrieveAuthorStyleID("Brian");
-	//test.insertDocument(StyleID, "Brian book", "1996");
-	test.retrieve("Styles", "Author", "Author", "Sam");
-	int DocumentID = test.insertDocument("Sam", "Sams Book", "1900");  // test new path
-	DocumentID = test.insertDocument("Brian", "Brians other book.", "1998"); // test same author, new book
-	DocumentID = test.insertDocument("Brian", "Brian book", "1996"); // test same author, same book.
-	vector<string> sentVect1;
-	sentVect1.push_back("This");
-	sentVect1.push_back("is");
-	sentVect1.push_back("a");
-	sentVect1.push_back("test");
-	test.insertSentence(DocumentID, sentVect1);
-	test.insertSentence(DocumentID, sentVect1); // test duplicate words.
-	vector<string> sentVect2;
-	sentVect2.push_back(".");
-	test.insertSentence(DocumentID, sentVect2); // test short sentence.
+	StyleDatabase db("AIsql.db3");
+	db.clearDatabase();
+//	string doc = ReadFile();
+	Tokenizer tokenizer = Tokenizer("../StareProject/Documents/AMidsummerNightsDream.txt");
+	tokenizer.tokenizeDoc();
+	int docID = db.insertDocument("Shakespere", "A Midnight Summer Dream", "a long long ago");
+	db.insertSentence(docID,tokenizer.getNextSentence());
+
 }
