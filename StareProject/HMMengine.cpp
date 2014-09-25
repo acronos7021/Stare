@@ -29,14 +29,14 @@ int HMMengine::learn(MetaData metaData)
 	vector<string> words;
 
 	// add the metadata to the database.
-	bool alreadyExists;
+//	bool alreadyExists;
 	int documentID = styleDB.insertDocument( metaData.Author, metaData.Title, metaData.PublishDate);
 	// add the document's sentences to the database.
-	if (!alreadyExists)
-	{
-		while ((words = tokenizer.getNextSentence()).size() > 0)
-			styleDB.insertSentence(documentID, words);
-	}
+	//if (!alreadyExists)
+	//{
+	//	while ((words = tokenizer.getNextSentence()).size() > 0)
+	//		styleDB.insertSentence(documentID, words);
+	//}
 
 	return documentID;
 }
