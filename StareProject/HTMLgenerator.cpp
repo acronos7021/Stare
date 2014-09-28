@@ -14,6 +14,7 @@ HTMLgenerator::HTMLgenerator(string DestinationFilename, int documentID, vector<
 	StyleDatabase db("aisql.db3");
 	string sentence; // the current sentence the function is working with
 	stringstream output; // the output that will be saved to the DestinationFilename
+	
 
 	//Basically I just want to take the contents of the header.txt file and put it in the output stream here
 	// If you can do it better, please do.
@@ -24,13 +25,25 @@ HTMLgenerator::HTMLgenerator(string DestinationFilename, int documentID, vector<
 	output << header;
 	infile.close();
 
-	if (rankingList.size!=0){
+	if (rankingList.size!=0)
+	{
 		//Output how much your document was plagarised
 		// ********I don't know how to call this, any ideas? insert between the bold tags(There is no input for this either)
 		output << "<p>Your document was plagiarized <b>" << "</b></p>";
 
 		for (std::vector<sentenceRanking>::size_type i = 0; i != rankingList.size(); i++)
 		{
+			//header
+			output << "<div id='doc-wrapper'>";
+			output << "<div id='left-column'><h3>";
+			//insert left header title
+			output << "</h3></div>";
+			output << "<div id='right-column'><h3>";
+			//insert right header title
+			output << "</h3></div>";
+			output << "</div>";
+
+
 			//Generate the left column first (That's the document that the user gave us)
 			output << "<div id='doc-wrapper'><div id='left-column'>";
 			output << db.getSentence(rankingList[i].sentenceID - 2) << "  ";
