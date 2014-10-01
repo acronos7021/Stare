@@ -42,13 +42,20 @@ void HMMengine::compare(MetaData metaData)
 
 	vector<StyleCounts> totalWordCountsPerStyle = db.getTotalWordCountPerStyle();
 
+	map<int, int> pairCountsPerStyle;
+
 	for (int s = 0; s < documentTokens.size(); s++)
 	{
 		int sentSize = documentTokens[s].size() - 1;
 		for (int w = 0; w < sentSize; w++)
 		{
 			// every word of every sentence except the last word in the sentence should be here.
-			db.getPathWordCountPerStyle(documentTokens[s][w], documentTokens[s][w + 1]);
+			vector<StyleCounts> wordCountsPerPath = db.getPathWordCountPerStyle(documentTokens[s][w], documentTokens[s][w + 1]);
+			for (int i = 0; i < wordCountsPerPath.size(); i++)
+			{
+				map<string, int>::iterator it = pairCountsPerStyle.find(wordCountsPerPath);
+				if (it == pairCountsPerStyle.end())
+			}
 		}
 	}
 
