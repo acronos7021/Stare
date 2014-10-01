@@ -46,7 +46,7 @@ bool Tokenizer::checkPunctuation(char c)
 
 std::vector <std::vector<int>> Tokenizer::tokenizeDoc(string Document)
 {
-	StyleDatabase db = StyleDatabase::getInstance();
+	//StyleDatabase db = StyleDatabase::getInstance();
 
 	sentences.clear();
 	ifstream fname(Document);

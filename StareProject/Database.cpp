@@ -1,17 +1,14 @@
 #include "Database.h"
+
 StyleDatabase::StyleDatabase()
 {
 	isOpen = false;
+
 	lastToken = 0;
 	lastAllocatedTokenID = 0;
 	currentAllocatedTokenID = 0;
 }
 
-StyleDatabase& StyleDatabase::getInstance()
-{
-	static StyleDatabase instance;
-	return instance;
-}
 
 StyleDatabase::~StyleDatabase(void)
 {
@@ -68,7 +65,7 @@ void StyleDatabase::clearDatabase()
 {
 	insert("DELETE FROM Documents");
 	insert("DELETE FROM HMMTokenPaths");
-	insert("DELETE FROM Sentences");
+//	insert("DELETE FROM Sentences");
 	insert("DELETE FROM Styles");
 	insert("DELETE FROM Variables");
 	insert("INSERT INTO Variables (LastSentenceID,LastTokenID) VALUES (0,2)");
@@ -178,22 +175,23 @@ void StyleDatabase::insertAuthor(string author)
 /* Retrieve the Author Style */
 int StyleDatabase::retrieveAuthorStyleID(string author)
 {
+	sqlite3_stmt* stmt;
 	string str = "select StyleID from Styles where author = '" + author + "';";
 	char *query2 = &str[0];
 	int retAns = -1;  // if the style isn't found, return this.
 
-	if (sqlite3_prepare(db, query2, -1, &statement, 0) == SQLITE_OK)
+	if (sqlite3_prepare(db, query2, -1, &stmt, 0) == SQLITE_OK)
 	{
-		int coltotal = sqlite3_column_count(statement);
+		int coltotal = sqlite3_column_count(stmt);
 		int res = 0;
 		while (1)
 		{
-			res = sqlite3_step(statement);
+			res = sqlite3_step(stmt);
 			if (res == SQLITE_ROW)
 			{
 				for (int i = 0; i < coltotal; i++)
 				{
-					string s = (char*)sqlite3_column_text(statement, i);
+					string s = (char*)sqlite3_column_text(stmt, i);
 					retAns = atoi(s.c_str());
 				}
 			}
@@ -208,22 +206,23 @@ int StyleDatabase::retrieveAuthorStyleID(string author)
 
 int StyleDatabase::getStyleID(int docID)
 {
+	sqlite3_stmt* stmt;
 	string str = "select StyleID from Documents where DocumentID = " + std::to_string(docID) + ";";
 	char *query2 = &str[0];
 	int retAns = 0;
 
-	if (sqlite3_prepare(db, query2, -1, &statement, 0) == SQLITE_OK)
+	if (sqlite3_prepare(db, query2, -1, &stmt, 0) == SQLITE_OK)
 	{
-		int coltotal = sqlite3_column_count(statement);
+		int coltotal = sqlite3_column_count(stmt);
 		int res = 0;
 		while (1)
 		{
-			res = sqlite3_step(statement);
+			res = sqlite3_step(stmt);
 			if (res == SQLITE_ROW)
 			{
 				for (int i = 0; i < coltotal; i++)
 				{
-					string s = (char*)sqlite3_column_text(statement, i);
+					string s = (char*)sqlite3_column_text(stmt, i);
 					retAns = atoi(s.c_str());
 				}
 			}
@@ -596,10 +595,10 @@ int StyleDatabase::incrementSentenceID(int byAmount)
 	char* errorMessage;
 	sqlite3_stmt *select_statement;
 	int currentSentenceID;
-
+	int prepareCode;
 	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &errorMessage);
 	// get the current value
-	if (sqlite3_prepare(db, "SELECT LastSentenceID FROM Variables", -1, &select_statement, 0) == SQLITE_OK)
+	if ((prepareCode = sqlite3_prepare(db, "SELECT LastSentenceID FROM Variables", -1, &select_statement, 0)) == SQLITE_OK)
 	{
 		int checkRow = sqlite3_step(select_statement);
 		if (checkRow == SQLITE_ROW)
@@ -618,6 +617,11 @@ int StyleDatabase::incrementSentenceID(int byAmount)
 			sqlite3_exec(db, insertStr.str().c_str(), NULL, NULL, &errorMessage);
 			currentSentenceID = 0;
 		}
+	}
+	else
+	{
+		cout << "Unable to execute 'SELECT LastSentenceID FROM Variables'" << endl;
+		cout << "Error Code: " << prepareCode << endl;
 	}
 	sqlite3_exec(db, "COMMIT TRANSACTION", NULL, NULL, &errorMessage);
 	return currentSentenceID;
@@ -808,3 +812,68 @@ int StyleDatabase::GetNextTokenID()
 	return ++currentAllocatedTokenID;
 }
 
+vector<StyleCounts> StyleDatabase::getTotalWordCountPerStyle()
+{
+//	char* errorMessage;
+	sqlite3_stmt *select_statement;
+	vector<StyleCounts> output;
+
+	int StyleID, wordCount;
+	string Author;
+
+	char* selectStr =
+		"SELECT StyleID,Author,COUNT(HMMtokenPaths.CurrentToken)						\
+				FROM HMMtokenPaths														\
+				JOIN Styles ON Styles.StyleID = HMMtokenPaths.StyleID					\
+				GROUP BY HMMtokenPaths.StyleID";
+
+
+	if (sqlite3_prepare(db, selectStr, -1, &select_statement, 0) == SQLITE_OK)
+	{
+		int checkRow = sqlite3_step(select_statement);
+		if (checkRow == SQLITE_ROW)
+		{
+			// The variable exists in the database, so read it and update it.
+			// we know there is something here or it wouldn't have given SQLITE_ROW, so just read first item.
+			StyleID = sqlite3_column_int(select_statement, 0);
+			Author = (char*) sqlite3_column_text(select_statement, 1);
+			wordCount = sqlite3_column_int(select_statement, 2);
+			output.push_back(StyleCounts(StyleID, Author, wordCount));
+		}
+	}
+	return output;
+}
+
+vector<StyleCounts> StyleDatabase::getPathWordCountPerStyle(int currToken, int nextToken)
+{
+//	char* errorMessage;
+	sqlite3_stmt *select_statement;
+	vector<StyleCounts> output;
+
+	int StyleID, wordCount;
+	string Author;
+
+	char selectStr[100];
+	sprintf_s(selectStr, 100,
+	"SELECT StyleID,Author,COUNT(HMMtokenPaths.CurrentToken)				\
+		FROM HMMtokenPaths														\
+		JOIN Styles ON Styles.StyleID = HMMtokenPaths.StyleID					\
+		WHERE CurrentToken = %d AND NextToken = %d								\
+		GROUP BY HMMtokenPaths.StyleID",
+	currToken, nextToken);
+
+	if (sqlite3_prepare(db, selectStr, -1, &select_statement, 0) == SQLITE_OK)
+	{
+		int checkRow = sqlite3_step(select_statement);
+		if (checkRow == SQLITE_ROW)
+		{
+			// The variable exists in the database, so read it and update it.
+			// we know there is something here or it wouldn't have given SQLITE_ROW, so just read first item.
+			StyleID = sqlite3_column_int(select_statement, 0);
+			Author = (char*)sqlite3_column_text(select_statement, 1);
+			wordCount = sqlite3_column_int(select_statement, 2);
+			output.push_back(StyleCounts(StyleID, Author, wordCount));
+		}
+	}
+	return output;
+}

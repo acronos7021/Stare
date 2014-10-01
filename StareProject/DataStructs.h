@@ -3,8 +3,11 @@ using namespace std;
 
 #include <string>
 #include <vector>
+//#include "Database.h"
+
 
 enum ActionType {Learn, Compare, Create};
+
 
 struct MetaData
 {
@@ -13,6 +16,17 @@ struct MetaData
     string Title;
     string PublishDate;
     string DocumentText;
+
+	MetaData(){}
+
+	MetaData(string in_author, string in_title, string in_PublishDate, string in_DocumentText)
+	{
+		Author = in_author;
+		Title = in_title;
+		PublishDate = in_PublishDate;
+		DocumentText = in_DocumentText;
+
+	}
 };
 
 struct sentenceRanking
@@ -30,4 +44,21 @@ struct sentenceRanking
 		certainty = Certainty;
 	}
 };
+
+
+struct StyleCounts
+{
+	int StyleID;
+	string Author;
+	int Count;
+
+	StyleCounts(int in_styleID, string in_author, int in_count)
+	{
+		StyleID = in_styleID;
+		Author = in_author;
+		Count = in_count;
+	}
+};
+
+
 

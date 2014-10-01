@@ -8,10 +8,9 @@
 class HMMengine
 {
 public:
-	HMMengine(MetaData metaData);
+	HMMengine();
 	~HMMengine();
 
-private:
 	int learn(MetaData metaData);
 	void compare(MetaData metaData);
 	void create(MetaData metaData);

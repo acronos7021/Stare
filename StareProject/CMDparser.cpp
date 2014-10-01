@@ -8,6 +8,7 @@ using namespace std;
 #include "Database.h"
 #include "CMDparser.h"
 #include "Tokenizer.h"
+#include "HMMengine.h"
 
 
 bool CMDparser::parseCMD(vector<string> cmdList)
@@ -221,26 +222,26 @@ void CMDparser::Brandon(vector<string> cmdParams)
 	//cout << "The int on our platform is " << (sizeof(int)*8) << " bits" << endl;
 	//cout << "The long on our platform is " << (sizeof(long)* 8) << " bits" << endl; 
 	//cout << "The long long on our platform is " << (sizeof(long long)* 8) << " bits" << endl;
-	StyleDatabase& test = StyleDatabase::getInstance();
-	test.open("BrianAIsql.db3");
-	test.clearDatabase();
-	test.insertAuthor("Brian");
-	int StyleID = test.retrieveAuthorStyleID("Brian");
+	//StyleDatabase& test = StyleDatabase::getInstance();
+	//test.open("BrianAIsql.db3");
+	db.clearDatabase();
+	db.insertAuthor("Brian");
+	int StyleID = db.retrieveAuthorStyleID("Brian");
 	//test.insertDocument(StyleID, "Brian book", "1996");
-	test.retrieve("Styles", "Author", "Author", "Sam");
-	int DocumentID = test.insertDocument("Sam", "Sams Book", "1900");  // test new path
-	DocumentID = test.insertDocument("Brian", "Brians other book.", "1998"); // test same author, new book
-	DocumentID = test.insertDocument("Brian", "Brian book", "1996"); // test same author, same book.
+	db.retrieve("Styles", "Author", "Author", "Sam");
+	int DocumentID = db.insertDocument("Sam", "Sams Book", "1900");  // test new path
+	DocumentID = db.insertDocument("Brian", "Brians other book.", "1998"); // test same author, new book
+	DocumentID = db.insertDocument("Brian", "Brian book", "1996"); // test same author, same book.
 	vector<string> sentVect1;
 	sentVect1.push_back("This");
 	sentVect1.push_back("is");
 	sentVect1.push_back("a");
 	sentVect1.push_back("test");
-	test.insertSentence(DocumentID, sentVect1);
-	test.insertSentence(DocumentID, sentVect1); // test duplicate words.
+	db.insertSentence(DocumentID, sentVect1);
+	db.insertSentence(DocumentID, sentVect1); // test duplicate words.
 	vector<string> sentVect2;
 	sentVect2.push_back(".");
-	test.insertSentence(DocumentID, sentVect2); // test short sentence.
+	db.insertSentence(DocumentID, sentVect2); // test short sentence.
 }
 
 void CMDparser::Blake(vector<string> cmdParams)
@@ -265,50 +266,41 @@ void CMDparser::Leven(vector<string> cmdParams)
 
 void CMDparser::Brian(vector<string> cmdParams)
 {
+	HMMengine hmm;
 	Stopwatch sw;
-	StyleDatabase& db = StyleDatabase::getInstance();
-	db.open("AIsql.db3");
 	db.clearDatabase();
 	//	string doc = ReadFile();
 
-	sw.start();
-	Tokenizer tokenizer = Tokenizer();
-	std::vector <std::vector<int>> Midsummer = tokenizer.tokenizeDoc("../StareProject/Documents/AMidsummerNightsDream.txt");
-	sw.end();
+	//sw.start();
+	//Tokenizer tokenizer = Tokenizer();
+	//std::vector <std::vector<int>> Midsummer = tokenizer.tokenizeDoc("../StareProject/Documents/AMidsummerNightsDream.txt");
+	//sw.end();
 
-	int tokenizerTime = sw.getTimeInMicroseconds();
+	//int tokenizerTime = sw.getTimeInMicroseconds();
 
-	//	vector<string> sentenceVect;
-	sw.start();
+	////	vector<string> sentenceVect;
+	//sw.start();
 
-	int docID = db.insertDocument("Shakespere", "A Midnight Summer Dream", "a long long ago");
-	sw.end();
-	int dbDocTime = sw.getTimeInMicroseconds();
+	//int docID = db.insertDocument("Shakespere", "A Midnight Summer Dream", "a long long ago");
+	//sw.end();
+	//int dbDocTime = sw.getTimeInMicroseconds();
 
-	sw.start();
-	db.insertDocumentText(docID, Midsummer);
-	sw.end();
+	//sw.start();
+	//db.insertDocumentText(docID, Midsummer);
+	//sw.end();
 
-	int dbTextTime = sw.getTimeInMicroseconds();
+	//int dbTextTime = sw.getTimeInMicroseconds();
 
 	//  Add more books
-	docID = db.insertDocument("Shakespere", "Henry V", "1619");
-	std::vector <std::vector<int>> docName = tokenizer.tokenizeDoc("../StareProject/Documents/HenryV.txt");
-	db.insertDocumentText(docID, docName);
+	sw.start();
+	hmm.learn(MetaData("Shakespere", "Henry V", "1619", "../StareProject/Documents/HenryV.txt"));
+	hmm.learn(MetaData("Shakespere", "Romeo and Juliet", "1597", "../StareProject/Documents/RomeoAndJuliet.txt"));
+	hmm.learn(MetaData("Charles Dickens", "A Tale of Two Cities", "1859", "../StareProject/Documents/ATaleOfTwoCities.txt"));
+	hmm.learn(MetaData("Charles Dickens", "Great Expectations", "1860", "../StareProject/Documents/GreatExpectations.txt"));
+	sw.end();
+	int learnTime = sw.getTimeInMicroseconds();
 
-	docID = db.insertDocument("Shakespere", "Romeo and Juliet", "1597");
-	docName = tokenizer.tokenizeDoc("../StareProject/Documents/RomeoAndJuliet.txt");
-	db.insertDocumentText(docID, docName);
-
-	docID = db.insertDocument("Charles Dickens", "A Tale of Two Cities", "1859");
-	docName = tokenizer.tokenizeDoc("../StareProject/Documents/ATaleOfTwoCities.txt");
-	db.insertDocumentText(docID, docName);
-
-	docID = db.insertDocument("Charles Dickens", "Great Expectations", "1860");
-	docName = tokenizer.tokenizeDoc("../StareProject/Documents/GreatExpectations.txt");
-	db.insertDocumentText(docID, docName);
-
-
+	//hmm.compare(MetaData("Shakespere", "A Midnight Summer Dream", "1605", "../StareProject/Documents/AMidsummerNightsDream.txt"));
 }
 
 	//do
