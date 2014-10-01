@@ -10,10 +10,10 @@ class Tokenizer
 {
 public:
 	bool proceed;
-	std::vector <std::vector<std::string>> sentences;
+	std::vector <std::vector<int>> sentences;
 	char punctuation[3];
 
-	Tokenizer(std::string Document);
+	Tokenizer();// std::string Document);
 	~Tokenizer();
 
 	bool checkIgnore(char c);
@@ -23,18 +23,16 @@ public:
 	std::string checkTabRet(std::string word);
 
 	//tokenizes the entire document and fills up the sentences vector
-	void tokenizeDoc();
+	std::vector <std::vector<int>> tokenizeDoc(string Document);
 	void print_BAV();
 
 	//returns a single sentence from the document
 	//returns an empty vector if there is no sentence left
-	std::vector<std::string> getNextSentence();
+	std::vector<int> getNextSentence();
 
-	static vector<string> getCommands(string cmdStr);
-	static bool isAlphaNumeric(char c);
 
-private:
-	std::string filename;
+//private:
+//	std::string filename;
 };
 
 

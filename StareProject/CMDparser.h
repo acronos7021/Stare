@@ -26,6 +26,8 @@ public:
 	void Leven(vector<string> cmdList);
 	void Brian(vector<string> cmdList);
 
+	static vector<string> getCommands(string cmdStr);
+	static bool isAlphaNumeric(char c);
 
 };
 

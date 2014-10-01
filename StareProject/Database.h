@@ -8,12 +8,18 @@ using namespace std;
 #include <stdexcept>
 #include <iostream>
 #include <sstream>
+#include <map>
 
 class StyleDatabase
 {
+private:
+	StyleDatabase();
 public:
-	StyleDatabase(string dbName);
+	static StyleDatabase& getInstance();
 	~StyleDatabase(void);
+
+	void open(string dbName);
+	bool isOpen;
 
 	//Use this to create a new Document
 	//  if a Style (author) doesn’t exist and add it to the Style table.  
@@ -72,6 +78,15 @@ public:
 	int getDocumentID(string Author, string title);
 	int getDocumentID(int styleID,string title);
 
-
+	int GetToken(string word);
+	int incrementSentenceID(int byAmount);
+	void insertDocumentText(int DocumentID, std::vector <std::vector<int>> document);
+	void LoadTokenMap();
+	int GetNextTokenID();
+	vector<std::pair<string, int>> tokenCache;
+	void FlushTokenCache();
+	std::map<string,int> tokenMap;
+	int lastToken;
+	int currentAllocatedTokenID, lastAllocatedTokenID;
 };
 

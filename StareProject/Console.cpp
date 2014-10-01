@@ -33,7 +33,7 @@ void Console::MessageLoop(int argc, char *argv[])
 	{
 		std::cout << endl << ">>  " ;
 		std::getline(std::cin, cmdStr);
-		cmdLst = Tokenizer::getCommands(cmdStr);
+		cmdLst = CMDparser::getCommands(cmdStr);
 	} while (cmdParser.parseCMD(cmdLst));
 	system("pause");
 

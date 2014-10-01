@@ -24,8 +24,10 @@ HMMengine::~HMMengine()
 int HMMengine::learn(MetaData metaData)
 {
 	// do learn
-	Tokenizer tokenizer = Tokenizer(metaData.DocumentText);
-	StyleDatabase styleDB("aisql.db3");
+	Tokenizer tokenizer = Tokenizer();
+	tokenizer.tokenizeDoc(metaData.DocumentText);
+	StyleDatabase styleDB = StyleDatabase::getInstance();
+	//styleDB.open("aisql.db3");
 	vector<string> words;
 
 	// add the metadata to the database.

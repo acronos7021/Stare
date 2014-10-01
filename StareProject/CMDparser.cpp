@@ -132,12 +132,97 @@ string CMDparser::ReadFile(string fileName)
 
 }
 
+
+vector<string> CMDparser::getCommands(string cmdStr)
+{
+	vector<string> words;
+	stringstream ss;
+
+	// I was too lazy to implement a full state machine.  However...
+	// Uses 3 states to determine the action at a character position.  They are:
+	// inWord==false, inQuotes==false :  this state means that any non Alphanums are dumped until a proper alphanum is encountered
+	// inWord==true, inQuotes==false  :  This state meant that any alphanums are added to the current word until a non-alphanum is encountered
+	// inWord==true, inQuotes==true  :  Anything, whether alphanum or not, is added to the current word until another '"' is encountered.
+
+	bool inWord = false;   // if inWord, all alphanumeric 
+	bool inQuotes = false; // if inQuotes is true, all characters are recorded into the current ss until another quote is encountered.
+
+	for (unsigned int i = 0; i < cmdStr.size(); i++)
+	{
+		if (!inWord)
+		{
+			if (isAlphaNumeric(cmdStr[i]))
+			{
+				// start word
+				ss << cmdStr[i];
+				inWord = true;
+			}
+			else if (cmdStr[i] == '"')
+			{
+				// start quotes
+				inWord = true;
+				inQuotes = true;
+			}
+		}
+		else
+		{
+			// inWord is true
+			if (inQuotes)
+			{
+				if (cmdStr[i] != '"')
+					ss << cmdStr[i];
+				else
+				{
+					// the quotes have ended
+					words.push_back(ss.str());
+					ss.str("");  // empty ss
+					inWord = false;
+					inQuotes = false;
+
+				}
+			}
+			else
+			{
+				if (isAlphaNumeric(cmdStr[i]))
+					ss << cmdStr[i];
+				else
+				{
+					// the word has ended
+					words.push_back(ss.str());
+					ss.str("");  // empty ss
+					inWord = false;
+				}
+
+			}
+		}
+	}
+
+	// The last word can end with the end of the string.  
+	// It would not be detected then, so add it here.
+	if (inWord)
+		words.push_back(ss.str());
+
+	return words;
+}
+
+bool CMDparser::isAlphaNumeric(char c)
+{
+	if (((c >= 'a') && (c <= 'z')) ||
+		((c >= 'A') && (c <= 'Z')) ||
+		((c >= '0') && (c <= '9')))
+		return true;
+	else
+		return false;
+}
+
+
 void CMDparser::Brandon(vector<string> cmdParams)
 {
 	//cout << "The int on our platform is " << (sizeof(int)*8) << " bits" << endl;
 	//cout << "The long on our platform is " << (sizeof(long)* 8) << " bits" << endl; 
 	//cout << "The long long on our platform is " << (sizeof(long long)* 8) << " bits" << endl;
-	StyleDatabase test("BrianAIsql.db3");
+	StyleDatabase& test = StyleDatabase::getInstance();
+	test.open("BrianAIsql.db3");
 	test.clearDatabase();
 	test.insertAuthor("Brian");
 	int StyleID = test.retrieveAuthorStyleID("Brian");
@@ -181,40 +266,70 @@ void CMDparser::Leven(vector<string> cmdParams)
 void CMDparser::Brian(vector<string> cmdParams)
 {
 	Stopwatch sw;
-	StyleDatabase db("AIsql.db3");
+	StyleDatabase& db = StyleDatabase::getInstance();
+	db.open("AIsql.db3");
 	db.clearDatabase();
-//	string doc = ReadFile();
+	//	string doc = ReadFile();
 
 	sw.start();
-	Tokenizer tokenizer = Tokenizer("../StareProject/Documents/AMidsummerNightsDream.txt");
-	tokenizer.tokenizeDoc();
+	Tokenizer tokenizer = Tokenizer();
+	std::vector <std::vector<int>> Midsummer = tokenizer.tokenizeDoc("../StareProject/Documents/AMidsummerNightsDream.txt");
 	sw.end();
 
 	int tokenizerTime = sw.getTimeInMicroseconds();
 
-	vector<string> sentenceVect;
+	//	vector<string> sentenceVect;
 	sw.start();
 
 	int docID = db.insertDocument("Shakespere", "A Midnight Summer Dream", "a long long ago");
-	do
-	{
-		sentenceVect = tokenizer.getNextSentence();
-		db.insertSentence(docID, sentenceVect);
-	} while (sentenceVect.size() > 0);
+	sw.end();
+	int dbDocTime = sw.getTimeInMicroseconds();
+
+	sw.start();
+	db.insertDocumentText(docID, Midsummer);
 	sw.end();
 
-	int dbTime = sw.getTimeInMicroseconds();
+	int dbTextTime = sw.getTimeInMicroseconds();
 
-	//int sentID = 
-	//string sent = db.getSentence(sentID);
-	Tokenizer tokenizer2 = Tokenizer("../StareProject/Documents/AChristmasCarol.txt");
-	tokenizer2.tokenizeDoc();
-	int docID2 = db.insertDocument("Charles Dickens", "A Christmas Carol", "1864");
-	do
-	{
-		sentenceVect = tokenizer2.getNextSentence();
-		db.insertSentence(docID2, sentenceVect);
-	} while (sentenceVect.size() > 0);
+	//  Add more books
+	docID = db.insertDocument("Shakespere", "Henry V", "1619");
+	std::vector <std::vector<int>> docName = tokenizer.tokenizeDoc("../StareProject/Documents/HenryV.txt");
+	db.insertDocumentText(docID, docName);
+
+	docID = db.insertDocument("Shakespere", "Romeo and Juliet", "1597");
+	docName = tokenizer.tokenizeDoc("../StareProject/Documents/RomeoAndJuliet.txt");
+	db.insertDocumentText(docID, docName);
+
+	docID = db.insertDocument("Charles Dickens", "A Tale of Two Cities", "1859");
+	docName = tokenizer.tokenizeDoc("../StareProject/Documents/ATaleOfTwoCities.txt");
+	db.insertDocumentText(docID, docName);
+
+	docID = db.insertDocument("Charles Dickens", "Great Expectations", "1860");
+	docName = tokenizer.tokenizeDoc("../StareProject/Documents/GreatExpectations.txt");
+	db.insertDocumentText(docID, docName);
 
 
 }
+
+	//do
+	//{
+	//	sentenceVect = tokenizer.getNextSentence();
+	//	db.insertSentence(docID, sentenceVect);
+	//} while (sentenceVect.size() > 0);
+	//sw.end();
+
+	//int dbTime = sw.getTimeInMicroseconds();
+
+	//int sentID = 
+	//string sent = db.getSentence(sentID);
+	//Tokenizer tokenizer2 = Tokenizer("../StareProject/Documents/AChristmasCarol.txt");
+	//tokenizer2.tokenizeDoc();
+	//int docID2 = db.insertDocument("Charles Dickens", "A Christmas Carol", "1864");
+	//do
+	//{
+	//	sentenceVect = tokenizer2.getNextSentence();
+	//	db.insertSentence(docID2, sentenceVect);
+	//} while (sentenceVect.size() > 0);
+
+
+//}

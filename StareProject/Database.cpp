@@ -1,23 +1,43 @@
 #include "Database.h"
-StyleDatabase::StyleDatabase(string dbName)
+StyleDatabase::StyleDatabase()
+{
+	isOpen = false;
+	lastToken = 0;
+	lastAllocatedTokenID = 0;
+	currentAllocatedTokenID = 0;
+}
+
+StyleDatabase& StyleDatabase::getInstance()
+{
+	static StyleDatabase instance;
+	return instance;
+}
+
+StyleDatabase::~StyleDatabase(void)
+{
+	sqlite3_close(db); // Try to close the database
+}
+
+void StyleDatabase::open(string dbName)
 {
 	// Convert the dbName string to a format sqlite3_open needs
 	const char * c = dbName.c_str();
 
 	if (sqlite3_open(c, &db) == SQLITE_OK)
 	{
-
+		isOpen = true;
 	}
 	else {
+		isOpen = false;
 		throw exception("SQLite database failed to open");
 	}
+
+	lastToken = 0;
+	lastAllocatedTokenID = 0;
+	currentAllocatedTokenID = 0;
+	LoadTokenMap();
 }
 
-
-StyleDatabase::~StyleDatabase(void)
-{
-	sqlite3_close(db); // Try to close the database
-}
 
 void StyleDatabase::insert(string q)
 {
@@ -50,7 +70,12 @@ void StyleDatabase::clearDatabase()
 	insert("DELETE FROM HMMTokenPaths");
 	insert("DELETE FROM Sentences");
 	insert("DELETE FROM Styles");
+	insert("DELETE FROM Variables");
+	insert("INSERT INTO Variables (LastSentenceID,LastTokenID) VALUES (0,2)");
 	insert("DELETE FROM Tokens");
+	insert("INSERT INTO Tokens (TokenID,Word) VALUES (1,CHAR(13))");
+	insert("INSERT INTO Tokens (TokenID,Word) VALUES (2,CHAR(9))");
+	LoadTokenMap();
 }
 
 void StyleDatabase::addHMMTokenPath(int SentID, int StyleID, int CurToken, int NextToken, int PrevToken)
@@ -240,6 +265,7 @@ int StyleDatabase::getSentenceID(int docid)
 	}
 	return retAns;
 }
+
 
 int StyleDatabase::getDocumentID(string Author, string title)
 {
@@ -563,5 +589,222 @@ vector<int> StyleDatabase::getWordGroupListByStyle(int StyleID, string prevWord,
 	}
 
 	return tokens;
+}
+
+int StyleDatabase::incrementSentenceID(int byAmount)
+{
+	char* errorMessage;
+	sqlite3_stmt *select_statement;
+	int currentSentenceID;
+
+	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &errorMessage);
+	// get the current value
+	if (sqlite3_prepare(db, "SELECT LastSentenceID FROM Variables", -1, &select_statement, 0) == SQLITE_OK)
+	{
+		int checkRow = sqlite3_step(select_statement);
+		if (checkRow == SQLITE_ROW)
+		{
+			// The variable exists in the database, so read it and update it.
+			// we know there is something here or it wouldn't have given SQLITE_OK, so just read first item.
+			currentSentenceID = sqlite3_column_int(select_statement, 0);
+			string updateStr = "UPDATE Variables SET LastSentenceID = LastSentenceID + " + byAmount;
+			sqlite3_exec(db, updateStr.c_str(), NULL, NULL, &errorMessage);
+		}
+		else
+		{
+			// the variable doesn't exist in the database, so create it and return 0;
+			stringstream insertStr;
+			insertStr << "INSERT INTO Variables (LastSentenceID) VALUES (" << byAmount << ")";
+			sqlite3_exec(db, insertStr.str().c_str(), NULL, NULL, &errorMessage);
+			currentSentenceID = 0;
+		}
+	}
+	sqlite3_exec(db, "COMMIT TRANSACTION", NULL, NULL, &errorMessage);
+	return currentSentenceID;
+}
+
+void StyleDatabase::insertDocumentText(int DocumentID, std::vector <std::vector<int>> document)
+{
+	char* errorMessage;
+
+	FlushTokenCache();
+
+	// Preallocate all of the sentenceIDs that we will need.
+	int StyleID = getStyleID(DocumentID);
+	int numberOfSentences = document.size();
+	int startSentenceID = incrementSentenceID(numberOfSentences); // returned from the server the first available SentenceID
+
+	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &errorMessage);
+
+	// setup pre-prepared sql statements.
+	char buffer[] = "INSERT INTO HMMtokenPaths (StyleID,DocumentID,SentenceID,CurrentToken,NextToken,PreviousToken) VALUES (?1, ?2, ?3, ?4, ?5, ?6)";
+	sqlite3_stmt* stmt;
+	int error = sqlite3_prepare_v2(db, buffer, strlen(buffer), &stmt, NULL);
+
+	// define required variables just once.
+	int sentenceNum, wordNum, lastWordNum;
+
+	int currWordToken, nextWordToken, prevWordToken;
+	int SentenceID;
+	// insert all words in all sentences into HMMtokenPaths
+	for (sentenceNum = 0; sentenceNum < numberOfSentences; sentenceNum++)
+	{
+		lastWordNum = document[sentenceNum].size();
+		for (wordNum = 0; wordNum < lastWordNum; wordNum++)
+		{
+			// Load all variables into the correct type to be inserted into the prepared statement.
+			if (wordNum>0)
+			{ 
+				// middle or end of sentence
+				prevWordToken = document[sentenceNum][wordNum - 1];
+			}
+			else
+			{ 
+				// Start of sentence
+				prevWordToken = -1;
+			}
+
+			if (wordNum + 1 < lastWordNum)
+			{
+				// Start or middle of sentence
+				nextWordToken = document[sentenceNum][wordNum + 1];
+			}
+			else
+			{
+				// end of sentence
+				nextWordToken = -1;
+			}
+
+			currWordToken = document[sentenceNum][wordNum];
+			//currWordSize = document[sentenceNum][wordNum].size();
+
+			SentenceID = startSentenceID + sentenceNum;
+
+			// bind to prepared statement. 
+			sqlite3_bind_int(stmt, 1, StyleID);
+			sqlite3_bind_int(stmt, 2, DocumentID);
+			sqlite3_bind_int(stmt, 3, SentenceID);
+			if (currWordToken != -1) sqlite3_bind_int(stmt, 4, currWordToken);
+			else sqlite3_bind_null(stmt, 4);
+			if (nextWordToken != -1) sqlite3_bind_int(stmt, 5, nextWordToken);
+			else sqlite3_bind_null(stmt, 5);
+			if (prevWordToken != -1) sqlite3_bind_int(stmt, 6, prevWordToken);
+			else sqlite3_bind_null(stmt, 6);
+			sqlite3_step(stmt);
+
+			//sqlite3_clear_bindings(stmt);
+			sqlite3_reset(stmt);
+		}
+	}
+	sqlite3_exec(db, "COMMIT TRANSACTION", NULL, NULL, &errorMessage);
+	sqlite3_finalize(stmt);
+}
+
+void StyleDatabase::LoadTokenMap()
+{
+	//char* errorMessage;
+	sqlite3_stmt *select_statement;
+
+	string selectTokenStr = "SELECT TokenID,Word FROM Tokens WHERE TokenID >= " + std::to_string(lastToken); // There is a bug here.  If another process gets tokens allocated and then adds them, they will not show up here.
+	if (sqlite3_prepare(db, selectTokenStr.c_str(), -1, &select_statement, 0) == SQLITE_OK)
+	{
+		int checkRow;
+		while (true)
+		{
+			checkRow = sqlite3_step(select_statement);
+			if (checkRow == SQLITE_ROW)
+			{
+				int tokenID = sqlite3_column_int(select_statement, 0);
+				string word = (char*)sqlite3_column_text(select_statement, 1);
+				tokenMap.insert(std::pair<string, int>(word, tokenID));
+				if (tokenID > lastToken) lastToken = tokenID;
+			}
+			else break;
+		}
+	}
+}
+
+int StyleDatabase::GetToken(string word)
+{
+	map<string,int>::iterator it = tokenMap.find(word);
+	if (it == tokenMap.end())
+	{
+		// the token does not exist in the database
+		// so add it to the temp list and insert it into the map
+		int nextTokenID = GetNextTokenID();
+		std::pair<string, int> tokenPair = std::pair<string, int>(word, nextTokenID);
+		tokenMap.insert(tokenPair);
+		tokenCache.push_back(tokenPair);
+		if (nextTokenID > lastToken) lastToken = nextTokenID;
+		return nextTokenID;
+	}
+	else
+		return it->second;
+}
+
+void StyleDatabase::FlushTokenCache()
+{
+	if (tokenCache.size() > 0)
+	{
+		char* errorMessage;
+		sqlite3_stmt *stmt;
+
+		sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &errorMessage);
+
+		// setup pre-prepared sql statements.
+		char buffer[] = "INSERT INTO Tokens VALUES (?1, ?2)";
+
+		sqlite3_prepare_v2(db, buffer, strlen(buffer), &stmt, NULL);
+
+		for (vector<pair<string, int>>::iterator it = tokenCache.begin(); it != tokenCache.end(); ++it)
+		{
+			// bind to prepared statement. 
+			sqlite3_bind_int(stmt, 1, it->second);
+			sqlite3_bind_text(stmt, 2, it->first.c_str(),it->first.size(),0);
+			sqlite3_step(stmt);
+			sqlite3_reset(stmt);
+		}
+		sqlite3_finalize(stmt);
+		sqlite3_exec(db, "COMMIT TRANSACTION", NULL, NULL, &errorMessage);
+		tokenCache.clear();
+	}
+}
+
+int StyleDatabase::GetNextTokenID()
+{
+	// get tokenIDs in 100 allocations.  Only ask for a new allocation when it is needed.
+	if (currentAllocatedTokenID == lastAllocatedTokenID)
+	{
+		// get new batch of tokens from the server
+		char* errorMessage;
+		sqlite3_stmt *select_statement;
+
+		sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &errorMessage);
+		// get the current value
+		if (sqlite3_prepare(db, "SELECT LastTokenID FROM Variables", -1, &select_statement, 0) == SQLITE_OK)
+		{
+			int checkRow = sqlite3_step(select_statement);
+			if (checkRow == SQLITE_ROW)
+			{
+				// The variable exists in the database, so read it and update it.
+				// we know there is something here or it wouldn't have given SQLITE_ROW, so just read first item.
+				currentAllocatedTokenID = sqlite3_column_int(select_statement, 0);
+				lastAllocatedTokenID = currentAllocatedTokenID + 100;
+				string updateStr = "UPDATE Variables SET LastTokenID = " + std::to_string(lastAllocatedTokenID);
+				sqlite3_exec(db, updateStr.c_str(), NULL, NULL, &errorMessage);
+			}
+			else
+			{
+				// the variable doesn't exist in the database, so create it and return 0;
+				//stringstream insertStr;
+				//insertStr << "INSERT INTO Variables (SentenceID) VALUES (100)";
+				sqlite3_exec(db, "INSERT INTO Variables (SentenceID) VALUES (100)", NULL, NULL, &errorMessage);
+				currentAllocatedTokenID = 0;
+				lastAllocatedTokenID = 100;
+			}
+		}
+		sqlite3_exec(db, "COMMIT TRANSACTION", NULL, NULL, &errorMessage);
+	}
+	return ++currentAllocatedTokenID;
 }
 
