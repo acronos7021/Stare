@@ -26,7 +26,7 @@ HTMLgenerator::HTMLgenerator(string DestinationFilename, int documentID, vector<
 	output << header;
 	infile.close();
 
-	if (rankingList.size!=0)
+	if (rankingList.size()!=0)
 	{
 		//Output how much your document was plagarised
 		// ********I don't know how to call this, any ideas? insert between the bold tags(There is no input for this either)
