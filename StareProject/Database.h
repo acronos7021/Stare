@@ -5,15 +5,24 @@ using namespace std;
 #include <string>
 #include <vector>
 #include "sqlite3.h"
+#include "DataStructs.h"
 #include <stdexcept>
 #include <iostream>
 #include <sstream>
+#include <map>
+
 
 class StyleDatabase
 {
 public:
-	StyleDatabase(string dbName);
+//	static StyleDatabase& getInstance();
+	StyleDatabase();
 	~StyleDatabase(void);
+
+	void open();
+	void close();
+	bool isOpen;
+	string databaseName;
 
 	//Use this to create a new Document
 	//  if a Style (author) doesn’t exist and add it to the Style table.  
@@ -46,6 +55,7 @@ public:
 	vector<int> getWordGroupListByStyle(int StyleID, string prevWord, string currWord, string nextWord);
 
 	void clearDatabase();
+	void CreateDatabase();
 	vector<string> testFunc(); // Remove after testing
 
 //private:
@@ -72,6 +82,18 @@ public:
 	int getDocumentID(string Author, string title);
 	int getDocumentID(int styleID,string title);
 
-
+	int GetToken(string word);
+	int incrementSentenceID(int byAmount);
+	void insertDocumentText(int DocumentID, std::vector <std::vector<int>> document);
+	void LoadTokenMap();
+	int GetNextTokenID();
+	vector<std::pair<string, int>> tokenCache;
+	void FlushTokenCache();
+	std::map<string,int> tokenMap;
+	int lastToken;
+	int currentAllocatedTokenID, lastAllocatedTokenID;
+	vector<StyleCounts> getTotalWordCountPerStyle();
+	vector<StyleCounts> getPathWordCountPerStyle(int currToken, int nextToken);
 };
 
+extern StyleDatabase& db;

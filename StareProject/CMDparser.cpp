@@ -4,10 +4,12 @@ using namespace std;
 
 #include <sstream> 
 #include <fstream>
+#include <iostream>
 #include "Stopwatch.h"
 #include "Database.h"
 #include "CMDparser.h"
 #include "Tokenizer.h"
+#include "HMMengine.h"
 
 
 bool CMDparser::parseCMD(vector<string> cmdList)
@@ -38,6 +40,10 @@ bool CMDparser::parseCMD(vector<string> cmdList)
 		Leven(cmdList);
 	else if (cmdList[0] == "Brian")
 		Brian(cmdList);
+	else if ((cmdList[0] == "Create") && (cmdList[1] == "Database"))
+		db.CreateDatabase();
+	else if (cmdList[0] == "Execute")
+		Execute(cmdList[1]);
 	else if (cmdList[0] == "help")
 	{
 		cout << "The commands are : 'quit', 'learn', 'compare', 'create', 'help'" << endl;
@@ -68,12 +74,14 @@ void CMDparser::Learn(vector<string> cmdList)
 		return;
 	}
 	MetaData metaData;
-	metaData.DocumentText = ReadFile(cmdList[1]);
+	metaData.DocumentText = cmdList[1]; // ReadFile(cmdList[1]);
 	metaData.action = ActionType::Learn;
 	metaData.Author = cmdList[2];
 	metaData.Title = cmdList[3];
 	metaData.PublishDate = cmdList[4];
-
+	cout << "Learning document -> " << metaData.Author << " : " << metaData.Title;
+	HMMengine hmm;
+	hmm.learn(metaData);
 }
 void CMDparser::Compare(vector<string> cmdList)
 {
@@ -89,11 +97,14 @@ void CMDparser::Compare(vector<string> cmdList)
 		return;
 	}
 	MetaData metaData;
-	metaData.DocumentText = ReadFile(cmdList[1]);
+	metaData.DocumentText = cmdList[1]; // ReadFile(cmdList[1]);
 	metaData.action = ActionType::Compare;
 	metaData.Author = cmdList[2];
 	metaData.Title = cmdList[3];
 	metaData.PublishDate = cmdList[4];
+	cout << "Comparing document -> " << metaData.Author << " : " << metaData.Title;
+	HMMengine hmm;
+	hmm.compare(metaData);
 }
 void CMDparser::Create(vector<string> cmdList)
 {
@@ -110,6 +121,8 @@ void CMDparser::Create(vector<string> cmdList)
 	metaData.DocumentText = ReadFile(cmdList[1]);
 	metaData.action = ActionType::Create;
 	metaData.Author = cmdList[2];
+	HMMengine hmm;
+	hmm.create(metaData);
 }
 
 string CMDparser::ReadFile(string fileName)
@@ -132,30 +145,134 @@ string CMDparser::ReadFile(string fileName)
 
 }
 
+void CMDparser::Execute(string file)
+{
+	string line;
+	vector<string> cmdLst;
+	string fileWithExtension = file + ".stare";
+	string commandString = ReadFile(fileWithExtension);
+	if (commandString != "")
+	{
+		istringstream commandStream(commandString);
+		while (getline(commandStream, line))
+		{
+			cout << "<< " << line << endl;
+			cmdLst = CMDparser::getCommands(line);
+			parseCMD(cmdLst);
+			cout << endl << endl;
+		}
+	}
+}
+
+vector<string> CMDparser::getCommands(string cmdStr)
+{
+	vector<string> words;
+	stringstream ss;
+
+	// I was too lazy to implement a full state machine.  However...
+	// Uses 3 states to determine the action at a character position.  They are:
+	// inWord==false, inQuotes==false :  this state means that any non Alphanums are dumped until a proper alphanum is encountered
+	// inWord==true, inQuotes==false  :  This state meant that any alphanums are added to the current word until a non-alphanum is encountered
+	// inWord==true, inQuotes==true  :  Anything, whether alphanum or not, is added to the current word until another '"' is encountered.
+
+	bool inWord = false;   // if inWord, all alphanumeric 
+	bool inQuotes = false; // if inQuotes is true, all characters are recorded into the current ss until another quote is encountered.
+
+	for (unsigned int i = 0; i < cmdStr.size(); i++)
+	{
+		if (!inWord)
+		{
+			if (isAlphaNumeric(cmdStr[i]))
+			{
+				// start word
+				ss << cmdStr[i];
+				inWord = true;
+			}
+			else if (cmdStr[i] == '"')
+			{
+				// start quotes
+				inWord = true;
+				inQuotes = true;
+			}
+		}
+		else
+		{
+			// inWord is true
+			if (inQuotes)
+			{
+				if (cmdStr[i] != '"')
+					ss << cmdStr[i];
+				else
+				{
+					// the quotes have ended
+					words.push_back(ss.str());
+					ss.str("");  // empty ss
+					inWord = false;
+					inQuotes = false;
+
+				}
+			}
+			else
+			{
+				if (isAlphaNumeric(cmdStr[i]))
+					ss << cmdStr[i];
+				else
+				{
+					// the word has ended
+					words.push_back(ss.str());
+					ss.str("");  // empty ss
+					inWord = false;
+				}
+
+			}
+		}
+	}
+
+	// The last word can end with the end of the string.  
+	// It would not be detected then, so add it here.
+	if (inWord)
+		words.push_back(ss.str());
+
+	return words;
+}
+
+bool CMDparser::isAlphaNumeric(char c)
+{
+	if (((c >= 'a') && (c <= 'z')) ||
+		((c >= 'A') && (c <= 'Z')) ||
+		((c >= '0') && (c <= '9')))
+		return true;
+	else
+		return false;
+}
+
+
+
 void CMDparser::Brandon(vector<string> cmdParams)
 {
 	//cout << "The int on our platform is " << (sizeof(int)*8) << " bits" << endl;
 	//cout << "The long on our platform is " << (sizeof(long)* 8) << " bits" << endl; 
 	//cout << "The long long on our platform is " << (sizeof(long long)* 8) << " bits" << endl;
-	StyleDatabase test("BrianAIsql.db3");
-	test.clearDatabase();
-	test.insertAuthor("Brian");
-	int StyleID = test.retrieveAuthorStyleID("Brian");
+	//StyleDatabase& test = StyleDatabase::getInstance();
+	//test.open("BrianAIsql.db3");
+	db.clearDatabase();
+	db.insertAuthor("Brian");
+	int StyleID = db.retrieveAuthorStyleID("Brian");
 	//test.insertDocument(StyleID, "Brian book", "1996");
-	test.retrieve("Styles", "Author", "Author", "Sam");
-	int DocumentID = test.insertDocument("Sam", "Sams Book", "1900");  // test new path
-	DocumentID = test.insertDocument("Brian", "Brians other book.", "1998"); // test same author, new book
-	DocumentID = test.insertDocument("Brian", "Brian book", "1996"); // test same author, same book.
+	db.retrieve("Styles", "Author", "Author", "Sam");
+	int DocumentID = db.insertDocument("Sam", "Sams Book", "1900");  // test new path
+	DocumentID = db.insertDocument("Brian", "Brians other book.", "1998"); // test same author, new book
+	DocumentID = db.insertDocument("Brian", "Brian book", "1996"); // test same author, same book.
 	vector<string> sentVect1;
 	sentVect1.push_back("This");
 	sentVect1.push_back("is");
 	sentVect1.push_back("a");
 	sentVect1.push_back("test");
-	test.insertSentence(DocumentID, sentVect1);
-	test.insertSentence(DocumentID, sentVect1); // test duplicate words.
+	db.insertSentence(DocumentID, sentVect1);
+	db.insertSentence(DocumentID, sentVect1); // test duplicate words.
 	vector<string> sentVect2;
 	sentVect2.push_back(".");
-	test.insertSentence(DocumentID, sentVect2); // test short sentence.
+	db.insertSentence(DocumentID, sentVect2); // test short sentence.
 }
 
 void CMDparser::Blake(vector<string> cmdParams)
@@ -180,41 +297,67 @@ void CMDparser::Leven(vector<string> cmdParams)
 
 void CMDparser::Brian(vector<string> cmdParams)
 {
+	HMMengine hmm;
 	Stopwatch sw;
-	StyleDatabase db("AIsql.db3");
-	db.clearDatabase();
-//	string doc = ReadFile();
 
-	sw.start();
-	Tokenizer tokenizer = Tokenizer("../StareProject/Documents/AMidsummerNightsDream.txt");
-	tokenizer.tokenizeDoc();
-	sw.end();
 
-	int tokenizerTime = sw.getTimeInMicroseconds();
+	//sw.start();
+	//Tokenizer tokenizer = Tokenizer();
+	//std::vector <std::vector<int>> Midsummer = tokenizer.tokenizeDoc("../StareProject/Documents/AMidsummerNightsDream.txt");
+	//sw.end();
 
-	vector<string> sentenceVect;
-	sw.start();
+	//int tokenizerTime = sw.getTimeInMicroseconds();
 
-	int docID = db.insertDocument("Shakespere", "A Midnight Summer Dream", "a long long ago");
-	do
-	{
-		sentenceVect = tokenizer.getNextSentence();
-		db.insertSentence(docID, sentenceVect);
-	} while (sentenceVect.size() > 0);
-	sw.end();
+	////	vector<string> sentenceVect;
+	//sw.start();
 
-	int dbTime = sw.getTimeInMicroseconds();
+	//int docID = db.insertDocument("Shakespere", "A Midnight Summer Dream", "a long long ago");
+	//sw.end();
+	//int dbDocTime = sw.getTimeInMicroseconds();
+
+	//sw.start();
+	//db.insertDocumentText(docID, Midsummer);
+	//sw.end();
+
+	//int dbTextTime = sw.getTimeInMicroseconds();
+
+	//  Add more books
+	//db.clearDatabase();
+
+	//sw.start();
+	//cout << "Loading Henry V" << endl;
+	//hmm.learn(MetaData("Shakespere", "Henry V", "1619", "../StareProject/Documents/HenryV.txt"));
+	//cout << "Loading Romeo and Juliet" << endl;
+	//hmm.learn(MetaData("Shakespere", "Romeo and Juliet", "1597", "../StareProject/Documents/RomeoAndJuliet.txt"));
+	//cout << "Loading A Tale of Two Cities" << endl;
+	//hmm.learn(MetaData("Charles Dickens", "A Tale of Two Cities", "1859", "../StareProject/Documents/ATaleOfTwoCities.txt"));
+	//cout << "Loading Great Expectation" << endl;
+	//hmm.learn(MetaData("Charles Dickens", "Great Expectations", "1860", "../StareProject/Documents/GreatExpectations.txt"));
+	//sw.end();
+	//int learnTime = sw.getTimeInMicroseconds();
+
+	hmm.compare(MetaData("Shakespere", "A Midnight Summer Dream", "1605", "../StareProject/Documents/AMidsummerNightsDream.txt"));
+}
+
+	//do
+	//{
+	//	sentenceVect = tokenizer.getNextSentence();
+	//	db.insertSentence(docID, sentenceVect);
+	//} while (sentenceVect.size() > 0);
+	//sw.end();
+
+	//int dbTime = sw.getTimeInMicroseconds();
 
 	//int sentID = 
 	//string sent = db.getSentence(sentID);
-	Tokenizer tokenizer2 = Tokenizer("../StareProject/Documents/AChristmasCarol.txt");
-	tokenizer2.tokenizeDoc();
-	int docID2 = db.insertDocument("Charles Dickens", "A Christmas Carol", "1864");
-	do
-	{
-		sentenceVect = tokenizer2.getNextSentence();
-		db.insertSentence(docID2, sentenceVect);
-	} while (sentenceVect.size() > 0);
+	//Tokenizer tokenizer2 = Tokenizer("../StareProject/Documents/AChristmasCarol.txt");
+	//tokenizer2.tokenizeDoc();
+	//int docID2 = db.insertDocument("Charles Dickens", "A Christmas Carol", "1864");
+	//do
+	//{
+	//	sentenceVect = tokenizer2.getNextSentence();
+	//	db.insertSentence(docID2, sentenceVect);
+	//} while (sentenceVect.size() > 0);
 
 
-}
+//}
