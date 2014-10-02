@@ -60,5 +60,18 @@ struct StyleCounts
 	}
 };
 
+struct StyleCounter
+{
+	int SentenceCount;
+	int TotalCount;
+	double SentencePercent;
+	double TotalDocPercent;
+	StyleCounter(int in_count) 
+	{
+		SentenceCount = in_count; 
+		TotalCount = in_count;
+	}
+
+};
 
 

@@ -822,23 +822,23 @@ vector<StyleCounts> StyleDatabase::getTotalWordCountPerStyle()
 	string Author;
 
 	char* selectStr =
-		"SELECT StyleID,Author,COUNT(HMMtokenPaths.CurrentToken)						\
-				FROM HMMtokenPaths														\
-				JOIN Styles ON Styles.StyleID = HMMtokenPaths.StyleID					\
-				GROUP BY HMMtokenPaths.StyleID";
-
+		"SELECT HMMtokenPaths.StyleID, Styles.Author, COUNT(HMMtokenPaths.CurrentToken) FROM HMMtokenPaths JOIN Styles ON Styles.StyleID = HMMtokenPaths.StyleID GROUP BY HMMtokenPaths.StyleID";
 
 	if (sqlite3_prepare(db, selectStr, -1, &select_statement, 0) == SQLITE_OK)
 	{
-		int checkRow = sqlite3_step(select_statement);
-		if (checkRow == SQLITE_ROW)
+		while (true)
 		{
-			// The variable exists in the database, so read it and update it.
-			// we know there is something here or it wouldn't have given SQLITE_ROW, so just read first item.
-			StyleID = sqlite3_column_int(select_statement, 0);
-			Author = (char*) sqlite3_column_text(select_statement, 1);
-			wordCount = sqlite3_column_int(select_statement, 2);
-			output.push_back(StyleCounts(StyleID, Author, wordCount));
+			int checkRow = sqlite3_step(select_statement);
+			if (checkRow == SQLITE_ROW)
+			{
+				// The variable exists in the database, so read it and update it.
+				// we know there is something here or it wouldn't have given SQLITE_ROW, so just read first item.
+				StyleID = sqlite3_column_int(select_statement, 0);
+				Author = (char*)sqlite3_column_text(select_statement, 1);
+				wordCount = sqlite3_column_int(select_statement, 2);
+				output.push_back(StyleCounts(StyleID, Author, wordCount));
+			}
+			else break;
 		}
 	}
 	return output;
@@ -853,26 +853,26 @@ vector<StyleCounts> StyleDatabase::getPathWordCountPerStyle(int currToken, int n
 	int StyleID, wordCount;
 	string Author;
 
-	char selectStr[100];
-	sprintf_s(selectStr, 100,
-	"SELECT StyleID,Author,COUNT(HMMtokenPaths.CurrentToken)				\
-		FROM HMMtokenPaths														\
-		JOIN Styles ON Styles.StyleID = HMMtokenPaths.StyleID					\
-		WHERE CurrentToken = %d AND NextToken = %d								\
-		GROUP BY HMMtokenPaths.StyleID",
-	currToken, nextToken);
+	char selectStr[500];
+	sprintf_s(selectStr, 500,
+	   "SELECT Styles.StyleID, Styles.Author, COUNT(HMMtokenPaths.CurrentToken) FROM HMMtokenPaths	JOIN Styles ON Styles.StyleID = HMMtokenPaths.StyleID WHERE CurrentToken = %d AND NextToken = %d GROUP BY HMMtokenPaths.StyleID",
+	   currToken, nextToken);
 
 	if (sqlite3_prepare(db, selectStr, -1, &select_statement, 0) == SQLITE_OK)
 	{
-		int checkRow = sqlite3_step(select_statement);
-		if (checkRow == SQLITE_ROW)
+		while (true)
 		{
-			// The variable exists in the database, so read it and update it.
-			// we know there is something here or it wouldn't have given SQLITE_ROW, so just read first item.
-			StyleID = sqlite3_column_int(select_statement, 0);
-			Author = (char*)sqlite3_column_text(select_statement, 1);
-			wordCount = sqlite3_column_int(select_statement, 2);
-			output.push_back(StyleCounts(StyleID, Author, wordCount));
+			int checkRow = sqlite3_step(select_statement);
+			if (checkRow == SQLITE_ROW)
+			{
+				// The variable exists in the database, so read it and update it.
+				// we know there is something here or it wouldn't have given SQLITE_ROW, so just read first item.
+				StyleID = sqlite3_column_int(select_statement, 0);
+				Author = (char*)sqlite3_column_text(select_statement, 1);
+				wordCount = sqlite3_column_int(select_statement, 2);
+				output.push_back(StyleCounts(StyleID, Author, wordCount));
+			}
+			else break;
 		}
 	}
 	return output;

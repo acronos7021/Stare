@@ -268,8 +268,7 @@ void CMDparser::Brian(vector<string> cmdParams)
 {
 	HMMengine hmm;
 	Stopwatch sw;
-	db.clearDatabase();
-	//	string doc = ReadFile();
+
 
 	//sw.start();
 	//Tokenizer tokenizer = Tokenizer();
@@ -292,15 +291,21 @@ void CMDparser::Brian(vector<string> cmdParams)
 	//int dbTextTime = sw.getTimeInMicroseconds();
 
 	//  Add more books
-	sw.start();
-	hmm.learn(MetaData("Shakespere", "Henry V", "1619", "../StareProject/Documents/HenryV.txt"));
-	hmm.learn(MetaData("Shakespere", "Romeo and Juliet", "1597", "../StareProject/Documents/RomeoAndJuliet.txt"));
-	hmm.learn(MetaData("Charles Dickens", "A Tale of Two Cities", "1859", "../StareProject/Documents/ATaleOfTwoCities.txt"));
-	hmm.learn(MetaData("Charles Dickens", "Great Expectations", "1860", "../StareProject/Documents/GreatExpectations.txt"));
-	sw.end();
-	int learnTime = sw.getTimeInMicroseconds();
+	//db.clearDatabase();
 
-	//hmm.compare(MetaData("Shakespere", "A Midnight Summer Dream", "1605", "../StareProject/Documents/AMidsummerNightsDream.txt"));
+	//sw.start();
+	//cout << "Loading Henry V" << endl;
+	//hmm.learn(MetaData("Shakespere", "Henry V", "1619", "../StareProject/Documents/HenryV.txt"));
+	//cout << "Loading Romeo and Juliet" << endl;
+	//hmm.learn(MetaData("Shakespere", "Romeo and Juliet", "1597", "../StareProject/Documents/RomeoAndJuliet.txt"));
+	//cout << "Loading A Tale of Two Cities" << endl;
+	//hmm.learn(MetaData("Charles Dickens", "A Tale of Two Cities", "1859", "../StareProject/Documents/ATaleOfTwoCities.txt"));
+	//cout << "Loading Great Expectation" << endl;
+	//hmm.learn(MetaData("Charles Dickens", "Great Expectations", "1860", "../StareProject/Documents/GreatExpectations.txt"));
+	//sw.end();
+	//int learnTime = sw.getTimeInMicroseconds();
+
+	hmm.compare(MetaData("Shakespere", "A Midnight Summer Dream", "1605", "../StareProject/Documents/AMidsummerNightsDream.txt"));
 }
 
 	//do

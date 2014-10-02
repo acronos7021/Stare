@@ -42,8 +42,10 @@ void HMMengine::compare(MetaData metaData)
 
 	vector<StyleCounts> totalWordCountsPerStyle = db.getTotalWordCountPerStyle();
 
-	map<int, int> pairCountsPerStyle;
+	map<int, StyleCounter> pairCountsPerStyle;
 
+	//pairCountsPerStyle.insert(std::pair<int, int>(1, 1));
+	int sentence = 0;
 	for (int s = 0; s < documentTokens.size(); s++)
 	{
 		int sentSize = documentTokens[s].size() - 1;
@@ -53,9 +55,45 @@ void HMMengine::compare(MetaData metaData)
 			vector<StyleCounts> wordCountsPerPath = db.getPathWordCountPerStyle(documentTokens[s][w], documentTokens[s][w + 1]);
 			for (int i = 0; i < wordCountsPerPath.size(); i++)
 			{
-				map<string, int>::iterator it = pairCountsPerStyle.find(wordCountsPerPath);
+				map<int, StyleCounter>::iterator it = pairCountsPerStyle.find(wordCountsPerPath[i].StyleID);
 				if (it == pairCountsPerStyle.end())
+				{
+					// not in the list, so insert it
+					pairCountsPerStyle.insert(std::pair<int, StyleCounter>(wordCountsPerPath[i].StyleID, StyleCounter(wordCountsPerPath[i].Count)));
+				}
+				else
+				{
+					// already exists so increment it.
+					it->second.SentenceCount += wordCountsPerPath[i].Count;
+					it->second.TotalCount += wordCountsPerPath[i].Count;
+
+				}
 			}
+		}
+		sentence++;
+		cout << endl << "Sentence:" << sentence << endl;
+
+		double totalSentencePercent = 0;
+		double totalDocumentPercent = 0;
+		for (int i = 0; i < totalWordCountsPerStyle.size(); i++)
+		{
+			map<int, StyleCounter>::iterator it = pairCountsPerStyle.find(totalWordCountsPerStyle[i].StyleID);
+//			double itrSentenceCount = it->second.SentenceCount;
+			it->second.SentencePercent = it->second.SentenceCount / (double)totalWordCountsPerStyle[i].Count;
+			it->second.TotalDocPercent = it->second.TotalCount / (double)totalWordCountsPerStyle[i].Count;
+			totalSentencePercent += it->second.SentencePercent;
+			totalDocumentPercent += it->second.TotalDocPercent;
+//			cout << totalWordCountsPerStyle[i].Author << " " << it->second.SentenceCount << "-" << it->second.TotalCount << endl;
+		}
+
+		for (int i = 0; i < totalWordCountsPerStyle.size(); i++)
+		{
+			map<int, StyleCounter>::iterator it = pairCountsPerStyle.find(totalWordCountsPerStyle[i].StyleID);
+			double sentencePercent = it->second.SentencePercent / totalSentencePercent * 100;
+			double docPercent = it->second.TotalDocPercent / totalDocumentPercent * 100;
+//			cout << setprecision(2) << totalWordCountsPerStyle[i].Author << " By Sentence:" << it->second.SentenceCount << ":" << sentencePercent << "% Total To Now: " << it->second.TotalCount << ":" << docPercent << "%" << endl;
+			cout << setprecision(2) << totalWordCountsPerStyle[i].Author << " => Sentence:" << sentencePercent << "%    Total: "  << docPercent << "%" << endl;
+			it->second.SentenceCount = 0;
 		}
 	}
 
