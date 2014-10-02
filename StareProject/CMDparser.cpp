@@ -4,6 +4,7 @@ using namespace std;
 
 #include <sstream> 
 #include <fstream>
+#include <iostream>
 #include "Stopwatch.h"
 #include "Database.h"
 #include "CMDparser.h"
@@ -39,6 +40,10 @@ bool CMDparser::parseCMD(vector<string> cmdList)
 		Leven(cmdList);
 	else if (cmdList[0] == "Brian")
 		Brian(cmdList);
+	else if ((cmdList[0] == "Create") && (cmdList[1] == "Database"))
+		db.CreateDatabase();
+	else if (cmdList[0] == "Execute")
+		Execute(cmdList[1]);
 	else if (cmdList[0] == "help")
 	{
 		cout << "The commands are : 'quit', 'learn', 'compare', 'create', 'help'" << endl;
@@ -69,12 +74,14 @@ void CMDparser::Learn(vector<string> cmdList)
 		return;
 	}
 	MetaData metaData;
-	metaData.DocumentText = ReadFile(cmdList[1]);
+	metaData.DocumentText = cmdList[1]; // ReadFile(cmdList[1]);
 	metaData.action = ActionType::Learn;
 	metaData.Author = cmdList[2];
 	metaData.Title = cmdList[3];
 	metaData.PublishDate = cmdList[4];
-
+	cout << "Learning document -> " << metaData.Author << " : " << metaData.Title;
+	HMMengine hmm;
+	hmm.learn(metaData);
 }
 void CMDparser::Compare(vector<string> cmdList)
 {
@@ -90,11 +97,14 @@ void CMDparser::Compare(vector<string> cmdList)
 		return;
 	}
 	MetaData metaData;
-	metaData.DocumentText = ReadFile(cmdList[1]);
+	metaData.DocumentText = cmdList[1]; // ReadFile(cmdList[1]);
 	metaData.action = ActionType::Compare;
 	metaData.Author = cmdList[2];
 	metaData.Title = cmdList[3];
 	metaData.PublishDate = cmdList[4];
+	cout << "Comparing document -> " << metaData.Author << " : " << metaData.Title;
+	HMMengine hmm;
+	hmm.compare(metaData);
 }
 void CMDparser::Create(vector<string> cmdList)
 {
@@ -111,6 +121,8 @@ void CMDparser::Create(vector<string> cmdList)
 	metaData.DocumentText = ReadFile(cmdList[1]);
 	metaData.action = ActionType::Create;
 	metaData.Author = cmdList[2];
+	HMMengine hmm;
+	hmm.create(metaData);
 }
 
 string CMDparser::ReadFile(string fileName)
@@ -133,6 +145,24 @@ string CMDparser::ReadFile(string fileName)
 
 }
 
+void CMDparser::Execute(string file)
+{
+	string line;
+	vector<string> cmdLst;
+	string fileWithExtension = file + ".stare";
+	string commandString = ReadFile(fileWithExtension);
+	if (commandString != "")
+	{
+		istringstream commandStream(commandString);
+		while (getline(commandStream, line))
+		{
+			cout << "<< " << line << endl;
+			cmdLst = CMDparser::getCommands(line);
+			parseCMD(cmdLst);
+			cout << endl << endl;
+		}
+	}
+}
 
 vector<string> CMDparser::getCommands(string cmdStr)
 {
@@ -215,6 +245,7 @@ bool CMDparser::isAlphaNumeric(char c)
 	else
 		return false;
 }
+
 
 
 void CMDparser::Brandon(vector<string> cmdParams)

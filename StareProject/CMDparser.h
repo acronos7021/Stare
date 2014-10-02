@@ -15,6 +15,7 @@ public:
 	void Compare(vector<string> cmdList);
 	void Create(vector<string> cmdList);
 
+	void Execute(string fileName);
 	void Quit(vector<string> cmdList);
 
 	string ReadFile(string fileName);

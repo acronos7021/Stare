@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 	//HMMengine hGen = HMMengine(md);
 	// Open the only copy of the database
 
-	db.open("AIsql.db3");
+	db.open();
 
 	Console c;
 	c.MessageLoop(argc, argv);

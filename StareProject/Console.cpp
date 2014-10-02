@@ -31,11 +31,10 @@ void Console::MessageLoop(int argc, char *argv[])
 	string cmdStr;
 	do
 	{
+		// This is the main message loop for the console.  It goes until someone types 'quit'
 		std::cout << endl << ">>  " ;
 		std::getline(std::cin, cmdStr);
 		cmdLst = CMDparser::getCommands(cmdStr);
 	} while (cmdParser.parseCMD(cmdLst));
-	system("pause");
-
 }
 

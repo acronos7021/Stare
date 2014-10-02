@@ -19,7 +19,8 @@ public:
 	StyleDatabase();
 	~StyleDatabase(void);
 
-	void open(string dbName);
+	void open();
+	void close();
 	bool isOpen;
 	string databaseName;
 
@@ -54,6 +55,7 @@ public:
 	vector<int> getWordGroupListByStyle(int StyleID, string prevWord, string currWord, string nextWord);
 
 	void clearDatabase();
+	void CreateDatabase();
 	vector<string> testFunc(); // Remove after testing
 
 //private:

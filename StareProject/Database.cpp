@@ -1,3 +1,4 @@
+#include <cstdio>
 #include "Database.h"
 
 StyleDatabase::StyleDatabase()
@@ -12,15 +13,15 @@ StyleDatabase::StyleDatabase()
 
 StyleDatabase::~StyleDatabase(void)
 {
-	sqlite3_close(db); // Try to close the database
+	close();// sqlite3_close(db); // Try to close the database
 }
 
-void StyleDatabase::open(string dbName)
+void StyleDatabase::open()
 {
 	// Convert the dbName string to a format sqlite3_open needs
-	const char * c = dbName.c_str();
+	//const char * c = dbName.c_str();
 
-	if (sqlite3_open(c, &db) == SQLITE_OK)
+	if (sqlite3_open("AIsql.db3", &db) == SQLITE_OK)
 	{
 		isOpen = true;
 	}
@@ -33,6 +34,11 @@ void StyleDatabase::open(string dbName)
 	lastAllocatedTokenID = 0;
 	currentAllocatedTokenID = 0;
 	LoadTokenMap();
+}
+
+void StyleDatabase::close()
+{
+	sqlite3_close(db); // Try to close the database
 }
 
 
@@ -63,6 +69,9 @@ void StyleDatabase::insert(string q)
 
 void StyleDatabase::clearDatabase()
 {
+
+
+
 	insert("DELETE FROM Documents");
 	insert("DELETE FROM HMMTokenPaths");
 //	insert("DELETE FROM Sentences");
@@ -74,6 +83,10 @@ void StyleDatabase::clearDatabase()
 	insert("INSERT INTO Tokens (TokenID,Word) VALUES (2,CHAR(9))");
 	LoadTokenMap();
 }
+
+
+
+
 
 void StyleDatabase::addHMMTokenPath(int SentID, int StyleID, int CurToken, int NextToken, int PrevToken)
 {
@@ -876,4 +889,133 @@ vector<StyleCounts> StyleDatabase::getPathWordCountPerStyle(int currToken, int n
 		}
 	}
 	return output;
+}
+
+
+void StyleDatabase::CreateDatabase()
+{
+	char* errorMessage;
+	sqlite3_stmt *select_statement;
+	string proceedWithOperation;
+
+	cout << "This operation will destroy any existing database." << endl << " If you want to prceed anyway, enter 'create' : ";
+	cin >> proceedWithOperation;
+
+	if (proceedWithOperation != "create")
+	{
+		cout << "Operation Canceled!";
+		return;
+	}
+
+	// close the current database
+	close();
+
+	// delete the current database file
+	int ret_code = std::remove("AIsql.db3");
+
+	if (ret_code != 0)
+	{
+		//cout << "Unable to delete file 'AIsql.db3'" << endl << "error code: " << strerror << endl;
+		perror("Unable to delete database");
+		cout << endl << "Attempting to clean existing database instead" << endl;
+		vector<string> tables;
+
+		open();
+		if (sqlite3_prepare(db, "SELECT name FROM sqlite_master WHERE type = 'table'", -1, &select_statement, 0) == SQLITE_OK)
+		{
+			while (true)
+			{
+				int checkRow = sqlite3_step(select_statement);
+				if (checkRow == SQLITE_ROW)
+				{
+					string table = (char*)sqlite3_column_text(select_statement, 0);
+					if (table != "sqlite_sequence") 
+						tables.push_back(table);
+				}
+				else
+					break;
+			}
+		}
+		else
+		{
+			cout << "Unable to list tables." << endl;
+			cout << "Operation Failed!" << endl;
+			return;
+		}
+		for (int i = 0; i < tables.size();i++)
+		{
+			cout << "Dropping " << tables[i] << endl;
+			char dropStr[500];
+			sprintf_s(dropStr, 500, "DROP TABLE %s", tables[i].c_str());
+			if (sqlite3_exec(db, dropStr, NULL, NULL, &errorMessage) != SQLITE_OK)
+			{
+				cout << errorMessage << endl;
+				cout << "Operation Failed!" << endl;
+				return;
+			}
+		}
+		if (sqlite3_exec(db, "DELETE FROM sqlite_sequence", NULL, NULL, &errorMessage) != SQLITE_OK)
+		{
+			cout << "Unable to reset the AutoIncrement fields!" << endl;
+			cout << "Proceeding anyway." << endl;
+		}
+
+	}
+	else
+	{
+		// open the clean database
+		open();
+	}
+
+	// create the tables
+	cout << "Creating Documents table" << endl;
+	sqlite3_exec(db, "CREATE TABLE Documents ( \
+		DocumentID  INTEGER PRIMARY KEY AUTOINCREMENT\
+		NOT NULL,\
+		StyleID     INTEGER NOT NULL,\
+		Title       TEXT,\
+		PublishDate TEXT)"
+		, NULL, NULL, &errorMessage);
+
+	cout << "Creating HMMtokenPaths table" << endl;
+	sqlite3_exec(db, "CREATE TABLE HMMtokenPaths ( \
+		TokenPathID   INTEGER PRIMARY KEY AUTOINCREMENT\
+		NOT NULL,\
+		StyleID       INTEGER NOT NULL,\
+		DocumentID    INTEGER NOT NULL,\
+		SentenceID    INTEGER NOT NULL,\
+		CurrentToken  INTEGER NOT NULL,\
+		NextToken     INTEGER NOT NULL,\
+		PreviousToken INTEGER NOT NULL)"
+		, NULL, NULL, &errorMessage);
+
+
+	cout << "Creating Styles table" << endl;
+	sqlite3_exec(db, "CREATE TABLE Styles ( \
+		StyleID INTEGER NOT NULL\
+		PRIMARY KEY AUTOINCREMENT,\
+		Author  TEXT    NOT NULL)"
+		, NULL, NULL, &errorMessage);
+
+	cout << "Creating Tokens table" << endl;
+	sqlite3_exec(db, "CREATE TABLE Tokens ( \
+		TokenID INTEGER NOT NULL\
+		PRIMARY KEY AUTOINCREMENT,\
+		Word    TEXT)"
+		, NULL, NULL, &errorMessage);
+
+	cout << "Creating Variables table" << endl;
+	sqlite3_exec(db, "CREATE TABLE Variables ( \
+		LastSentenceID INT PRIMARY KEY,\
+		LastTokenID    INT)"
+		, NULL, NULL, &errorMessage);
+
+	cout << "Setup default values" << endl;
+	// Load Initial Values
+	insert("INSERT INTO Variables (LastSentenceID,LastTokenID) VALUES (0,2)");
+
+	insert("INSERT INTO Tokens (TokenID,Word) VALUES (1,CHAR(13))");
+	insert("INSERT INTO Tokens (TokenID,Word) VALUES (2,CHAR(9))");
+
+	LoadTokenMap();
 }
