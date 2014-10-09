@@ -5,8 +5,11 @@ using namespace std;
 #include <sstream> 
 #include <fstream>
 #include <iostream>
+#include "Stopwatch.h"
+#include "Database.h"
 #include "CMDparser.h"
-
+#include "Tokenizer.h"
+#include "HMMengine.h"
 
 
 bool CMDparser::parseCMD(vector<string> cmdList)
@@ -38,9 +41,7 @@ bool CMDparser::parseCMD(vector<string> cmdList)
 	else if (cmdList[0] == "Brian")
 		Brian(cmdList);
 	else if ((cmdList[0] == "Create") && (cmdList[1] == "Database"))
-	{
-		//db.CreateDatabase();
-	}
+		db.CreateDatabase();
 	else if (cmdList[0] == "Execute")
 		Execute(cmdList[1]);
 	else if (cmdList[0] == "help")
@@ -72,7 +73,15 @@ void CMDparser::Learn(vector<string> cmdList)
 		cout << "All arguements should be in quotes." << endl;
 		return;
 	}
-
+	MetaData metaData;
+	metaData.DocumentText = cmdList[1]; // ReadFile(cmdList[1]);
+	metaData.action = ActionType::Learn;
+	metaData.Author = cmdList[2];
+	metaData.Title = cmdList[3];
+	metaData.PublishDate = cmdList[4];
+	cout << "Learning document -> " << metaData.Author << " : " << metaData.Title;
+	HMMengine hmm;
+	hmm.learn(metaData);
 }
 void CMDparser::Compare(vector<string> cmdList)
 {
@@ -87,7 +96,15 @@ void CMDparser::Compare(vector<string> cmdList)
 		cout << "All arguements should be in quotes." << endl;
 		return;
 	}
-
+	MetaData metaData;
+	metaData.DocumentText = cmdList[1]; // ReadFile(cmdList[1]);
+	metaData.action = ActionType::Compare;
+	metaData.Author = cmdList[2];
+	metaData.Title = cmdList[3];
+	metaData.PublishDate = cmdList[4];
+	cout << "Comparing document -> " << metaData.Author << " : " << metaData.Title;
+	HMMengine hmm;
+	hmm.compare(metaData);
 }
 void CMDparser::Create(vector<string> cmdList)
 {
@@ -100,14 +117,19 @@ void CMDparser::Create(vector<string> cmdList)
 		return;
 	}
 
-
+	MetaData metaData;
+	metaData.DocumentText = ReadFile(cmdList[1]);
+	metaData.action = ActionType::Create;
+	metaData.Author = cmdList[2];
+	HMMengine hmm;
+	hmm.create(metaData);
 }
 
 string CMDparser::ReadFile(string fileName)
 {
-	//using std::ifstream;
+	using std::ifstream;
 
-	std::ifstream t(fileName.c_str());
+	ifstream t(fileName);
 	std::stringstream buffer;
 
 	if (!t.is_open())
@@ -233,24 +255,24 @@ void CMDparser::Brandon(vector<string> cmdParams)
 	//cout << "The long long on our platform is " << (sizeof(long long)* 8) << " bits" << endl;
 	//StyleDatabase& test = StyleDatabase::getInstance();
 	//test.open("BrianAIsql.db3");
-	//db.clearDatabase();
-	//db.insertAuthor("Brian");
-	//int StyleID = db.retrieveAuthorStyleID("Brian");
+	db.clearDatabase();
+	db.insertAuthor("Brian");
+	int StyleID = db.retrieveAuthorStyleID("Brian");
 	//test.insertDocument(StyleID, "Brian book", "1996");
-	//db.retrieve("Styles", "Author", "Author", "Sam");
-	//int DocumentID = db.insertDocument("Sam", "Sams Book", "1900");  // test new path
-	//DocumentID = db.insertDocument("Brian", "Brians other book.", "1998"); // test same author, new book
-	//DocumentID = db.insertDocument("Brian", "Brian book", "1996"); // test same author, same book.
-	//vector<string> sentVect1;
-	//sentVect1.push_back("This");
-	//sentVect1.push_back("is");
-	//sentVect1.push_back("a");
-	//sentVect1.push_back("test");
-	//db.insertSentence(DocumentID, sentVect1);
-	//db.insertSentence(DocumentID, sentVect1); // test duplicate words.
-	//vector<string> sentVect2;
-	//sentVect2.push_back(".");
-	//db.insertSentence(DocumentID, sentVect2); // test short sentence.
+	db.retrieve("Styles", "Author", "Author", "Sam");
+	int DocumentID = db.insertDocument("Sam", "Sams Book", "1900");  // test new path
+	DocumentID = db.insertDocument("Brian", "Brians other book.", "1998"); // test same author, new book
+	DocumentID = db.insertDocument("Brian", "Brian book", "1996"); // test same author, same book.
+	vector<string> sentVect1;
+	sentVect1.push_back("This");
+	sentVect1.push_back("is");
+	sentVect1.push_back("a");
+	sentVect1.push_back("test");
+	db.insertSentence(DocumentID, sentVect1);
+	db.insertSentence(DocumentID, sentVect1); // test duplicate words.
+	vector<string> sentVect2;
+	sentVect2.push_back(".");
+	db.insertSentence(DocumentID, sentVect2); // test short sentence.
 }
 
 void CMDparser::Blake(vector<string> cmdParams)
@@ -275,44 +297,44 @@ void CMDparser::Leven(vector<string> cmdParams)
 
 void CMDparser::Brian(vector<string> cmdParams)
 {
-	//HMMengine hmm;
-	//Stopwatch sw;
+	HMMengine hmm;
+	Stopwatch sw;
 
 
-	//sw.start();
-	//Tokenizer tokenizer = Tokenizer();
-	//std::vector <std::vector<int>> Midsummer = tokenizer.tokenizeDoc("../StareProject/Documents/AMidsummerNightsDream.txt");
-	//sw.end();
+	sw.start();
+	Tokenizer tokenizer = Tokenizer();
+	std::vector <std::vector<int>> Midsummer = tokenizer.tokenizeDoc("../StareProject/Documents/AMidsummerNightsDream.txt");
+	sw.end();
 
-	//int tokenizerTime = sw.getTimeInMicroseconds();
+	int tokenizerTime = sw.getTimeInMicroseconds();
 
 	////	vector<string> sentenceVect;
-	//sw.start();
+	sw.start();
 
-	//int docID = db.insertDocument("Shakespere", "A Midnight Summer Dream", "a long long ago");
-	//sw.end();
-	//int dbDocTime = sw.getTimeInMicroseconds();
+	int docID = db.insertDocument("Shakespere", "A Midnight Summer Dream", "a long long ago");
+	sw.end();
+	int dbDocTime = sw.getTimeInMicroseconds();
 
-	//sw.start();
-	//db.insertDocumentText(docID, Midsummer);
-	//sw.end();
+	sw.start();
+	db.insertDocumentText(docID, Midsummer);
+	sw.end();
 
-	//int dbTextTime = sw.getTimeInMicroseconds();
+	int dbTextTime = sw.getTimeInMicroseconds();
 
 	//  Add more books
-	//db.clearDatabase();
+	db.clearDatabase();
 
-	//sw.start();
-	//cout << "Loading Henry V" << endl;
-	//hmm.learn(MetaData("Shakespere", "Henry V", "1619", "../StareProject/Documents/HenryV.txt"));
-	//cout << "Loading Romeo and Juliet" << endl;
-	//hmm.learn(MetaData("Shakespere", "Romeo and Juliet", "1597", "../StareProject/Documents/RomeoAndJuliet.txt"));
-	//cout << "Loading A Tale of Two Cities" << endl;
-	//hmm.learn(MetaData("Charles Dickens", "A Tale of Two Cities", "1859", "../StareProject/Documents/ATaleOfTwoCities.txt"));
-	//cout << "Loading Great Expectation" << endl;
-	//hmm.learn(MetaData("Charles Dickens", "Great Expectations", "1860", "../StareProject/Documents/GreatExpectations.txt"));
-	//sw.end();
-	//int learnTime = sw.getTimeInMicroseconds();
+	sw.start();
+	cout << "Loading Henry V" << endl;
+	hmm.learn(MetaData("Shakespere", "Henry V", "1619", "../StareProject/Documents/HenryV.txt"));
+	cout << "Loading Romeo and Juliet" << endl;
+	hmm.learn(MetaData("Shakespere", "Romeo and Juliet", "1597", "../StareProject/Documents/RomeoAndJuliet.txt"));
+	cout << "Loading A Tale of Two Cities" << endl;
+	hmm.learn(MetaData("Charles Dickens", "A Tale of Two Cities", "1859", "../StareProject/Documents/ATaleOfTwoCities.txt"));
+	cout << "Loading Great Expectation" << endl;
+	hmm.learn(MetaData("Charles Dickens", "Great Expectations", "1860", "../StareProject/Documents/GreatExpectations.txt"));
+	sw.end();
+	int learnTime = sw.getTimeInMicroseconds();
 
 	//hmm.compare(MetaData("Shakespere", "A Midnight Summer Dream", "1605", "../StareProject/Documents/AMidsummerNightsDream.txt"));
 }
