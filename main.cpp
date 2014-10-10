@@ -9,17 +9,20 @@ using namespace std;
 //#include "DataStructs.h"
 
 //StyleDatabase& db = StyleDatabase();
-StyleDatabase& db;
+//StyleDatabase& db;
+//StyleDatabase& db;
 
 int main(int argc, char *argv[])
 {
-   db = StyleDatabase();
+
+    //db = StyleDatabase();
 	//MetaData md = CMDparser::parseCMD(argc, argv);
 
 	//HMMengine hGen = HMMengine(md);
 	// Open the only copy of the database
 
-	db.open();
+//	db.open();
+  //db.open();
 
 	Console c;
 	c.MessageLoop(argc, argv);

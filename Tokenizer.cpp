@@ -4,9 +4,9 @@
 using namespace std;
 
 //takes care of everything aside from and empty lines in the document ATM
-
 Tokenizer::Tokenizer()// string Document)
 {
+ 
 //	filename = Document;
 	proceed = false;
 	punctuation[0] = '.';
@@ -47,7 +47,7 @@ bool Tokenizer::checkPunctuation(char c)
 std::vector <std::vector<int>> Tokenizer::tokenizeDoc(string Document)
 {
 	//StyleDatabase db = StyleDatabase::getInstance();
-
+StyleDatabase db = StyleDatabase();
 	sentences.clear();
 	ifstream fname(Document);
 	string currline;

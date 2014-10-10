@@ -28,9 +28,9 @@ int HMMengine::learn(MetaData metaData)
 	std::vector <std::vector<int>> documentTokens = tokenizer.tokenizeDoc(metaData.DocumentText);
 
 	// insert it into the database;
-	int documentID = db.insertDocument( metaData.Author, metaData.Title, metaData.PublishDate);
-	db.insertDocumentText(documentID, documentTokens);
-	return documentID;
+/*	int documentID = db.insertDocument( metaData.Author, metaData.Title, metaData.PublishDate);
+	db.insertDocumentText(documentID, documentTokens);*/
+	return 1; // Originally: documentID
 }
 
 void HMMengine::compare(MetaData metaData)
@@ -39,7 +39,7 @@ void HMMengine::compare(MetaData metaData)
 	Tokenizer tokenizer = Tokenizer();
 	std::vector <std::vector<int>> documentTokens = tokenizer.tokenizeDoc(metaData.DocumentText);
 
-	vector<StyleCounts> totalWordCountsPerStyle = db.getTotalWordCountPerStyle();
+/*	vector<StyleCounts> totalWordCountsPerStyle = db.getTotalWordCountPerStyle();
 
 	map<int, StyleCounter> pairCountsPerStyle;
 
@@ -110,6 +110,7 @@ void HMMengine::compare(MetaData metaData)
 			}
 		}
 	}
+	*/
 }
 
 void HMMengine::create(MetaData metaData)

@@ -10,7 +10,7 @@ using namespace std;
 #include "CMDparser.h"
 #include "Tokenizer.h"
 #include "HMMengine.h"
-
+StyleDatabase db = StyleDatabase();
 
 bool CMDparser::parseCMD(vector<string> cmdList)
 {
@@ -80,8 +80,8 @@ void CMDparser::Learn(vector<string> cmdList)
 	metaData.Title = cmdList[3];
 	metaData.PublishDate = cmdList[4];
 	cout << "Learning document -> " << metaData.Author << " : " << metaData.Title;
-	HMMengine hmm;
-	hmm.learn(metaData);
+//	HMMengine hmm;
+//	hmm.learn(metaData);
 }
 void CMDparser::Compare(vector<string> cmdList)
 {
@@ -103,8 +103,8 @@ void CMDparser::Compare(vector<string> cmdList)
 	metaData.Title = cmdList[3];
 	metaData.PublishDate = cmdList[4];
 	cout << "Comparing document -> " << metaData.Author << " : " << metaData.Title;
-	HMMengine hmm;
-	hmm.compare(metaData);
+	//HMMengine hmm;
+	//hmm.compare(metaData);
 }
 void CMDparser::Create(vector<string> cmdList)
 {
@@ -121,8 +121,8 @@ void CMDparser::Create(vector<string> cmdList)
 	metaData.DocumentText = ReadFile(cmdList[1]);
 	metaData.action = ActionType::Create;
 	metaData.Author = cmdList[2];
-	HMMengine hmm;
-	hmm.create(metaData);
+	//HMMengine hmm;
+	//hmm.create(metaData);
 }
 
 string CMDparser::ReadFile(string fileName)
@@ -272,7 +272,7 @@ void CMDparser::Brandon(vector<string> cmdParams)
 	db.insertSentence(DocumentID, sentVect1); // test duplicate words.
 	vector<string> sentVect2;
 	sentVect2.push_back(".");
-	db.insertSentence(DocumentID, sentVect2); // test short sentence.
+	db.insertSentence(DocumentID, sentVect2); // test short sentence.*/
 }
 
 void CMDparser::Blake(vector<string> cmdParams)
@@ -297,10 +297,10 @@ void CMDparser::Leven(vector<string> cmdParams)
 
 void CMDparser::Brian(vector<string> cmdParams)
 {
-	HMMengine hmm;
-	Stopwatch sw;
+	//HMMengine hmm;
+//	Stopwatch sw;
 
-
+/*
 	sw.start();
 	Tokenizer tokenizer = Tokenizer();
 	std::vector <std::vector<int>> Midsummer = tokenizer.tokenizeDoc("../StareProject/Documents/AMidsummerNightsDream.txt");
@@ -334,7 +334,7 @@ void CMDparser::Brian(vector<string> cmdParams)
 	cout << "Loading Great Expectation" << endl;
 	hmm.learn(MetaData("Charles Dickens", "Great Expectations", "1860", "../StareProject/Documents/GreatExpectations.txt"));
 	sw.end();
-	int learnTime = sw.getTimeInMicroseconds();
+	int learnTime = sw.getTimeInMicroseconds();*/
 
 	//hmm.compare(MetaData("Shakespere", "A Midnight Summer Dream", "1605", "../StareProject/Documents/AMidsummerNightsDream.txt"));
 }

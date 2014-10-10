@@ -169,7 +169,7 @@ bool StyleDatabase::doesWordExist(string word)
 		}
 
 		/* retAns is set to false if the word isn't found; otherwise it's set to true */
-		if (retAns == NULL)
+		if (retAns == false) // Originally NULL
 		{
 			retAns = false;
 		}
@@ -836,7 +836,7 @@ vector<StyleCounts> StyleDatabase::getTotalWordCountPerStyle()
 	int StyleID, wordCount;
 	string Author;
 
-	char* selectStr =
+	char selectStr[] =
 		"SELECT HMMtokenPaths.StyleID, Styles.Author, COUNT(HMMtokenPaths.CurrentToken) FROM HMMtokenPaths JOIN Styles ON Styles.StyleID = HMMtokenPaths.StyleID GROUP BY HMMtokenPaths.StyleID";
 
 	if (sqlite3_prepare(db, selectStr, -1, &select_statement, 0) == SQLITE_OK)

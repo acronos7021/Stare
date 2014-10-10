@@ -101,4 +101,3 @@ public:
 	vector<StyleCounts> getPathWordCountPerStyle(int currToken, int nextToken);
 };
 
-extern StyleDatabase& db;

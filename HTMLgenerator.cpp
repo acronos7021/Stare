@@ -5,9 +5,9 @@
 #include <fstream>
 #include <iostream>
 
-
 HTMLgenerator::HTMLgenerator(string DestinationFilename, int documentID, vector<sentenceRanking> rankingList)
 {
+  StyleDatabase db = StyleDatabase();
 	// Blake, this is one of the harder challenges in the program.  Since it is sometimes hard to see what a designer is 
 	// envisioning, I wanted to give a basic set of sample code for how to access the database
 
