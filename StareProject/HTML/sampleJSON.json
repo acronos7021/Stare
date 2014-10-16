@@ -1,0 +1,14 @@
+{
+  "UserBook": {
+    "Author": "Mark Twain",
+    "Title": "Adventures of Tom Sawyer",
+    "PublishDate": "1800",
+    "DocumentText" : "The whole book goes here I believe" 
+  },
+  "PlagBook1": {
+    "Author": "Mark Twain",
+    "Title": "Adventures of Tom Sawyer",
+    "PublishDate": "1800",
+    "DocumentText" : "The whole book goes here I believe" 
+  }
+}
