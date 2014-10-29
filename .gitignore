@@ -7,13 +7,14 @@
 *.sln.docstates
 
 **/AIsql.db3
+build/astar
+build/CMakeFiles
 
 # Build results
 
 [Dd]ebug/
 [Rr]elease/
 x64/
-build/
 [Bb]in/
 [Oo]bj/
 
