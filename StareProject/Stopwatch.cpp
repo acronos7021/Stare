@@ -1,16 +1,13 @@
 #include "Stopwatch.h"
 
-
 Stopwatch::Stopwatch()
 {
 	swState = stopwatchState::clear;
 }
 
-
 Stopwatch::~Stopwatch()
 {
 }
-
 
 void Stopwatch::start()
 {
@@ -20,8 +17,6 @@ void Stopwatch::start()
 		swState = stopwatchState::running;
 	}
 }
-
-
 
 void Stopwatch::end()
 {

@@ -1,14 +1,10 @@
 #include "Tokenizer.h"
-#include "Database.h"
-#include <sstream>
+#include "Stopwatch.h"
 using namespace std;
 
-//takes care of everything aside from and empty lines in the document ATM
-
-Tokenizer::Tokenizer()// string Document)
+Tokenizer::Tokenizer()
 {
-//	filename = Document;
-	proceed = false;
+	index = 0;
 	punctuation[0] = '.';
 	punctuation[1] = '!';
 	punctuation[2] = '?';
@@ -16,19 +12,20 @@ Tokenizer::Tokenizer()// string Document)
 
 Tokenizer:: ~Tokenizer()
 {
-	//nada
+
 }
 
-bool Tokenizer::checkIgnore(char c)
+inline bool Tokenizer::checkIgnore(char c)
 {
-	if ((c >= 33 && c <= 47 || c >= 58 && c <= 64 || c >= 91 && c <= 96 || c >= 123 && c <= 126 || c >= 128 || c >= 10 && c <= 13) && (c != 39 && c != 96))
+	if ((c == 32 && c >= 34 && c <= 45 || c == 47 || c >= 58 && c <= 62 || c == 64 || c >= 91 && c <= 96 || c >= 123 && c <= 126 || c >= 128) || (c == '\"' || c == '\,' ||
+		c == '\(' || c == '\)' || c == '\'' || c == '\-'))
 	{
 		return true;
 	}
 	return false;
 }
 
-bool Tokenizer::checkPunctuation(char c)
+inline bool Tokenizer::checkPunctuation(char c)
 {
 	for (unsigned i = 0; i < sizeof(punctuation); i++)
 	{
@@ -40,245 +37,213 @@ bool Tokenizer::checkPunctuation(char c)
 	return false;
 }
 
-// Preassigned token types
-// 1 = Carrage Return
-// 2 = tab
-
-std::vector <std::vector<int>> Tokenizer::tokenizeDoc(string Document)
-{
-	//StyleDatabase db = StyleDatabase::getInstance();
-
-	sentences.clear();
-	ifstream fname(Document);
-	string currline;
-	//vector <string> curr;
-	vector <int> curr;
-	vector <string> temp;
-	if (!fname.is_open())
-	{
-		printf("\nAn error has occured and the file does not exist!!!\n");
-		return sentences;
-	}
-
-	while (!fname.eof())
-	{
-		if (fname.peek() == '\n' || fname.peek() == '\r')
-		{
-			curr.push_back(1); // use /n instead of \n for illustration puposes only
-		}
-		fname >> currline;
-		curr.push_back(db.GetToken(currline));
-		for (unsigned i = 0; i < currline.size(); i++)
-		{
-			//if (currline[i] == 39 || currline[i] == 239 || currline[i] == 96)
-			//{
-			//	curr.pop_back();
-			//	currline[i] = 'Z';
-			//	curr.push_back(currline);
-			//}
-
-			if (checkIgnore((char)currline[i]) || checkPunctuation((char)currline[i]))
-			{
-				curr.pop_back();
-				temp.clear();
-				temp = getWord(currline);
-				for (unsigned int i = 0; i < temp.size(); i++)
-				{
-					curr.push_back(db.GetToken(temp[i]));
-				}
-				if (checkPunctuation((char)currline[i]))
-				{
-					proceed = true;
-				}
-				break;
-			}
-		}
-		if (proceed)
-		{
-			sentences.push_back(curr);
-			curr.clear();
-			proceed = false;
-		}
-	}
-	db.FlushTokenCache();
-	return sentences;
-} //end of method
-
-vector<string> Tokenizer::getWord(string word)
-{
-	vector<string> v;
-	vector<char>letters;
-	string temp;
-
-	for (unsigned int i = 0; i < word.size(); i++)
-	{	
-		letters.push_back(word[i]);
-	}
-	for (unsigned int i = 0; i < letters.size(); i++)
-	{
-		if (!checkIgnore(letters[i]))
-		{
-			temp.push_back(letters[i]);
-		}
-		else
-		{
-			if (temp != "")
-			{
-				v.push_back(temp);
-			}
-
-			temp.clear();
-			temp = letters[i];
-
-			if (temp != "")
-			{
-				v.push_back(temp);
-			}
-			temp.clear();
-		}
-	}
-	return v;
-}
-
 void Tokenizer::print_BAV()
 {
-	for (unsigned int i = 0; i < sentences.size(); i++)
+	for (int i = 0; i < (int)sentence.size(); i++)
 	{
-		for (unsigned int j = 0; j < sentences[i].size(); j++)
+		for (int j = 0; j < (int)sentence[i].size(); j++)
 		{
-			cout << sentences[i][j] << " ";
+			cout << sentence[i][j] << " ";
 		}
+		cout << endl;
 	}
 }
 
-vector <int> Tokenizer::getNextSentence()
+vector<string> Tokenizer::getNextSentence() //vector<int> Tokenizer::getNextSentence2()
 {
-	vector<int> temp;
-	if (sentences.size() < 1)
+	vector<string> temp; // vector<int> temp
+	if (index > sentence.size() - 1) //(index > sentID.size() - 1)
 	{
 		return temp;
 	}
 	else
 	{
-		temp = sentences[0];
-		sentences.erase(sentences.begin());
+		temp = sentence[index]; //temp = sentID[index];
+		index++;
+		//sentences.erase(sentences.begin());
 		return temp;
 	}
 }
 
-/*int main()
+void Tokenizer::tokenizeFileH()
 {
-string testfile = "text.txt";
-Sentence test(testfile);
+	loc* ind = new loc();
+	ind->start = &file[0];
+	ind->end = &file[0];
+	char* done = &file[file.size() - 1];
+	vector <string> tmp; // vector <int> tmp;
 
-test.tokenizeDoc();
-test.print_BAV();
+	while (ind->end != done)
+	{
+		if (!(ind->start == ind->end && *ind->end == 32))
+		{
+			if (checkIgnore((char)*ind->end))
+			{
+				tmp.push_back(ind->toString()); // tmp.push_back(db.getToken(ind->toString()));
+				if (*ind->end != 32)
+				{
+					tmp.push_back(ind->toStringE()); // tmp.push_back(db.getToken(ind->toStringE()));
+				}
+				ind->start = ++ind->end;
+			}
+			else if (checkPunctuation((char)*ind->end))
+			{
+				tmp.push_back(ind->toString()); // tmp.push_back(db.getToken(ind->toString()));
+				tmp.push_back(ind->toStringE()); // tmp.push_back(db.getToken(ind->toStringE()));
+				sentence.push_back(tmp); // sentID.push_back(tmp);
+				tmp.clear();
+				ind->start = ++ind->end;
+			}
+			else
+			{
+				++ind->end;
+			}
+		}
+		else
+		{
+			ind->start = ++ind->end;
+		}
+		if (ind->end == done)
+		{
+			tmp.push_back(ind->toString()); // tmp.push_back(db.getToken(ind->toString()));
+			tmp.push_back(ind->toStringE()); // tmp.push_back(db.getToken(ind->toStringE()));
+			sentence.push_back(tmp); // sentID.push_back(tmp);
+			tmp.clear();
+		}
+	} //end of loop
+} //end of method
 
-cout << endl;
-system("pause");
-}*/
+void Tokenizer::tokenizeFile(string filename)
+{
+	index = 0;
+	readFile(filename);
+	file.c_str();
+	tokenizeFileH();
+}
 
+void Tokenizer::tokenizeDoc(string document)
+{
+	index = 0;
+	file = document;
+	file.c_str();
+	loc* ind = new loc();
+	ind->start = &file[0];
+	ind->end = &file[0];
+	char* done = &file[file.size() - 1];
+	vector <string> tmp; // vector <int> tmp;
 
+	while (ind->end != done)
+	{
+		if (!(ind->start == ind->end && *ind->end == 32))
+		{
+			if (checkIgnore((char)*ind->end))
+			{
+				tmp.push_back(ind->toString()); // tmp.push_back(db.getToken(ind->toString()));
+				if (*ind->end != 32)
+				{
+					tmp.push_back(ind->toStringE()); // tmp.push_back(db.getToken(ind->toStringE()));
+				}
+				ind->start = ++ind->end;
+			}
+			else if (checkPunctuation((char)*ind->end))
+			{
+				tmp.push_back(ind->toString()); // tmp.push_back(db.getToken(ind->toString()));
+				tmp.push_back(ind->toStringE()); // tmp.push_back(db.getToken(ind->toStringE()));
+				sentence.push_back(tmp); // sentID.push_back(tmp);
+				tmp.clear();
+				ind->start = ++ind->end;
+			}
+			else
+			{
+				++ind->end;
+			}
+		}
+		else
+		{
+			ind->start = ++ind->end;
+		}
+		if (ind->end == done)
+		{
+			tmp.push_back(ind->toString()); // tmp.push_back(db.getToken(ind->toString()));
+			tmp.push_back(ind->toStringE()); // tmp.push_back(db.getToken(ind->toStringE()));
+			sentence.push_back(tmp); // sentID.push_back(tmp);
+			tmp.clear();
+		}
+	} //end of loop
+}
 
-//#include "Tokenizer.h"
-//#include <sstream>
-//
-//
-//Tokenizer::Tokenizer(string Document)
-//{
-//	nextChar = 0;
-//}
-//
-//
-//Tokenizer::~Tokenizer()
-//{
-//}
-//
-//vector<string> Tokenizer::getNextSentence()
-//{
-//	vector<string> words;
-//
-//	return words;
-//}
-//
-//vector<string> Tokenizer::getCommands(string cmdStr)
-//{
-//	vector<string> words;
-//	stringstream ss;
-//
-//	// I was too lazy to implement a full state machine.  However...
-//	// Uses 3 states to determine the action at a character position.  They are:
-//	// inWord==false, inQuotes==false :  this state means that any non Alphanums are dumped until a proper alphanum is encountered
-//	// inWord==true, inQuotes==false  :  This state meant that any alphanums are added to the current word until a non-alphanum is encountered
-//	// inWord==true, inQuotes==true  :  Anything, whether alphanum or not, is added to the current word until another '"' is encountered.
-//
-//	bool inWord = false;   // if inWord, all alphanumeric 
-//	bool inQuotes = false; // if inQuotes is true, all characters are recorded into the current ss until another quote is encountered.
-//
-//	for (unsigned int i = 0; i < cmdStr.size(); i++)
-//	{
-//		if (!inWord)
-//		{
-//			if (isAlphaNumeric(cmdStr[i]))
-//			{
-//				// start word
-//				ss << cmdStr[i];
-//				inWord = true;
-//			}
-//			else if (cmdStr[i] == '"')
-//			{
-//				// start quotes
-//				inWord = true;
-//				inQuotes = true;
-//			}
-//		}
-//		else
-//		{
-//			// inWord is true
-//			if (inQuotes)
-//			{
-//				if (cmdStr[i] != '"')
-//					ss << cmdStr[i];
-//				else
-//				{
-//					// the quotes have ended
-//					words.push_back(ss.str());
-//					ss.str("");  // empty ss
-//					inWord = false;
-//					inQuotes = false;
-//
-//				}
-//			}
-//			else
-//			{
-//				if (isAlphaNumeric(cmdStr[i]))
-//					ss << cmdStr[i];
-//				else
-//				{
-//					// the word has ended
-//					words.push_back(ss.str());
-//					ss.str("");  // empty ss
-//					inWord = false;
-//				}
-//
-//			}
-//		}
-//	}
-//	
-//	// The last word can end with the end of the string.  
-//	// It would not be detected then, so add it here.
-//	if (inWord)
-//		words.push_back(ss.str());
-//
-//	return words;
-//}
-//
-//bool Tokenizer::isAlphaNumeric(char c)
-//{
-//	if (((c >= 'a') && (c <= 'z')) ||
-//		((c >= 'A') && (c <= 'Z')) ||
-//		((c >= '0') && (c <= '9')))
-//		return true;
-//	else
-//		return false;
-//}
+string Tokenizer::rebuildSent(vector<int>sent)
+{
+	string s;
+	char c;
+	for (int i = 0; i < sent.size(); i++)
+	{
+		if (sent[i] < 128 && sent[i] >= 0)
+		{
+			c = (char)sent[i];
+			if (checkPunctuation(c) || checkIgnore(c))
+			{
+				s.pop_back();
+				s += (char)sent[i];
+			}
+			else
+			{
+				s += (char)sent[i];
+				s += " ";
+			}
+		}
+		else
+		{
+			s += std::to_string(sent[i]) + " "; //s += db.getString(sent[i]) + " ";
+		}
+	}
+	return s;
+}//end of rebuildDoc
+
+void Tokenizer::readFile(string fileName)
+{
+	using std::ifstream;
+	ifstream t(fileName);
+	stringstream buffer;
+	if (!t.is_open())
+	{
+		cout << "can't open '" << fileName << "' file for input" << endl;
+	}
+	else
+	{
+		buffer << t.rdbuf();
+		file = buffer.str();
+	}
+}
+
+int main()
+{
+	string testfile = "The Man of Adamant.txt";
+	string testfile2 = "Test.txt";
+	Tokenizer test;
+	Stopwatch s;
+	s.start();
+	test.tokenizeFile(testfile);
+	s.end();
+
+	test.print_BAV();
+	std::cout << "\n\n" << s.getTimeInMicroseconds() << " Ms\n\n";
+	/*
+	if ((c == 32 && c >= 34 && c <= 45 || c == 47 || c >= 58 && c <= 62 || c == 64 || c >= 91 && c <= 96 || c >= 123 && c <= 126 || c >= 128) || (c == '\"' || c == '\,' ||
+	c == '\(' || c == '\)' || c == '\'' || c == '\-'))*/
+
+	/*vector<int>testID;
+	testID.push_back(256);
+	testID.push_back(345);
+	testID.push_back(756);
+	testID.push_back(876);
+	testID.push_back(44);
+	testID.push_back(65);
+	testID.push_back(256);
+	testID.push_back(33);
+	string sentence = test.rebuildDoc(testID);
+
+	cout << sentence << endl;*/
+
+	system("pause");
+}
