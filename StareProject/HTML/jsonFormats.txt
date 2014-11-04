@@ -1,0 +1,88 @@
+#getSentences
+{
+  "command": "getSentences",
+  "range": [
+    47,
+    50
+  ],
+  "sentences": [
+    "Sentence1",
+    "Sentence2",
+    "AndSoOn"
+  ]
+}
+
+#getDocument
+{
+  "command": "getDocument",
+  "doumentID": "ID",
+  "sentences": [
+    "Sentence1",
+    "Sentence2",
+    "AndSoOn"
+  ]
+}
+
+#compare (the middle sentence is the one that is the match.  The sentences before and after show context)
+{
+  "clientID": "ID",
+  "command": "compare",
+  "status": "#of characters process",
+  "documentText": "the document text here",
+  "ranking": [
+    {
+      "origSnip": ["sentence1","sentence2","sentence3"], 
+      "dataBaseSnip":["sentence1","sentence2","sentence3"],
+      "certainty": "someValue",
+      "sentenceID": "someValue",
+      "foundDocumentID": "SomeValue",
+      "foundSentenceID": "someValue"
+    },
+    {
+      "origSnip": ["sentence1","sentence2","sentence3"], 
+      "dataBaseSnip":["sentence1","sentence2","sentence3"],
+      "certainty": "someValue",
+      "sentenceID": "someValue",
+      "foundDocumentID": "SomeValue",
+      "foundSentenceID": "someValue"
+    }
+  ]
+}
+
+#getStyles
+{
+  "command": "getStyles",
+  "styles": [
+    ["styleName","StyleID"],
+    ["styleName","StyleID"],
+    ["styleName","StyleID"],
+  ]
+}
+
+#getDocuments
+{
+  "command": "getDocuments",
+  "documents": [
+    ["DocumentID","DocumentTitle", "DocumentAuthor", "DocumentPubDate"],
+    ["DocumentID","DocumentTitle", "DocumentAuthor", "DocumentPubDate"],
+    ["DocumentID","DocumentTitle", "DocumentAuthor", "DocumentPubDate"]
+  ]
+}
+
+#createDocument
+{
+  "clientID": "ID",
+  "command": "create",
+  "styleID":"#ID",
+  "numberOfSentences": "#OfSentences"
+  "result": "Output text"
+}
+
+#learn
+{
+  "command": "learn",
+  "documentText": "text",
+  "author": "text",
+  "title": "text",
+  "publishDate": "text"
+}
