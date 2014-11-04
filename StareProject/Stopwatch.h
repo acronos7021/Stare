@@ -2,17 +2,15 @@
 #include<chrono>
 #include<ctime>
 
-enum stopwatchState {running, stopped, clear};
+enum stopwatchState { running, stopped, clear };
 
 class Stopwatch
 {
 public:
 	Stopwatch();
 	~Stopwatch();
-
 	void start();
 	void end();
-
 	int getTimeInMicroseconds();
 
 private:
@@ -20,4 +18,3 @@ private:
 	std::chrono::steady_clock::time_point endTime;
 	stopwatchState swState;
 };
-
