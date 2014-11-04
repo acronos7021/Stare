@@ -34,17 +34,17 @@
       "origSnip": ["sentence1","sentence2","sentence3"], 
       "dataBaseSnip":["sentence1","sentence2","sentence3"],
       "certainty": "someValue",
-      "sentenceID": "someValue",
-      "foundDocumentID": "SomeValue",
-      "foundSentenceID": "someValue"
+      "documentTitle": "someTitle",
+      "foundDocumentID": "SomeDocID",
+      "foundSentenceID": "someSentID"
     },
     {
       "origSnip": ["sentence1","sentence2","sentence3"], 
       "dataBaseSnip":["sentence1","sentence2","sentence3"],
       "certainty": "someValue",
-      "sentenceID": "someValue",
-      "foundDocumentID": "SomeValue",
-      "foundSentenceID": "someValue"
+      "documentTitle": "someTitle",
+      "foundDocumentID": "SomeDocID",
+      "foundSentenceID": "someSentID"
     }
   ]
 }
