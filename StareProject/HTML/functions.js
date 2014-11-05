@@ -45,6 +45,16 @@ function sendCompare(clientID, text) {
     alert(sendMessage(compare));
 }
 
+function checkCompare(id){
+	var compare = {
+		"clientID": clientID,
+		"command": "compare",
+	}
+	var response = sendMessage(compare);
+	
+	
+}
+
 function sendMessage(string){
 	var xmlhttp=new XMLHttpRequest();
 	xmlhttp.open("POST","some.php",true);
