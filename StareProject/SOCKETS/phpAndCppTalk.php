@@ -9,23 +9,23 @@
 //Must create object and call init() to do anything.
 // getData() makes php act as a server,
 // wrap it in a while loop if you want it to run forever.
-// setData makes php act as a client. Auto send.
+// request() makes php act as a client. Auto send.
 // Remember to run close method when necessary.
 //-----------------------------------------------------------
-//$object = new phpAndCppTalk;
-//$object->init();
+$object = new phpAndCppTalk;
+$object->init();
 //----------------------------------
 // Being a client. Test data.
 //----------------------------------
-//$data = "Hello i am a client";
-//$object->setData($data);
+$data = "Hello i am a client";
+$object->request($data);
 //----------------------------------
 // Being a server. Test data.
 //----------------------------------
 //$result = $object->getData();
 //echo $result;
 //----------------------------------
-//$object->closeSocket();
+$object->closeSocket();
 
 class phpAndCppTalk
 {
@@ -42,7 +42,7 @@ class phpAndCppTalk
         $this->socket = socket_create(AF_INET, SOCK_STREAM, 0) or die("Could not create socket\n");
     }
 
-    public function setData($data) {
+    public function request($data) {
         $this->sendData($data);
     }
     // send data to C++ using the specifications specified in the init method
@@ -50,7 +50,8 @@ class phpAndCppTalk
     {
         socket_connect($this->socket, $this->host, $this->port) or die("Could not connect to server\n");
         socket_write($this->socket,$data, strlen($data)) or die("couldn't write");
-        socket_close($this->socket);
+        $this->data = socket_read($this->socket, 3000);
+        echo $this->data;
 
       //  echo "A connection is found!\n";
     }
