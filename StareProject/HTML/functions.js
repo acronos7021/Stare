@@ -81,6 +81,12 @@ function sendCreate(id, styleID, numOfSent) {
     alert(sendMessage(create));
 }
 
+function generateID(){
+	var d = new Date();
+	var n=CryptoJS.lib.WordArray.random(256)+d.getTime();
+	var id = CryptoJS.SHA256(n);
+	return id;
+}
 
 //sendCompare("TheID", "The document text will go here");
 //This is for testing
@@ -89,6 +95,8 @@ compareDecode(
     '{"clientID":"ID","command":"compare","status":"#of characters process","documentText":"the document text here","overallCertainty":"50","ranking":[{"origSnip":["Aenean suscipit a metus eu aliquet.","Vestibulum lacus lorem, viverra sit amet tincidunt a, pharetra vitae mi.","Aliquam egestas rutrum tincidunt."],"dataBaseSnip":["Lorem ipsum dolor sit amet, consectetur adipiscing elit.","In molestie congue libero ut feugiat.","Etiam convallis arcu sit amet elit ullamcorper, rhoncus sodales lorem consequat."],"certainty":"10","documentTitle":"someTitle","foundDocumentID":"SomeDocID","foundSentenceID":"someSentID"},{"origSnip":["sentence1","sentence2","sentence3"],"dataBaseSnip":["sentence1","sentence2","sentence3"],"certainty":"100","documentTitle":"2nd Document","foundDocumentID":"SomeDocID","foundSentenceID":"someSentID"}]}'
 );
 
+//test generate id
+alert("Your ID is:\n"+generateID());
 
 
 
