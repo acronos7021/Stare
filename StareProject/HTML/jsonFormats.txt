@@ -29,6 +29,7 @@
   "command": "compare",
   "status": "#of characters process",
   "documentText": "the document text here",
+  "overallCertainty": "someValue",
   "ranking": [
     {
       "origSnip": ["sentence1","sentence2","sentence3"], 

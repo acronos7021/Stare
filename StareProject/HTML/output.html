@@ -1,97 +1,16 @@
 <html>
     <head>
         <title>STARE</title>
-        <style>
-            #wrapper{
-            width: 95%; 
-            margin: 0 auto;
-            text-align: center;
-            font-family: Baskerville, "Baskerville Old Face", "Hoefler Text", Garamond, "Times New Roman", serif;
-            }
-            #left-column{
-            width: 49%;
-            float: left;
-            }
-            #right-column{
-            width: 49%;
-            float: right;
-            }
-            #doc-box{
-            border-style: solid;
-            border-width: 2px;
-            text-align: left;
-            margin-bottom: 25px;
-            padding: 5;
-            }
-            #highlight-yellow{
-            background-color:yellow;
-            }
-            #highlight-blue{
-            background-color:#47FFFF;
-            }
-            #popup { 
-            position: relative; 
-            display: inline;
-            }
-            #popup span { 
-            display: none;  
-            }
-            #popup:hover span {    
-            text-decoration: none; 
-            display: block; 
-            position: absolute; 
-            width: 200px; 
-            color: black;
-            background-color: white; 
-            height: 50px; 
-            left: 0px; 
-            top: -68px; 
-            padding: 5 5 0 5; 
-            text-align:center;
-            border-style: solid;
-            border-width: 2px;
-            }
-            #doc-wrapper{
-            width: 100%;
-            display: inline-block;
-            }
-        </style>
+        <link rel="stylesheet" type="text/css" href="style.css" />
     </head>
     <div id="wrapper">
         <h1>STARE</h1>
         <p>This is STARE. A plagiarism
             detector.
         </p>
-        <p>Your document was plagiarized <b>5%</b></p>
+        <p>Your document was plagiarized: <b><span id="certainty"></span>%</b></p>
         <div id="plag">
-            <div id="section">
-                <div id="doc-wrapper">
-                    <div id="left-column">
-                        <h3>Left Document</h3>
-                    </div>
-                    <div id="right-column">
-                        <h3>Right Document</h3>
-                    </div>
-                </div>
-                <div id="doc-wrapper">
-                    <div id="left-column">
-                        <div id="doc-box">
-                            Aenean suscipit a metus eu aliquet.  
-                            <div id="popup" style="background-color: yellow;">Vestibulum lacus lorem, viverra sit amet tincidunt a, pharetra vitae mi. <span>This section was plagiarized: <b>100%</b></span></div>
-                            Aliquam egestas rutrum tincidunt. 
-                        </div>
-                    </div>
-                    <div id="right-column">
-                        <div id="doc-box">
-                            Aenean suscipit a metus eu aliquet.
-                            <div id="popup" style="background-color: yellow;">Vestibulum lacus lorem, viverra sit amet tincidunt a, pharetra vitae mi. 
-                                <span>This section was plagiarized: <b>100%</b></span>
-                            </div>
-                            Aliquam egestas rutrum tincidunt. 
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- This is where javascript inserts compare -->
         </div>
     </div>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
