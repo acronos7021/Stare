@@ -11,7 +11,7 @@ function compareDecode(json) {
     
     //content section
     inside += '<div id="doc-wrapper"><div id="left-column"><div id=doc-box>'+ response.ranking[0].origSnip[0] +'</div></div>';
-    inside += '<div id="right-column"><h3>'+response.ranking[0].documentTitle+'</h3></div></div>';
+    inside += '<div id="right-column"><div id=doc-box>'+ response.ranking[0].dataBaseSnip[0] +'</div></div></div>';
     div.innerHTML=inside;
     document.getElementById('plag').appendChild(div);
     
