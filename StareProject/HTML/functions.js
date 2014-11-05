@@ -1,21 +1,18 @@
 function compareDecode(json) {
     var response = JSON.parse(json);
-
     //add the overall certainty
     document.getElementById('certainty').innerHTML = response.overallCertainty;
-
     //Start body of plagarized document
 	for (i=0; i < response.ranking.length; ++i){
 	    var plagiarism = document.createElement('div');
 	    plagiarism.setAttribute("id", "section");
 	    var inside = "";
-	    //title section
+	    //title area
 	    inside += '<div id="doc-wrapper"><div id="left-column"><h3>' +
 	        userDocTitle + '</h3></div>';
 	    inside += '<div id="right-column"><h3>' + response.ranking[i]
 	        .documentTitle + '</h3></div></div>';
-	
-	    //content section
+	    //content area
 	    inside +=
 	        '<div id="doc-wrapper"><div id="left-column"><div id=doc-box>' +
 	        response.ranking[i].origSnip[0] +
