@@ -143,6 +143,10 @@ void server::recvData() {
 		// will implement error checking later. 
 		if (recvDataSize >= 0) buffer[recvDataSize] = '\0';
 		recvDataString = buffer;
+		dataToSend = "Hello client, I have received your data ";
+		dataInChars = dataToSend.c_str();
+		dataSendSize = dataToSend.length();
+		sent_ok = send(server_socket_connect, dataInChars, dataSendSize, NULL);
 	}
 }
 
