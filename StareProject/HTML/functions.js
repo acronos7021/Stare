@@ -56,12 +56,27 @@ function checkCompare(id){
 }
 
 function sendMessage(string){
+    var data=JSON.stringify(string);
 	var xmlhttp=new XMLHttpRequest();
-	xmlhttp.open("POST","some.php",true);
-	xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-	xmlhttp.send(string);
-	return xmlhttp.responseText;
+	xmlhttp.open("POST","phpAndCppTalk.php",true);
+    xmlhttp.onreadystatechange=function()
+    {
+    if (xmlhttp.readyState==4 && xmlhttp.status==200)
+        {
+        callback(xmlhttp.responseText);
+        }
+    }
+	xmlhttp.setRequestHeader("Content-Type", "application/json");
+	xmlhttp.send(data);
 }
+
+function callback(response){
+    var json = JSON.parse(response);
+    if(json.command=="compare"){
+        compareDecode(JSON.stringify(json));
+    }
+}
+
 
 function sendLearn(text, author, title, publishDate) {
 	var learn = {
@@ -90,22 +105,22 @@ function sendCreate(id, styleID, numOfSent) {
 
 function generateID(){
 	var d = new Date();
-	var n=CryptoJS.lib.WordArray.random(256)+d.getTime();
+	var n=CryptoJS.lib.WordArray.random(128)+d.getTime();
 	var id = CryptoJS.SHA256(n);
-	return id;
+	return n;
 }
 
 //sendCompare("TheID", "The document text will go here");
 //This is for testing
 var userDocTitle = "My Title";
-compareDecode(
-    '{"clientID":"ID","command":"compare","status":"#of characters process","documentText":"the document text here","overallCertainty":"50","ranking":[{"origSnip":["Aenean suscipit a metus eu aliquet.","Vestibulum lacus lorem, viverra sit amet tincidunt a, pharetra vitae mi.","Aliquam egestas rutrum tincidunt."],"dataBaseSnip":["Lorem ipsum dolor sit amet, consectetur adipiscing elit.","In molestie congue libero ut feugiat.","Etiam convallis arcu sit amet elit ullamcorper, rhoncus sodales lorem consequat."],"certainty":"10","documentTitle":"someTitle","foundDocumentID":"SomeDocID","foundSentenceID":"someSentID"},{"origSnip":["sentence1","sentence2","sentence3"],"dataBaseSnip":["sentence1","sentence2","sentence3"],"certainty":"100","documentTitle":"2nd Document","foundDocumentID":"SomeDocID","foundSentenceID":"someSentID"}]}'
-);
+//compareDecode(
+//    '{"clientID":"ID","command":"compare","status":"#of characters process","documentText":"the document text here","overallCertainty":"50","ranking":[{"origSnip":["Aenean suscipit a metus eu aliquet.","Vestibulum lacus lorem, viverra sit amet tincidunt a, pharetra vitae mi.","Aliquam egestas rutrum tincidunt."],"dataBaseSnip":["Lorem ipsum dolor sit amet, consectetur adipiscing elit.","In molestie congue libero ut feugiat.","Etiam convallis arcu sit amet elit ullamcorper, rhoncus sodales lorem consequat."],"certainty":"10","documentTitle":"someTitle","foundDocumentID":"SomeDocID","foundSentenceID":"someSentID"},{"origSnip":["sentence1","sentence2","sentence3"],"dataBaseSnip":["sentence1","sentence2","sentence3"],"certainty":"100","documentTitle":"2nd Document","foundDocumentID":"SomeDocID","foundSentenceID":"someSentID"}]}'
+//);
 
 //test generate id
-alert("Your ID is:\n"+generateID());
-
-
+//alert("Your ID is:\n"+generateID());
+var compare = {"command":"compare","overallCertainty":"100","ranking":[{"origSnip":["sentence1","sentence2","sentence3"],"dataBaseSnip":["sentence1","sentence2","sentence3"],"certainty":"80","documentTitle":"someTitle","foundDocumentID":"SomeDocID","foundSentenceID":"someSentID"},{"origSnip":["sentence1","sentence2","sentence3"],"dataBaseSnip":["sentence1","sentence2","sentence3"],"certainty":"90","documentTitle":"someTitle","foundDocumentID":"SomeDocID","foundSentenceID":"someSentID"}]}
+sendMessage(compare);
 
 
 
