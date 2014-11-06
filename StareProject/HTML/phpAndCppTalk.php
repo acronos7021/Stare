@@ -18,7 +18,6 @@
 // Being a client. Test data.
 //----------------------------------
 $data = $HTTP_RAW_POST_DATA;
-echo($data);
 //$object->request($data);
 //----------------------------------
 // Being a server. Test data.
