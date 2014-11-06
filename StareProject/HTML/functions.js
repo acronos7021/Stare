@@ -1,5 +1,9 @@
 function compareDecode(json) {
     var response = JSON.parse(json);
+    
+    //TODO add most of HTML for output page.  removed from template due to progress bar.
+    //TODO replace output HTML with what would be needed for update page instead.
+    
     //add the overall certainty
     document.getElementById('certainty').innerHTML = response.overallCertainty;
     //Start body of plagarized document
@@ -43,16 +47,15 @@ function sendCompare(clientID, text) {
 	
     //do something to send it off here
     sendMessage(compare);
+    window.location.href = 'output.html';
 }
 
 function checkCompare(id){
 	var compare = {
 		"clientID": clientID,
-		"command": "compare",
+		"command": "checkCompare",
 	}
-	var response = sendMessage(compare);
-	
-	
+	sendMessage(compare);
 }
 
 function sendMessage(string){
@@ -73,8 +76,31 @@ function sendMessage(string){
 function callback(response){
     var json = JSON.parse(response);
     if(json.command=="compare"){
-        compareDecode(JSON.stringify(json));
+        //compareDecode(JSON.stringify(json));
+        window.location.href = 'output.html'; 
     }
+    else if(json.command=="checkCompare"){
+        if(json.hasOwnProperty("documentText")){
+            compareDecode(JSON.stringify(json));
+            return;
+        }
+        //update the progress bar here
+        setTimeout(check, 1000);  //wait a second before trying again
+        checkCompare(getCookie("id"));
+    }
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1);
+        if (c.indexOf(name) != -1) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
 }
 
 
@@ -118,7 +144,9 @@ function readSingleFile(evt) {
         var r = new FileReader();
         r.onload = function(e) {
             contents = e.target.result;
-            sendCompare(generateID(), contents);
+            var id = generateID();
+            document.cookie="id="+id;
+            sendCompare(id, contents);
         }
         r.readAsText(f);
     } else {
@@ -128,7 +156,7 @@ function readSingleFile(evt) {
 document.getElementById('files').addEventListener('change', readSingleFile, false);
 //sendCompare("TheID", "The document text will go here");
 //This is for testing
-var userDocTitle = "My Title";
+var userDocTitle = "My Title"; // this will be set using a cookie in the future.
 //compareDecode(
 //    '{"clientID":"ID","command":"compare","status":"#of characters process","documentText":"the document text here","overallCertainty":"50","ranking":[{"origSnip":["Aenean suscipit a metus eu aliquet.","Vestibulum lacus lorem, viverra sit amet tincidunt a, pharetra vitae mi.","Aliquam egestas rutrum tincidunt."],"dataBaseSnip":["Lorem ipsum dolor sit amet, consectetur adipiscing elit.","In molestie congue libero ut feugiat.","Etiam convallis arcu sit amet elit ullamcorper, rhoncus sodales lorem consequat."],"certainty":"10","documentTitle":"someTitle","foundDocumentID":"SomeDocID","foundSentenceID":"someSentID"},{"origSnip":["sentence1","sentence2","sentence3"],"dataBaseSnip":["sentence1","sentence2","sentence3"],"certainty":"100","documentTitle":"2nd Document","foundDocumentID":"SomeDocID","foundSentenceID":"someSentID"}]}'
 //);
