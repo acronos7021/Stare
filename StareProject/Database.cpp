@@ -1,5 +1,9 @@
 #include <cstdio>
+#include <unordered_map>
+#include <chrono>
+#include <thread>
 #include "Database.h"
+#include "WordPairCountDatabase.h"
 
 StyleDatabase::StyleDatabase()
 {
@@ -407,8 +411,8 @@ int StyleDatabase::insertDocument(string Author, string Title, string PublishDat
 int StyleDatabase::insertSentence(int DocumentID, vector<string> words)
 {
 
-	char* errorMessage;
-	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &errorMessage);
+	//char* errorMessage;
+	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, NULL);
 	int count = 0;
 	insertIntoSentences(DocumentID);
 	int sentID = getSentenceID(DocumentID);
@@ -460,7 +464,7 @@ int StyleDatabase::insertSentence(int DocumentID, vector<string> words)
 		}
 		count = count + 1;
 	}
-	sqlite3_exec(db, "COMMIT TRANSACTION", NULL, NULL, &errorMessage);
+	sqlite3_exec(db, "COMMIT TRANSACTION", NULL, NULL, NULL);
 	return sentID;  
 }
 
@@ -605,11 +609,11 @@ vector<int> StyleDatabase::getWordGroupListByStyle(int StyleID, string prevWord,
 
 int StyleDatabase::incrementSentenceID(int byAmount)
 {
-	char* errorMessage;
+	//char* errorMessage;
 	sqlite3_stmt *select_statement;
 	int currentSentenceID;
 	int prepareCode;
-	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &errorMessage);
+	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, NULL);
 	// get the current value
 	if ((prepareCode = sqlite3_prepare(db, "SELECT LastSentenceID FROM Variables", -1, &select_statement, 0)) == SQLITE_OK)
 	{
@@ -620,14 +624,14 @@ int StyleDatabase::incrementSentenceID(int byAmount)
 			// we know there is something here or it wouldn't have given SQLITE_OK, so just read first item.
 			currentSentenceID = sqlite3_column_int(select_statement, 0);
 			string updateStr = "UPDATE Variables SET LastSentenceID = LastSentenceID + " + byAmount;
-			sqlite3_exec(db, updateStr.c_str(), NULL, NULL, &errorMessage);
+			sqlite3_exec(db, updateStr.c_str(), NULL, NULL, NULL);
 		}
 		else
 		{
 			// the variable doesn't exist in the database, so create it and return 0;
 			stringstream insertStr;
 			insertStr << "INSERT INTO Variables (LastSentenceID) VALUES (" << byAmount << ")";
-			sqlite3_exec(db, insertStr.str().c_str(), NULL, NULL, &errorMessage);
+			sqlite3_exec(db, insertStr.str().c_str(), NULL, NULL, NULL);
 			currentSentenceID = 0;
 		}
 	}
@@ -636,86 +640,12 @@ int StyleDatabase::incrementSentenceID(int byAmount)
 		cout << "Unable to execute 'SELECT LastSentenceID FROM Variables'" << endl;
 		cout << "Error Code: " << prepareCode << endl;
 	}
-	sqlite3_exec(db, "COMMIT TRANSACTION", NULL, NULL, &errorMessage);
+	sqlite3_exec(db, "COMMIT TRANSACTION", NULL, NULL, NULL);
 	return currentSentenceID;
 }
 
-void StyleDatabase::insertDocumentText(int DocumentID, std::vector <std::vector<int>> document)
-{
-	char* errorMessage;
 
-	FlushTokenCache();
 
-	// Preallocate all of the sentenceIDs that we will need.
-	int StyleID = getStyleID(DocumentID);
-	int numberOfSentences = document.size();
-	int startSentenceID = incrementSentenceID(numberOfSentences); // returned from the server the first available SentenceID
-
-	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &errorMessage);
-
-	// setup pre-prepared sql statements.
-	char buffer[] = "INSERT INTO HMMtokenPaths (StyleID,DocumentID,SentenceID,CurrentToken,NextToken,PreviousToken) VALUES (?1, ?2, ?3, ?4, ?5, ?6)";
-	sqlite3_stmt* stmt;
-	int error = sqlite3_prepare_v2(db, buffer, strlen(buffer), &stmt, NULL);
-
-	// define required variables just once.
-	int sentenceNum, wordNum, lastWordNum;
-
-	int currWordToken, nextWordToken, prevWordToken;
-	int SentenceID;
-	// insert all words in all sentences into HMMtokenPaths
-	for (sentenceNum = 0; sentenceNum < numberOfSentences; sentenceNum++)
-	{
-		lastWordNum = document[sentenceNum].size();
-		for (wordNum = 0; wordNum < lastWordNum; wordNum++)
-		{
-			// Load all variables into the correct type to be inserted into the prepared statement.
-			if (wordNum>0)
-			{ 
-				// middle or end of sentence
-				prevWordToken = document[sentenceNum][wordNum - 1];
-			}
-			else
-			{ 
-				// Start of sentence
-				prevWordToken = -1;
-			}
-
-			if (wordNum + 1 < lastWordNum)
-			{
-				// Start or middle of sentence
-				nextWordToken = document[sentenceNum][wordNum + 1];
-			}
-			else
-			{
-				// end of sentence
-				nextWordToken = -1;
-			}
-
-			currWordToken = document[sentenceNum][wordNum];
-			//currWordSize = document[sentenceNum][wordNum].size();
-
-			SentenceID = startSentenceID + sentenceNum;
-
-			// bind to prepared statement. 
-			sqlite3_bind_int(stmt, 1, StyleID);
-			sqlite3_bind_int(stmt, 2, DocumentID);
-			sqlite3_bind_int(stmt, 3, SentenceID);
-			if (currWordToken != -1) sqlite3_bind_int(stmt, 4, currWordToken);
-			else sqlite3_bind_null(stmt, 4);
-			if (nextWordToken != -1) sqlite3_bind_int(stmt, 5, nextWordToken);
-			else sqlite3_bind_null(stmt, 5);
-			if (prevWordToken != -1) sqlite3_bind_int(stmt, 6, prevWordToken);
-			else sqlite3_bind_null(stmt, 6);
-			sqlite3_step(stmt);
-
-			//sqlite3_clear_bindings(stmt);
-			sqlite3_reset(stmt);
-		}
-	}
-	sqlite3_exec(db, "COMMIT TRANSACTION", NULL, NULL, &errorMessage);
-	sqlite3_finalize(stmt);
-}
 
 void StyleDatabase::LoadTokenMap()
 {
@@ -763,10 +693,10 @@ void StyleDatabase::FlushTokenCache()
 {
 	if (tokenCache.size() > 0)
 	{
-		char* errorMessage;
+		//char* errorMessage;
 		sqlite3_stmt *stmt;
 
-		sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &errorMessage);
+		sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, NULL);
 
 		// setup pre-prepared sql statements.
 		char buffer[] = "INSERT INTO Tokens VALUES (?1, ?2)";
@@ -782,7 +712,7 @@ void StyleDatabase::FlushTokenCache()
 			sqlite3_reset(stmt);
 		}
 		sqlite3_finalize(stmt);
-		sqlite3_exec(db, "COMMIT TRANSACTION", NULL, NULL, &errorMessage);
+		sqlite3_exec(db, "COMMIT TRANSACTION", NULL, NULL, NULL);
 		tokenCache.clear();
 	}
 }
@@ -793,10 +723,10 @@ int StyleDatabase::GetNextTokenID()
 	if (currentAllocatedTokenID == lastAllocatedTokenID)
 	{
 		// get new batch of tokens from the server
-		char* errorMessage;
+		//char* errorMessage;
 		sqlite3_stmt *select_statement;
 
-		sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &errorMessage);
+		sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, NULL);
 		// get the current value
 		if (sqlite3_prepare(db, "SELECT LastTokenID FROM Variables", -1, &select_statement, 0) == SQLITE_OK)
 		{
@@ -808,19 +738,19 @@ int StyleDatabase::GetNextTokenID()
 				currentAllocatedTokenID = sqlite3_column_int(select_statement, 0);
 				lastAllocatedTokenID = currentAllocatedTokenID + 100;
 				string updateStr = "UPDATE Variables SET LastTokenID = " + std::to_string(lastAllocatedTokenID);
-				sqlite3_exec(db, updateStr.c_str(), NULL, NULL, &errorMessage);
+				sqlite3_exec(db, updateStr.c_str(), NULL, NULL, NULL);
 			}
 			else
 			{
 				// the variable doesn't exist in the database, so create it and return 0;
 				//stringstream insertStr;
 				//insertStr << "INSERT INTO Variables (SentenceID) VALUES (100)";
-				sqlite3_exec(db, "INSERT INTO Variables (SentenceID) VALUES (100)", NULL, NULL, &errorMessage);
+				sqlite3_exec(db, "INSERT INTO Variables (SentenceID) VALUES (100)", NULL, NULL, NULL);
 				currentAllocatedTokenID = 0;
 				lastAllocatedTokenID = 100;
 			}
 		}
-		sqlite3_exec(db, "COMMIT TRANSACTION", NULL, NULL, &errorMessage);
+		sqlite3_exec(db, "COMMIT TRANSACTION", NULL, NULL, NULL);
 	}
 	return ++currentAllocatedTokenID;
 }
@@ -942,7 +872,7 @@ void StyleDatabase::CreateDatabase()
 			cout << "Operation Failed!" << endl;
 			return;
 		}
-		for (int i = 0; i < tables.size();i++)
+		for (unsigned int i = 0; i < tables.size();i++)
 		{
 			cout << "Dropping " << tables[i] << endl;
 			char dropStr[500];
@@ -951,6 +881,7 @@ void StyleDatabase::CreateDatabase()
 			{
 				cout << errorMessage << endl;
 				cout << "Operation Failed!" << endl;
+				sqlite3_free(errorMessage);
 				return;
 			}
 		}
@@ -958,6 +889,7 @@ void StyleDatabase::CreateDatabase()
 		{
 			cout << "Unable to reset the AutoIncrement fields!" << endl;
 			cout << "Proceeding anyway." << endl;
+			sqlite3_free(errorMessage);
 		}
 
 	}
@@ -975,7 +907,7 @@ void StyleDatabase::CreateDatabase()
 		StyleID     INTEGER NOT NULL,\
 		Title       TEXT,\
 		PublishDate TEXT)"
-		, NULL, NULL, &errorMessage);
+		, NULL, NULL, NULL);
 
 	cout << "Creating HMMtokenPaths table" << endl;
 	sqlite3_exec(db, "CREATE TABLE HMMtokenPaths ( \
@@ -987,7 +919,7 @@ void StyleDatabase::CreateDatabase()
 		CurrentToken  INTEGER NOT NULL,\
 		NextToken     INTEGER NOT NULL,\
 		PreviousToken INTEGER NOT NULL)"
-		, NULL, NULL, &errorMessage);
+		, NULL, NULL, NULL);
 
 
 	cout << "Creating Styles table" << endl;
@@ -995,20 +927,20 @@ void StyleDatabase::CreateDatabase()
 		StyleID INTEGER NOT NULL\
 		PRIMARY KEY AUTOINCREMENT,\
 		Author  TEXT    NOT NULL)"
-		, NULL, NULL, &errorMessage);
+		, NULL, NULL, NULL);
 
 	cout << "Creating Tokens table" << endl;
 	sqlite3_exec(db, "CREATE TABLE Tokens ( \
 		TokenID INTEGER NOT NULL\
 		PRIMARY KEY AUTOINCREMENT,\
 		Word    TEXT)"
-		, NULL, NULL, &errorMessage);
+		, NULL, NULL, NULL);
 
 	cout << "Creating Variables table" << endl;
 	sqlite3_exec(db, "CREATE TABLE Variables ( \
 		LastSentenceID INT PRIMARY KEY,\
 		LastTokenID    INT)"
-		, NULL, NULL, &errorMessage);
+		, NULL, NULL, NULL);
 
 	cout << "Setup default values" << endl;
 	// Load Initial Values
@@ -1019,3 +951,99 @@ void StyleDatabase::CreateDatabase()
 
 	LoadTokenMap();
 }
+
+
+
+
+
+///***********************************************************************  Moved functions
+
+
+
+
+
+
+void StyleDatabase::insertDocumentText(int DocumentID, std::vector <std::vector<int>> document)
+{
+	char* errorMessage;
+
+	FlushTokenCache();
+
+
+	// Preallocate all of the sentenceIDs that we will need.
+	int StyleID = getStyleID(DocumentID);
+	int numberOfSentences = document.size();
+	int startSentenceID = incrementSentenceID(numberOfSentences); // returned from the server the first available SentenceID
+
+	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &errorMessage);
+
+	// setup pre-prepared sql statements.
+	char hmm_buffer[] = "INSERT INTO HMMtokenPaths (StyleID,DocumentID,SentenceID,CurrentToken,NextToken,PreviousToken) VALUES (?1, ?2, ?3, ?4, ?5, ?6)";
+	sqlite3_stmt* HMMtokenPaths_stmt;
+	int error = sqlite3_prepare_v2(db, hmm_buffer, strlen(hmm_buffer), &HMMtokenPaths_stmt, NULL);
+
+	// define required variables just once.
+	int sentenceNum, wordNum, lastWordNum;
+
+	int currWordToken, nextWordToken, prevWordToken;
+	int SentenceID;
+	// insert all words in all sentences into HMMtokenPaths
+	for (sentenceNum = 0; sentenceNum < numberOfSentences; sentenceNum++)
+	{
+		lastWordNum = document[sentenceNum].size();
+		for (wordNum = 0; wordNum < lastWordNum; wordNum++)
+		{
+			// Load all variables into the correct type to be inserted into the prepared statement.
+			if (wordNum>0)
+			{
+				// middle or end of sentence
+				prevWordToken = document[sentenceNum][wordNum - 1];
+			}
+			else
+			{
+				// Start of sentence
+				prevWordToken = -1;
+			}
+
+			if (wordNum + 1 < lastWordNum)
+			{
+				// Start or middle of sentence
+				nextWordToken = document[sentenceNum][wordNum + 1];
+			}
+			else
+			{
+				// end of sentence
+				nextWordToken = -1;
+			}
+
+			currWordToken = document[sentenceNum][wordNum];
+			//currWordSize = document[sentenceNum][wordNum].size();
+
+			SentenceID = startSentenceID + sentenceNum;
+
+			// bind to prepared statement. 
+			sqlite3_bind_int(HMMtokenPaths_stmt, 1, StyleID);
+			sqlite3_bind_int(HMMtokenPaths_stmt, 2, DocumentID);
+			sqlite3_bind_int(HMMtokenPaths_stmt, 3, SentenceID);
+			if (currWordToken != -1) sqlite3_bind_int(HMMtokenPaths_stmt, 4, currWordToken);
+			else sqlite3_bind_null(HMMtokenPaths_stmt, 4);
+			if (nextWordToken != -1) sqlite3_bind_int(HMMtokenPaths_stmt, 5, nextWordToken);
+			else sqlite3_bind_null(HMMtokenPaths_stmt, 5);
+			if (prevWordToken != -1) sqlite3_bind_int(HMMtokenPaths_stmt, 6, prevWordToken);
+			else sqlite3_bind_null(HMMtokenPaths_stmt, 6);
+			sqlite3_step(HMMtokenPaths_stmt);
+
+			//sqlite3_clear_bindings(stmt);
+			sqlite3_reset(HMMtokenPaths_stmt);
+		}
+	}
+
+	char word_counts_buffer[] = "INSERT INTO WordCounts (CurrentToken,NextToken,Count) VALUES (?1, ?2, ?3)";// "StyleID,DocumentID,SentenceID,CurrentToken,NextToken,PreviousToken) VALUES (?1, ?2, ?3, ?4, ?5, ?6)";
+	sqlite3_stmt* word_counts_stmt;
+	int error2 = sqlite3_prepare_v2(db, word_counts_buffer, strlen(word_counts_buffer), &word_counts_stmt, NULL);
+
+	sqlite3_exec(db, "COMMIT TRANSACTION", NULL, NULL, &errorMessage);
+	sqlite3_finalize(HMMtokenPaths_stmt);
+}
+
+

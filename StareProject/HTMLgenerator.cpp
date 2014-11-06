@@ -13,6 +13,8 @@ HTMLgenerator::HTMLgenerator(string DestinationFilename, int documentID, vector<
 
 	//StyleDatabase& db = StyleDatabase::getInstance();
 	//db.open("aisql.db3");
+	StyleDatabase db;
+	db.open();
 	string sentence; // the current sentence the function is working with
 	stringstream output; // the output that will be saved to the DestinationFilename
 	
@@ -59,13 +61,13 @@ HTMLgenerator::HTMLgenerator(string DestinationFilename, int documentID, vector<
 
 
 			output << "<div id='right-column'>"; //begin right column
-			output << db.getSentence(rankingList[i].foundSentenceID - 2) << "  ";
-			output << db.getSentence(rankingList[i].foundSentenceID - 1) << "  ";
-			output << "<div id='popup' style='background-color: yellow;'>";
-			output << db.getSentence(rankingList[i].foundSentenceID) << "  ";
-			output << "<span>This section was plagiarized: <b>" << rankingList[i].certainty << "</b></span></div>";
-			output << db.getSentence(rankingList[i].foundSentenceID + 1) << "  ";
-			output << db.getSentence(rankingList[i].foundSentenceID + 2) << "  ";
+			//output << db.getSentence(rankingList[i].foundSentenceID - 2) << "  ";
+			//output << db.getSentence(rankingList[i].foundSentenceID - 1) << "  ";
+			//output << "<div id='popup' style='background-color: yellow;'>";
+			//output << db.getSentence(rankingList[i].foundSentenceID) << "  ";
+			//output << "<span>This section was plagiarized: <b>" << rankingList[i].certainty << "</b></span></div>";
+			//output << db.getSentence(rankingList[i].foundSentenceID + 1) << "  ";
+			//output << db.getSentence(rankingList[i].foundSentenceID + 2) << "  ";
 
 			output << "</div>"; //end the doc-wrapper
 		}
@@ -90,6 +92,7 @@ HTMLgenerator::HTMLgenerator(string DestinationFilename, int documentID, vector<
 	std::ostream outStream(&fb);
 	outStream << output.str();
 	fb.close();
+	db.close();
 
 }
 

@@ -28,8 +28,8 @@ int HMMengine::learn(MetaData metaData)
 	std::vector <std::vector<int>> documentTokens = tokenizer.tokenizeDoc(metaData.DocumentText);
 
 	// insert it into the database;
-	int documentID = db.insertDocument( metaData.Author, metaData.Title, metaData.PublishDate);
-	db.insertDocumentText(documentID, documentTokens);
+	int documentID = dataBase.insertDocument( metaData.Author, metaData.Title, metaData.PublishDate);
+	dataBase.insertDocumentText(documentID, documentTokens);
 	return documentID;
 }
 
@@ -39,20 +39,20 @@ void HMMengine::compare(MetaData metaData)
 	Tokenizer tokenizer = Tokenizer();
 	std::vector <std::vector<int>> documentTokens = tokenizer.tokenizeDoc(metaData.DocumentText);
 
-	vector<StyleCounts> totalWordCountsPerStyle = db.getTotalWordCountPerStyle();
+	vector<StyleCounts> totalWordCountsPerStyle = dataBase.getTotalWordCountPerStyle();
 
 	map<int, StyleCounter> pairCountsPerStyle;
 
 	int sentence = 0;
-	for (int s = 0; s < documentTokens.size(); s++)
+	for (int s = 0; s < (int)documentTokens.size(); s++)
 	{
 		int sentSize = documentTokens[s].size() - 1;
 		for (int w = 0; w < sentSize; w++)
 		{
 			// every word of every sentence except the last word in the sentence should be here.
 			// This does a compare of each pair with the database.  It increments a count and loads it into a map for each pair found.
-			vector<StyleCounts> wordCountsPerPath = db.getPathWordCountPerStyle(documentTokens[s][w], documentTokens[s][w + 1]);
-			for (int i = 0; i < wordCountsPerPath.size(); i++)
+			vector<StyleCounts> wordCountsPerPath = dataBase.getPathWordCountPerStyle(documentTokens[s][w], documentTokens[s][w + 1]);
+			for (unsigned int i = 0; i < wordCountsPerPath.size(); i++)
 			{
 				map<int, StyleCounter>::iterator it = pairCountsPerStyle.find(wordCountsPerPath[i].StyleID);
 				if (it == pairCountsPerStyle.end())
@@ -76,7 +76,7 @@ void HMMengine::compare(MetaData metaData)
 		// we need two loops because current/total needs total to print.
 		double totalSentencePercent = 0;
 		double totalDocumentPercent = 0;
-		for (int i = 0; i < totalWordCountsPerStyle.size(); i++)
+		for (unsigned int i = 0; i < totalWordCountsPerStyle.size(); i++)
 		{
 			// examines each style.  If the style has hits, it tracks that and uses it in the totals.
 			map<int, StyleCounter>::iterator it = pairCountsPerStyle.find(totalWordCountsPerStyle[i].StyleID);
@@ -94,7 +94,7 @@ void HMMengine::compare(MetaData metaData)
 		}
 
 		// now print out the results.
-		for (int i = 0; i < totalWordCountsPerStyle.size(); i++)
+		for (unsigned int i = 0; i < totalWordCountsPerStyle.size(); i++)
 		{
 			map<int, StyleCounter>::iterator it = pairCountsPerStyle.find(totalWordCountsPerStyle[i].StyleID);
 			if (it != pairCountsPerStyle.end())

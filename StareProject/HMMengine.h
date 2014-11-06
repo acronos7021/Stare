@@ -5,6 +5,7 @@
 #include "DataStructs.h"
 #include "Tokenizer.h"
 #include "HTMLgenerator.h"
+#include "DocumentDatabase.h"
 
 
 class HMMengine
@@ -12,6 +13,7 @@ class HMMengine
 public:
 	HMMengine();
 	~HMMengine();
+	DocumentDatabase dataBase;
 
 	int learn(MetaData metaData);
 	void compare(MetaData metaData);

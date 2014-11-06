@@ -8,7 +8,7 @@ using namespace std;
 #include "Database.h"
 //#include "DataStructs.h"
 
-StyleDatabase& db = StyleDatabase();
+//StyleDatabase& db = StyleDatabase();
 
 int main(int argc, char *argv[])
 {
@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 	//HMMengine hGen = HMMengine(md);
 	// Open the only copy of the database
 
-	db.open();
+	//db.open();
 
 	Console c;
 	c.MessageLoop(argc, argv);

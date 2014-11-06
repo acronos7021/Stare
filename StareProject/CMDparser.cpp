@@ -41,7 +41,11 @@ bool CMDparser::parseCMD(vector<string> cmdList)
 	else if (cmdList[0] == "Brian")
 		Brian(cmdList);
 	else if ((cmdList[0] == "Create") && (cmdList[1] == "Database"))
-		db.CreateDatabase();
+	{
+		//db.CreateDatabase();
+		DocumentDatabase db;
+		db.CreateDatabase(false);
+	}
 	else if (cmdList[0] == "Execute")
 		Execute(cmdList[1]);
 	else if (cmdList[0] == "help")
@@ -255,6 +259,7 @@ void CMDparser::Brandon(vector<string> cmdParams)
 	//cout << "The long long on our platform is " << (sizeof(long long)* 8) << " bits" << endl;
 	//StyleDatabase& test = StyleDatabase::getInstance();
 	//test.open("BrianAIsql.db3");
+	StyleDatabase db;
 	db.clearDatabase();
 	db.insertAuthor("Brian");
 	int StyleID = db.retrieveAuthorStyleID("Brian");
@@ -273,6 +278,7 @@ void CMDparser::Brandon(vector<string> cmdParams)
 	vector<string> sentVect2;
 	sentVect2.push_back(".");
 	db.insertSentence(DocumentID, sentVect2); // test short sentence.
+	db.close();
 }
 
 void CMDparser::Blake(vector<string> cmdParams)
@@ -300,6 +306,25 @@ void CMDparser::Brian(vector<string> cmdParams)
 	HMMengine hmm;
 	Stopwatch sw;
 
+	DocumentDatabase dBase;
+
+	MetaData metaData;
+	metaData.DocumentText = "../StareProject/Documents/HenryV.txt"; // ReadFile(cmdList[1]);
+	metaData.action = ActionType::Learn;
+	metaData.Author = "Shakespere";
+	metaData.Title = "Henry V";
+	metaData.PublishDate = "1619";
+	cout << "Learning document -> " << metaData.Author << " : " << metaData.Title;
+
+	hmm.learn(metaData);
+
+	//Execute("test");
+	dBase.CreateDatabase(false);
+	hmm.learn(metaData);
+	dBase.insertDocument("fred", "sam book", "2341");
+	sqlite3* db = dBase.openDB();
+	int styleID = dBase.getStyleID(db, "fred");
+	std::cout << styleID;
 
 	//sw.start();
 	//Tokenizer tokenizer = Tokenizer();
@@ -336,7 +361,7 @@ void CMDparser::Brian(vector<string> cmdParams)
 	//sw.end();
 	//int learnTime = sw.getTimeInMicroseconds();
 
-	hmm.compare(MetaData("Shakespere", "A Midnight Summer Dream", "1605", "../StareProject/Documents/AMidsummerNightsDream.txt"));
+	//hmm.compare(MetaData("Shakespere", "A Midnight Summer Dream", "1605", "../StareProject/Documents/AMidsummerNightsDream.txt"));
 }
 
 	//do

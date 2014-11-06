@@ -59,6 +59,8 @@ std::vector <std::vector<int>> Tokenizer::tokenizeDoc(string Document)
 		printf("\nAn error has occured and the file does not exist!!!\n");
 		return sentences;
 	}
+	StyleDatabase db;
+	db.open();
 
 	while (!fname.eof())
 	{
@@ -101,6 +103,7 @@ std::vector <std::vector<int>> Tokenizer::tokenizeDoc(string Document)
 		}
 	}
 	db.FlushTokenCache();
+	db.close();
 	return sentences;
 } //end of method
 

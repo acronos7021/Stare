@@ -12,6 +12,9 @@ using namespace std;
 #include <map>
 
 
+
+
+
 class StyleDatabase
 {
 public:
@@ -19,15 +22,16 @@ public:
 	StyleDatabase();
 	~StyleDatabase(void);
 
+	void clearDatabase();
+	void CreateDatabase();
+
+
 	void open();
 	void close();
 	bool isOpen;
-	string databaseName;
+	//string databaseName;
 
-	//Use this to create a new Document
-	//  if a Style (author) doesn’t exist and add it to the Style table.  
-	//returns the DocumentID of the new Document.
-	int insertDocument(string Author, string Title, string publishDate);
+
 
 	// Used to add a sentence
 	// This would:
@@ -54,8 +58,7 @@ public:
 	//Returns a list of all of the SentenceIDs where that combination of words exists in all documents of the selected style. 
 	vector<int> getWordGroupListByStyle(int StyleID, string prevWord, string currWord, string nextWord);
 
-	void clearDatabase();
-	void CreateDatabase();
+
 	vector<string> testFunc(); // Remove after testing
 
 //private:
@@ -67,24 +70,23 @@ public:
 	void insert(string query);
 	int retrieve(string table, string data, string searchType, string searchData);
 
-	/* Wrapper Functions */
-	void insertAuthor(string author);
-	int retrieveAuthorStyleID(string author);
-	void insertDocumentIntoDB(int styleID, string title, string publishDate);
+
+
+
 	void insertIntoSentences(int docId);
 	void addHMMTokenPath(int SentID, int StyleID, int CurToken, int NextToken, int PrevToken);
-	int getStyleID(int docID);
-	int getSentenceID(int docID);
+
 	bool doesWordExist(string word);
 	void addWord(string word);
 	int getWordID(string word);
 
-	int getDocumentID(string Author, string title);
-	int getDocumentID(int styleID,string title);
+
+	int getSentenceID(int docID);
 
 	int GetToken(string word);
+	int GetString(int TokenID);
 	int incrementSentenceID(int byAmount);
-	void insertDocumentText(int DocumentID, std::vector <std::vector<int>> document);
+
 	void LoadTokenMap();
 	int GetNextTokenID();
 	vector<std::pair<string, int>> tokenCache;
@@ -94,6 +96,24 @@ public:
 	int currentAllocatedTokenID, lastAllocatedTokenID;
 	vector<StyleCounts> getTotalWordCountPerStyle();
 	vector<StyleCounts> getPathWordCountPerStyle(int currToken, int nextToken);
+
+	//********************** moved functions
+	void insertDocumentText(int DocumentID, std::vector <std::vector<int>> document);
+	int getDocumentID(string Author, string title);
+	int getDocumentID(int styleID, string title);
+	int getStyleID(int docID);
+
+	int retrieveAuthorStyleID(string author);
+
+	//Use this to create a new Document
+	//  if a Style (author) doesn’t exist and add it to the Style table.  
+	//returns the DocumentID of the new Document.
+	int insertDocument(string Author, string Title, string publishDate);
+	void insertDocumentIntoDB(int styleID, string title, string publishDate);
+
+	/* Wrapper Functions */
+	void insertAuthor(string author);
+
 };
 
 extern StyleDatabase& db;
