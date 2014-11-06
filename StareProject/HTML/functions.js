@@ -42,7 +42,7 @@ function sendCompare(clientID, text) {
 	}
 	
     //do something to send it off here
-    alert(sendMessage(compare));
+    sendMessage(compare);
 }
 
 function checkCompare(id){
@@ -110,6 +110,22 @@ function generateID(){
 	return n;
 }
 
+function readSingleFile(evt) {
+    //Retrieve the first (and only!) File from the FileList object
+    var f = evt.target.files[0];
+    var contents;
+    if (f) {
+        var r = new FileReader();
+        r.onload = function(e) {
+            contents = e.target.result;
+            sendCompare(generateID(), contents);
+        }
+        r.readAsText(f);
+    } else {
+        alert("Failed to load file");
+    }
+}
+document.getElementById('files').addEventListener('change', readSingleFile, false);
 //sendCompare("TheID", "The document text will go here");
 //This is for testing
 var userDocTitle = "My Title";
@@ -120,7 +136,7 @@ var userDocTitle = "My Title";
 //test generate id
 //alert("Your ID is:\n"+generateID());
 var compare = {"command":"compare","overallCertainty":"100","ranking":[{"origSnip":["sentence1","sentence2","sentence3"],"dataBaseSnip":["sentence1","sentence2","sentence3"],"certainty":"80","documentTitle":"someTitle","foundDocumentID":"SomeDocID","foundSentenceID":"someSentID"},{"origSnip":["sentence1","sentence2","sentence3"],"dataBaseSnip":["sentence1","sentence2","sentence3"],"certainty":"90","documentTitle":"someTitle","foundDocumentID":"SomeDocID","foundSentenceID":"someSentID"}]}
-sendMessage(compare);
+//sendMessage(compare);
 
 
 
