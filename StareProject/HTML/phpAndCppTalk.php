@@ -12,18 +12,18 @@
 // request() makes php act as a client. Auto send.
 // Remember to run close method when necessary.
 //-----------------------------------------------------------
-//$object = new phpAndCppTalk;
-//$object->init();
+$object = new phpAndCppTalk;
+$object->init();
 //----------------------------------
 // Being a client. Test data.
 //----------------------------------
 $data = $HTTP_RAW_POST_DATA;
-//$object->request($data);
+$object->request($data);
 //----------------------------------
 // Being a server. Test data.
 //----------------------------------
-//$result = $object->getData();
-//echo $result;
+$result = $object->getData();
+echo $result;
 //----------------------------------
 //$object->closeSocket();
 
