@@ -9,6 +9,29 @@ PHPsocket::~PHPsocket()
 {
 }
 
+void PHPsocket::jsonDecoder(string json)
+{
+	Json::Value jsonObject=parseJSON(json);
+	string command = jsonObject["command"].asString();
+	string output;
+
+	if (command.compare("compare")==0){
+		output = doCompare(jsonObject);
+	}
+	else if (command.compare("checkCompare") == 0){
+		string ID = jsonObject["clientID"].asString();
+		int sessionID;
+		istringstream(ID) >> sessionID;
+		output = doCompare(jsonObject);
+	}
+
+
+
+
+	cout << output << endl;
+	//send off the output to the socket here
+}
+
 string PHPsocket::doCompare(Json::Value json)
 {
 	CMDparser cmd;
@@ -49,16 +72,9 @@ string PHPsocket::doCompare(Json::Value json)
 		compare["ranking"].append(rankingObj);
 	}
 
-
-
 	return compare.toStyledString();
 }
 
-Json::Value PHPsocket::doCheckCompare(int sessionID)
-{
-	Json::Value nothing;
-	return nothing;
-}
 
 Json::Value PHPsocket::formCheckCompareReturn(int status)
 {

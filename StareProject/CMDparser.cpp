@@ -379,9 +379,11 @@ void CMDparser::Brandon(vector<string> cmdParams)
 
 void CMDparser::Blake(vector<string> cmdParams)
 {
-	string json = "{ \"clientID\":\"789\", \"command\" : \"compare\", \"documentText\" : \"the document text here\" }";
+	string json = "{ \"clientID\":\"789\", \"command\" : \"checkCompare\", \"documentText\" : \"the document text here\" }";
 	PHPsocket test;
-	cout << test.doCompare(test.parseJSON(json)) << endl;
+
+	// I think you potentially could start a new thread here.
+	test.jsonDecoder(json);
 }
 
 void CMDparser::Sam(vector<string> cmdParams)
