@@ -250,51 +250,81 @@ bool CMDparser::isAlphaNumeric(char c)
 
 /******************************   PHPconnector functions  ************************************/
 
-string getSentences(int rangeStart, int rangeEnd)
+
+/******************************   PHPconnector functions  ************************************/
+string CMDparser::getSentences(int rangeStart, int rangeEnd)
 {
 	return "This is sentence 3.  This is sentence 4.";
 }
 
-string getDocument(int DocumentID)
+string CMDparser::getDocument(int DocumentID)
 {
 	return"This is sentence 1.  This is sentence 2. This is sentence 3.  This is sentence 4.";
 }
 
 
-void learn(string author, string title, string date, string text)
+void CMDparser::learn(string author, string title, string date, string text)
 {
 	HMMengine hmm;
-	hmm.compare(MetaData(author,title,date,text));
+	hmm.compare(MetaData(author, title, date, text));
 	string sam = "good";
 }
 
-vector<sentenceRanking> compare(int clientID, string text)
+CompareResult CMDparser::compare(int clientID, string text)
 {
 	//HMMengine hmm;
 	//hmm.compare(MetaData("", "", "", text));
-	vector<sentenceRanking> test;
+	vector<SentenceRanking> test;
 
-	test.push_back(sentenceRanking(30, 2, 54, "Sentence7.", "Sentence 6", "Sentence 5", "Sentence 8", "Sentence 9", .57));
-	test.push_back(sentenceRanking(30, 2, 54, "Sentence7.", "Sentence 6", "Sentence 5", "Sentence 8", "Sentence 9", .57));
-	test.push_back(sentenceRanking(30, 2, 54, "Sentence7.", "Sentence 6", "Sentence 5", "Sentence 8", "Sentence 9", .57));
-	return test;
+	SentenceBlob sbSource;
+	sbSource.NextNextSentenceStr = "Sentence 9";
+	sbSource.NextSentenceStr = "Sentence 8";
+	sbSource.SentenceStr = "Sentence 7";
+	sbSource.PrevSentenceStr = "Sentence 6";
+	sbSource.PrevPrevSentenceStr = "Sentence 5";
+	sbSource.SentenceID = 7;
+
+	SentenceBlob sbFound;
+	sbFound.NextNextSentenceStr = "Sentence 9";
+	sbFound.NextSentenceStr = "Sentence 8";
+	sbFound.SentenceStr = "Sentence 7";
+	sbFound.PrevSentenceStr = "Sentence 6";
+	sbFound.PrevPrevSentenceStr = "Sentence 5";
+	sbFound.SentenceID = 7;
+
+	test.push_back(SentenceRanking("Dickens", "A tale of two cities", sbSource, sbFound, .57));
+	test.push_back(SentenceRanking("Mark Twain", "Huckleberry Finn", sbSource, sbFound, .57));
+
+	StyleCertaintyItem style1;
+	style1.certainty = .73;
+	style1.StyleID = 2;
+	style1.StyleName = "Mark Twain";
+
+	vector<StyleCertaintyItem> ci;
+	ci.push_back(style1);
+
+	CompareResult cr;
+	cr.documentCertainties = ci;
+	cr.sentenceRankings = test;
+
+	return cr;
 }
 
-string create(int clientID, string author, int numOfSentences)
+string CMDparser::create(int clientID, string author, int numOfSentences)
 {
 	return "Now is the time for all good men to come to the aid of their country.";
 }
 
-int checkCompareStatus(int clientID)  // done is 100
+int CMDparser::checkCompareStatus(int clientID)  // done is 100
 {
 	return 25;
 }
-int checkCreateStatus(int clientID)     // done is 100
+int CMDparser::checkCreateStatus(int clientID)     // done is 100
 {
 	return 25;
 }
 
-vector<MetaData> getDocuments()
+vector<MetaData> CMDparser::getDocuments()
 {
 	MetaData md("Shakespere", "Henry V", "1619", "../StareProject/Documents/HenryV.txt");
 	std::vector<MetaData> test;
@@ -305,7 +335,7 @@ vector<MetaData> getDocuments()
 
 }
 
-std::vector<MetaData> getStyles()
+std::vector<MetaData> CMDparser::getStyles()
 {
 	MetaData md("Shakespere", "Henry V", "1619", "../StareProject/Documents/HenryV.txt");
 	std::vector<MetaData> test;
@@ -315,7 +345,9 @@ std::vector<MetaData> getStyles()
 	return test;
 }
 
-/******************************   PHPconnector functions  ************************************/
+
+
+/**********************************************************************************************/
 
 void CMDparser::Brandon(vector<string> cmdParams)
 {
