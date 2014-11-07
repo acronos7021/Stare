@@ -12,6 +12,7 @@ using namespace std;
 #include "Tokenizer.h"
 #include "HMMengine.h"
 #include "DataStructs.h"
+#include "PHPsocket.h"
 
 
 bool CMDparser::parseCMD(vector<string> cmdList)
@@ -378,7 +379,9 @@ void CMDparser::Brandon(vector<string> cmdParams)
 
 void CMDparser::Blake(vector<string> cmdParams)
 {
-
+	string json = "{ \"clientID\":\"789\", \"command\" : \"compare\", \"documentText\" : \"the document text here\" }";
+	PHPsocket test;
+	cout << test.doCompare(test.parseJSON(json)) << endl;
 }
 
 void CMDparser::Sam(vector<string> cmdParams)

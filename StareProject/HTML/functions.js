@@ -133,7 +133,7 @@ function generateID(){
 	var d = new Date();
 	var n=CryptoJS.lib.WordArray.random(128)+d.getTime();
 	var id = CryptoJS.SHA256(n);
-	return n;
+	return d.getTime();
 }
 
 function readSingleFile(evt) {
@@ -153,7 +153,6 @@ function readSingleFile(evt) {
         alert("Failed to load file");
     }
 }
-document.getElementById('files').addEventListener('change', readSingleFile, false);
 //sendCompare("TheID", "The document text will go here");
 //This is for testing
 var userDocTitle = "My Title"; // this will be set using a cookie in the future.
