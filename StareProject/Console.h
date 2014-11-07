@@ -1,6 +1,7 @@
 #pragma once
 #include<vector>
 #include<string>
+#include "CMDparser.h"
 
 using namespace std;
 
@@ -10,6 +11,6 @@ public:
 	Console();
 	~Console();
 
-	void MessageLoop(int argc, char *argv[]);
+	void MessageLoop(CMDparser &cmdParser, int argc, char *argv[]);
 };
 

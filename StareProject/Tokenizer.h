@@ -7,6 +7,7 @@
 #include <deque>
 #include <stdexcept>
 //#include "DataStructs.h"
+#include "Database.h"
 
 class Tokenizer
 {
@@ -40,7 +41,7 @@ public:
 	std::string file;
 	int index;
 
-	std::deque<std::vector<std::string>> sentence;
+	//std::deque<std::vector<std::string>> sentence;
 	std::deque<std::vector<int>>sentID;
 	char punctuation[3];
 
@@ -70,7 +71,7 @@ public:
 	//@param: string document (a single string that is the entire document)
 	//@return: void
 	//@logic: tokenizes the entire document into a deque<vector<int>> sentID
-	void tokenizeDoc(std::string document);
+	std::deque<std::vector<int>> tokenizeDoc(std::string document);
 
 	//@param: vector<int> sent
 	//@return: a string that is a reconstructed sentence
@@ -80,7 +81,7 @@ public:
 	//@param: void
 	//@return: a vector of string / ID from the master list
 	//@logic: called after a document has been tokenize; it returns the current sentence you are on based on the index
-	std::vector<std::string> getNextSentence(); //std::vector<int>getNextSentence();
+	std::vector<int> getNextSentence(); //std::vector<int>getNextSentence();
 
 	//@param: string filename
 	//@return: void

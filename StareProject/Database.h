@@ -10,6 +10,7 @@ using namespace std;
 #include <iostream>
 #include <sstream>
 #include <map>
+#include <deque>
 
 
 class StyleDatabase
@@ -84,7 +85,7 @@ public:
 
 	int GetToken(string word);
 	int incrementSentenceID(int byAmount);
-	void insertDocumentText(int DocumentID, std::vector <std::vector<int>> document);
+	void insertDocumentText(int DocumentID, std::deque<std::vector<int>> document);
 	void LoadTokenMap();
 	int GetNextTokenID();
 	vector<std::pair<string, int>> tokenCache;

@@ -1,5 +1,7 @@
 #include "Tokenizer.h"
 #include "Stopwatch.h"
+#include "Database.h"
+#include "DataStructs.h"
 using namespace std;
 
 Tokenizer::Tokenizer()
@@ -39,26 +41,26 @@ inline bool Tokenizer::checkPunctuation(char c)
 
 void Tokenizer::print_BAV()
 {
-	for (int i = 0; i < (int)sentence.size(); i++)
+	for (int i = 0; i < (int)sentID.size(); i++)
 	{
-		for (int j = 0; j < (int)sentence[i].size(); j++)
+		for (int j = 0; j < (int)sentID[i].size(); j++)
 		{
-			cout << sentence[i][j] << " ";
+			cout << sentID[i][j] << " ";
 		}
 		cout << endl;
 	}
 }
 
-vector<string> Tokenizer::getNextSentence() //vector<int> Tokenizer::getNextSentence2()
+vector<int> Tokenizer::getNextSentence() //vector<int> Tokenizer::getNextSentence2()
 {
-	vector<string> temp; // vector<int> temp
-	if (index > sentence.size() - 1) //(index > sentID.size() - 1)
+	vector<int> temp; // vector<int> temp
+	if (index > sentID.size() - 1) //(index > sentID.size() - 1)
 	{
 		return temp;
 	}
 	else
 	{
-		temp = sentence[index]; //temp = sentID[index];
+		temp = sentID[index]; //temp = sentID[index];
 		index++;
 		//sentences.erase(sentences.begin());
 		return temp;
@@ -71,7 +73,7 @@ void Tokenizer::tokenizeFileH()
 	ind->start = &file[0];
 	ind->end = &file[0];
 	char* done = &file[file.size() - 1];
-	vector <string> tmp; // vector <int> tmp;
+	vector <int> tmp; // vector <int> tmp;
 
 	while (ind->end != done)
 	{
@@ -79,18 +81,18 @@ void Tokenizer::tokenizeFileH()
 		{
 			if (checkIgnore((char)*ind->end))
 			{
-				tmp.push_back(ind->toString()); // tmp.push_back(db.getToken(ind->toString()));
+				tmp.push_back(db.GetToken(ind->toString()));
 				if (*ind->end != 32)
 				{
-					tmp.push_back(ind->toStringE()); // tmp.push_back(db.getToken(ind->toStringE()));
+					tmp.push_back(db.GetToken(ind->toStringE()));
 				}
 				ind->start = ++ind->end;
 			}
 			else if (checkPunctuation((char)*ind->end))
 			{
-				tmp.push_back(ind->toString()); // tmp.push_back(db.getToken(ind->toString()));
-				tmp.push_back(ind->toStringE()); // tmp.push_back(db.getToken(ind->toStringE()));
-				sentence.push_back(tmp); // sentID.push_back(tmp);
+				tmp.push_back(db.GetToken(ind->toString()));
+				tmp.push_back(db.GetToken(ind->toStringE()));
+				sentID.push_back(tmp); // sentID.push_back(tmp);
 				tmp.clear();
 				ind->start = ++ind->end;
 			}
@@ -105,9 +107,9 @@ void Tokenizer::tokenizeFileH()
 		}
 		if (ind->end == done)
 		{
-			tmp.push_back(ind->toString()); // tmp.push_back(db.getToken(ind->toString()));
-			tmp.push_back(ind->toStringE()); // tmp.push_back(db.getToken(ind->toStringE()));
-			sentence.push_back(tmp); // sentID.push_back(tmp);
+			tmp.push_back(db.GetToken(ind->toString()));
+			tmp.push_back(db.GetToken(ind->toStringE()));
+			sentID.push_back(tmp); // sentID.push_back(tmp);
 			tmp.clear();
 		}
 	} //end of loop
@@ -121,7 +123,7 @@ void Tokenizer::tokenizeFile(string filename)
 	tokenizeFileH();
 }
 
-void Tokenizer::tokenizeDoc(string document)
+std::deque<std::vector<int>> Tokenizer::tokenizeDoc(string document)
 {
 	index = 0;
 	file = document;
@@ -130,7 +132,7 @@ void Tokenizer::tokenizeDoc(string document)
 	ind->start = &file[0];
 	ind->end = &file[0];
 	char* done = &file[file.size() - 1];
-	vector <string> tmp; // vector <int> tmp;
+	vector <int> tmp; // vector <int> tmp;
 
 	while (ind->end != done)
 	{
@@ -138,18 +140,18 @@ void Tokenizer::tokenizeDoc(string document)
 		{
 			if (checkIgnore((char)*ind->end))
 			{
-				tmp.push_back(ind->toString()); // tmp.push_back(db.getToken(ind->toString()));
+				tmp.push_back(db.GetToken(ind->toString()));
 				if (*ind->end != 32)
 				{
-					tmp.push_back(ind->toStringE()); // tmp.push_back(db.getToken(ind->toStringE()));
+					tmp.push_back(db.GetToken(ind->toStringE()));
 				}
 				ind->start = ++ind->end;
 			}
 			else if (checkPunctuation((char)*ind->end))
 			{
-				tmp.push_back(ind->toString()); // tmp.push_back(db.getToken(ind->toString()));
-				tmp.push_back(ind->toStringE()); // tmp.push_back(db.getToken(ind->toStringE()));
-				sentence.push_back(tmp); // sentID.push_back(tmp);
+				tmp.push_back(db.GetToken(ind->toString()));
+				tmp.push_back(db.GetToken(ind->toStringE()));
+				sentID.push_back(tmp); // sentID.push_back(tmp);
 				tmp.clear();
 				ind->start = ++ind->end;
 			}
@@ -164,12 +166,13 @@ void Tokenizer::tokenizeDoc(string document)
 		}
 		if (ind->end == done)
 		{
-			tmp.push_back(ind->toString()); // tmp.push_back(db.getToken(ind->toString()));
-			tmp.push_back(ind->toStringE()); // tmp.push_back(db.getToken(ind->toStringE()));
-			sentence.push_back(tmp); // sentID.push_back(tmp);
+			tmp.push_back(db.GetToken(ind->toString()));
+			tmp.push_back(db.GetToken(ind->toStringE()));
+			sentID.push_back(tmp); // sentID.push_back(tmp);
 			tmp.clear();
 		}
 	} //end of loop
+	return sentID;
 }
 
 string Tokenizer::rebuildSent(vector<int>sent)
@@ -216,34 +219,34 @@ void Tokenizer::readFile(string fileName)
 	}
 }
 
-int main()
-{
-	string testfile = "The Man of Adamant.txt";
-	string testfile2 = "Test.txt";
-	Tokenizer test;
-	Stopwatch s;
-	s.start();
-	test.tokenizeFile(testfile);
-	s.end();
-
-	test.print_BAV();
-	std::cout << "\n\n" << s.getTimeInMicroseconds() << " Ms\n\n";
-	/*
-	if ((c == 32 && c >= 34 && c <= 45 || c == 47 || c >= 58 && c <= 62 || c == 64 || c >= 91 && c <= 96 || c >= 123 && c <= 126 || c >= 128) || (c == '\"' || c == '\,' ||
-	c == '\(' || c == '\)' || c == '\'' || c == '\-'))*/
-
-	/*vector<int>testID;
-	testID.push_back(256);
-	testID.push_back(345);
-	testID.push_back(756);
-	testID.push_back(876);
-	testID.push_back(44);
-	testID.push_back(65);
-	testID.push_back(256);
-	testID.push_back(33);
-	string sentence = test.rebuildDoc(testID);
-
-	cout << sentence << endl;*/
-
-	system("pause");
-}
+//int main()
+//{
+//	string testfile = "The Man of Adamant.txt";
+//	string testfile2 = "Test.txt";
+//	Tokenizer test;
+//	Stopwatch s;
+//	s.start();
+//	test.tokenizeFile(testfile);
+//	s.end();
+//
+//	test.print_BAV();
+//	std::cout << "\n\n" << s.getTimeInMicroseconds() << " Ms\n\n";
+//	/*
+//	if ((c == 32 && c >= 34 && c <= 45 || c == 47 || c >= 58 && c <= 62 || c == 64 || c >= 91 && c <= 96 || c >= 123 && c <= 126 || c >= 128) || (c == '\"' || c == '\,' ||
+//	c == '\(' || c == '\)' || c == '\'' || c == '\-'))*/
+//
+//	/*vector<int>testID;
+//	testID.push_back(256);
+//	testID.push_back(345);
+//	testID.push_back(756);
+//	testID.push_back(876);
+//	testID.push_back(44);
+//	testID.push_back(65);
+//	testID.push_back(256);
+//	testID.push_back(33);
+//	string sentence = test.rebuildDoc(testID);
+//
+//	cout << sentence << endl;*/
+//
+//	system("pause");
+//}

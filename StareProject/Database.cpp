@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <deque>
 #include "Database.h"
 
 StyleDatabase::StyleDatabase()
@@ -640,7 +641,7 @@ int StyleDatabase::incrementSentenceID(int byAmount)
 	return currentSentenceID;
 }
 
-void StyleDatabase::insertDocumentText(int DocumentID, std::vector <std::vector<int>> document)
+void StyleDatabase::insertDocumentText(int DocumentID, std::deque<std::vector<int>> document)
 {
 	char* errorMessage;
 

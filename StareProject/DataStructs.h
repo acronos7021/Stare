@@ -28,23 +28,50 @@ struct MetaData
 
 	}
 };
+//
+//struct sentenceRanking
+//{
+//	int sentenceID;		  // The selected sentence in the document that is being compared.
+//	int foundDocumentID;  // the document id on the server that matches the new source sentence.
+//	int foundSentenceID;  // The sentence id on the server that most closely matches the source sentence.
+//	double certainty;	  // The certainty that a certain sentence is the particular style listed.
+//
+//	sentenceRanking(int SentenceID, int FoundDocumentID, int FoundSentenceID, double Certainty)
+//	{
+//		sentenceID = SentenceID;
+//		foundDocumentID = FoundDocumentID;
+//		foundSentenceID = FoundSentenceID;
+//		certainty = Certainty;
+//	}
+//};
+
 
 struct sentenceRanking
 {
 	int sentenceID;		  // The selected sentence in the document that is being compared.
 	int foundDocumentID;  // the document id on the server that matches the new source sentence.
+	int foundDocumentName; // the name of the document on the server tha matches the new source sentence
 	int foundSentenceID;  // The sentence id on the server that most closely matches the source sentence.
+	string foundPrevPrevSentenceStr;
+	string foundPrevSentenceStr;
+	string foundSentenceStr;
+	string foundNextSentenceStr;
+	string foundNextNextSentenceStr;
 	double certainty;	  // The certainty that a certain sentence is the particular style listed.
 
-	sentenceRanking(int SentenceID, int FoundDocumentID, int FoundSentenceID, double Certainty)
+	sentenceRanking(int SentenceID, int FoundDocumentID, int FoundSentenceID, string FoundSentenceStr, string FoundPrevSentenceStr, string FoundPrevPrevSentenceStr, string FoundNextSentenceStr, string FoundNextNextSentenceStr, double Certainty)
 	{
 		sentenceID = SentenceID;
 		foundDocumentID = FoundDocumentID;
 		foundSentenceID = FoundSentenceID;
+		foundPrevPrevSentenceStr = FoundPrevPrevSentenceStr;
+		foundPrevSentenceStr = FoundPrevSentenceStr;
+		foundSentenceStr = FoundSentenceStr;
+		foundNextSentenceStr = FoundNextSentenceStr;
+		foundNextNextSentenceStr = FoundNextNextSentenceStr;
 		certainty = Certainty;
 	}
 };
-
 
 struct StyleCounts
 {

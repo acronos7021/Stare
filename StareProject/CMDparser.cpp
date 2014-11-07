@@ -5,11 +5,13 @@ using namespace std;
 #include <sstream> 
 #include <fstream>
 #include <iostream>
+#include <vector>
 #include "Stopwatch.h"
 #include "Database.h"
 #include "CMDparser.h"
 #include "Tokenizer.h"
 #include "HMMengine.h"
+#include "DataStructs.h"
 
 
 bool CMDparser::parseCMD(vector<string> cmdList)
@@ -246,7 +248,74 @@ bool CMDparser::isAlphaNumeric(char c)
 		return false;
 }
 
+/******************************   PHPconnector functions  ************************************/
 
+string getSentences(int rangeStart, int rangeEnd)
+{
+	return "This is sentence 3.  This is sentence 4.";
+}
+
+string getDocument(int DocumentID)
+{
+	return"This is sentence 1.  This is sentence 2. This is sentence 3.  This is sentence 4.";
+}
+
+
+void learn(string author, string title, string date, string text)
+{
+	HMMengine hmm;
+	hmm.compare(MetaData(author,title,date,text));
+	string sam = "good";
+}
+
+vector<sentenceRanking> compare(int clientID, string text)
+{
+	//HMMengine hmm;
+	//hmm.compare(MetaData("", "", "", text));
+	vector<sentenceRanking> test;
+
+	test.push_back(sentenceRanking(30, 2, 54, "Sentence7.", "Sentence 6", "Sentence 5", "Sentence 8", "Sentence 9", .57));
+	test.push_back(sentenceRanking(30, 2, 54, "Sentence7.", "Sentence 6", "Sentence 5", "Sentence 8", "Sentence 9", .57));
+	test.push_back(sentenceRanking(30, 2, 54, "Sentence7.", "Sentence 6", "Sentence 5", "Sentence 8", "Sentence 9", .57));
+	return test;
+}
+
+string create(int clientID, string author, int numOfSentences)
+{
+	return "Now is the time for all good men to come to the aid of their country.";
+}
+
+int checkCompareStatus(int clientID)  // done is 100
+{
+	return 25;
+}
+int checkCreateStatus(int clientID)     // done is 100
+{
+	return 25;
+}
+
+vector<MetaData> getDocuments()
+{
+	MetaData md("Shakespere", "Henry V", "1619", "../StareProject/Documents/HenryV.txt");
+	std::vector<MetaData> test;
+	test.push_back(md);
+	test.push_back(md);
+	test.push_back(md);
+	return test;
+
+}
+
+std::vector<MetaData> getStyles()
+{
+	MetaData md("Shakespere", "Henry V", "1619", "../StareProject/Documents/HenryV.txt");
+	std::vector<MetaData> test;
+	test.push_back(md);
+	test.push_back(md);
+	test.push_back(md);
+	return test;
+}
+
+/******************************   PHPconnector functions  ************************************/
 
 void CMDparser::Brandon(vector<string> cmdParams)
 {
