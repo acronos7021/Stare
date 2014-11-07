@@ -18,5 +18,7 @@ public:
 
 	Json::Value parseJSON(string json);
 	string doCompare(Json::Value json);
+	Json::Value formCheckCompareReturn(int status);
+	Json::Value doCheckCompare(int sessionID);
 };
 

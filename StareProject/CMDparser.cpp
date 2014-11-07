@@ -293,7 +293,7 @@ CompareResult CMDparser::compare(int clientID, string text)
 	sbFound.PrevPrevSentenceStr = "Sentence 5";
 	sbFound.SentenceID = 7;
 
-	test.push_back(SentenceRanking("Dickens", "A tale of two cities", sbSource, sbFound, .57));
+	test.push_back(SentenceRanking("Dickens", "A tale of two cities", sbSource, sbFound, .58));
 	test.push_back(SentenceRanking("Mark Twain", "Huckleberry Finn", sbSource, sbFound, .57));
 
 	StyleCertaintyItem style1;
