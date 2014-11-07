@@ -39,5 +39,5 @@ void Stopwatch::end()
 int Stopwatch::getTimeInMicroseconds()
 {
 	auto elapsed = std::chrono::duration_cast<std::chrono::microseconds> (endTime - startTime);
-	return elapsed.count();
+	return (int) elapsed.count();
 }

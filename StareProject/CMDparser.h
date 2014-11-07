@@ -30,5 +30,21 @@ public:
 	static vector<string> getCommands(string cmdStr);
 	static bool isAlphaNumeric(char c);
 
+	string getSentences(int rangeStart, int rangeEnd);
+	string getDocument(int DocumentID);
+
+
+	void learn(string author, string title, string date, string text);
+	CompareResult compare(int clientID, string text);
+	string create(int clientID, string author, int numOfSentences);
+
+	int checkCompareStatus(int clientID);  // done is 100
+	int checkCreateStatus(int clientID);   // done is 100
+
+	vector<MetaData> getDocuments();
+
+	vector<MetaData> getStyles();
+
+
 };
 

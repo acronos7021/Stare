@@ -292,7 +292,7 @@ vector<StyleCounts> DocumentDatabase::getPathWordCountPerStyle(int currToken, in
 	return retVect;
 }
 
-void DocumentDatabase::insertDocumentText(int DocumentID, std::vector <std::vector<int>> document)
+void DocumentDatabase::insertDocumentText(int DocumentID, std::deque<std::vector<int>> document)
 {
 	//char* errorMessage;
 

@@ -6,7 +6,7 @@
 #include <iostream>
 
 
-HTMLgenerator::HTMLgenerator(string DestinationFilename, int documentID, vector<sentenceRanking> rankingList)
+HTMLgenerator::HTMLgenerator(string DestinationFilename, int documentID, vector<SentenceRanking> rankingList)
 {
 	// Blake, this is one of the harder challenges in the program.  Since it is sometimes hard to see what a designer is 
 	// envisioning, I wanted to give a basic set of sample code for how to access the database
@@ -34,7 +34,7 @@ HTMLgenerator::HTMLgenerator(string DestinationFilename, int documentID, vector<
 		// ********I don't know how to call this, any ideas? insert between the bold tags(There is no input for this either)
 		output << "<p>Your document was plagiarized <b>" << "</b></p>";
 
-		for (std::vector<sentenceRanking>::size_type i = 0; i != rankingList.size(); i++)
+		for (std::vector<SentenceRanking>::size_type i = 0; i != rankingList.size(); i++)
 		{
 			//header
 			output << "<div id='doc-wrapper'>";
@@ -48,15 +48,15 @@ HTMLgenerator::HTMLgenerator(string DestinationFilename, int documentID, vector<
 
 
 			//Generate the left column first (That's the document that the user gave us)
-			output << "<div id='doc-wrapper'><div id='left-column'>";
-			output << db.getSentence(rankingList[i].sentenceID - 2) << "  ";
-			output << db.getSentence(rankingList[i].sentenceID - 1) << "  ";
-			output << "<div id='popup' style='background-color: yellow;'>";
-			output << db.getSentence(rankingList[i].sentenceID) << "  ";
-			//add spans for probability
-			output << "<span>This section was plagiarized: <b>" << rankingList[i].certainty << "</b></span></div>";
-			output << db.getSentence(rankingList[i].sentenceID + 1) << "  ";
-			output << db.getSentence(rankingList[i].sentenceID + 2) << "  ";
+			//output << "<div id='doc-wrapper'><div id='left-column'>";
+			//output << db.getSentence(rankingList[i].foundSentenceID - 2) << "  ";
+			//output << db.getSentence(rankingList[i].foundSentenceID - 1) << "  ";
+			//output << "<div id='popup' style='background-color: yellow;'>";
+			//output << db.getSentence(rankingList[i].foundSentenceID) << "  ";
+			////add spans for probability
+			//output << "<span>This section was plagiarized: <b>" << rankingList[i].certainty << "</b></span></div>";
+			//output << db.getSentence(rankingList[i].foundSentenceID + 1) << "  ";
+			//output << db.getSentence(rankingList[i].foundSentenceID + 2) << "  ";
 			output << "</div'>"; //end left-column
 
 

@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <deque>
 #include "WordPairCountDatabase.h"
 #include "sqlite3.h"
 #include "DataStructs.h"
@@ -43,7 +44,7 @@ public:
 	void createWordStyleCounts(int StyleID, std::string author);
 
 	int insertDocument(std::string Author, std::string Title, std::string publishDate);
-	void insertDocumentText(int DocumentID, std::vector <std::vector<int>> document);
+	void insertDocumentText(int DocumentID, std::deque<std::vector<int>> document);
 	const vector<StyleCounts> getTotalWordCountPerStyle();
 	vector<StyleCounts> getPathWordCountPerStyle(int currToken, int nextToken);
 	void CreateDatabase(bool confirmation);

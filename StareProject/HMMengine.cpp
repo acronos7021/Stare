@@ -25,7 +25,7 @@ int HMMengine::learn(MetaData metaData)
 {
 	// Tokenize the document we want to learn
 	Tokenizer tokenizer = Tokenizer();
-	std::vector <std::vector<int>> documentTokens = tokenizer.tokenizeDoc(metaData.DocumentText);
+	std::deque<std::vector<int>> documentTokens = tokenizer.tokenizeDoc(metaData.DocumentText);
 
 	// insert it into the database;
 	int documentID = dataBase.insertDocument( metaData.Author, metaData.Title, metaData.PublishDate);
@@ -37,7 +37,7 @@ void HMMengine::compare(MetaData metaData)
 {
 
 	Tokenizer tokenizer = Tokenizer();
-	std::vector <std::vector<int>> documentTokens = tokenizer.tokenizeDoc(metaData.DocumentText);
+	std::deque<std::vector<int>> documentTokens = tokenizer.tokenizeDoc(metaData.DocumentText);
 
 	vector<StyleCounts> totalWordCountsPerStyle = dataBase.getTotalWordCountPerStyle();
 

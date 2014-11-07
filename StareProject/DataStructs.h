@@ -29,46 +29,67 @@ struct MetaData
 	}
 };
 
-struct sentenceRanking
+// the text of the area around a found sentence
+struct SentenceBlob
 {
-	int sentenceID;		  // The selected sentence in the document that is being compared.
-	int foundDocumentID;  // the document id on the server that matches the new source sentence.
-	int foundDocumentName; // the name of the document on the server tha matches the new source sentence
-	//int foundSentenceID;  // The sentence id on the server that most closely matches the source sentence.
-	string foundPrevPrevSentenceStr;
-	string foundPrevSentenceStr;
-	string foundSentenceStr;
-	string foundNextSentenceStr;
-	string foundNextNextSentenceStr;
+	int SentenceID;  // The sentence id on the server that most closely matches the source sentence.
+	string PrevPrevSentenceStr;
+	string PrevSentenceStr;
+	string SentenceStr;
+	string NextSentenceStr;
+	string NextNextSentenceStr;
+};
+
+// The comparison results for a single sentence.
+struct SentenceRanking
+{
+	SentenceBlob sourceSentences;
+	string foundDocumentStyle;  // the document id on the server that matches the new source sentence.
+	string foundDocumentName; // the name of the document on the server tha matches the new source sentence
+	SentenceBlob foundSentences;
 	double certainty;	  // The certainty that a certain sentence is the particular style listed.
 
-	sentenceRanking(int SentenceID, int FoundDocumentID, string FoundSentenceStr, string FoundPrevSentenceStr, string FoundPrevPrevSentenceStr, string FoundNextSentenceStr,  string FoundNextNextSentenceStr, double Certainty)
+	SentenceRanking(string FoundDocumentStyle, string FoundDocumentName, SentenceBlob SourceSentences, SentenceBlob FoundSentences, double Certainty)
 	{
-		sentenceID = SentenceID;
-		foundDocumentID = FoundDocumentID;
-		//foundSentenceID = FoundSentenceID;
-		foundPrevPrevSentenceStr = FoundPrevPrevSentenceStr;
-		foundPrevSentenceStr = FoundPrevSentenceStr;
-		foundSentenceStr = FoundSentenceStr;
-		foundNextSentenceStr = FoundNextSentenceStr;
-		foundNextNextSentenceStr = FoundNextNextSentenceStr;
+		foundDocumentStyle = FoundDocumentStyle;
+		foundDocumentName = FoundDocumentName;
+		sourceSentences = SourceSentences;
+		foundSentences = FoundSentences;
 		certainty = Certainty;
 	}
 };
 
-struct StyleScore
+// used to return the list of certainties that the document is a particular style.
+struct StyleCertaintyItem
 {
 	int StyleID;
 	string StyleName;
-	float score;
+	double certainty;
 };
 
-struct compareResult
+
+// the final product that is returned from compare
+struct CompareResult
 {
-	vector<StyleScore> styleScores;
-	vector<sentenceRanking> sentenceRankings;
-	MetaData sourceDocument;
+	// a list of certainties for each style ranked by highest probability to lowest
+	vector<StyleCertaintyItem> documentCertainties;
+	// a list of the sentence that look suspicious throughout the document
+	vector<SentenceRanking> sentenceRankings;
 };
+
+//struct StyleScore
+//{
+//	int StyleID;
+//	string StyleName;
+//	float score;
+//};
+
+//struct compareResult
+//{
+//	vector<StyleScore> styleScores;
+//	vector<SentenceRanking> sentenceRankings;
+//	MetaData sourceDocument;
+//};
 
 
 
