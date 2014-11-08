@@ -830,6 +830,7 @@
 //
 //void StyleDatabase::CreateDatabase()
 //{
+
 //	char* errorMessage;
 //	sqlite3_stmt *select_statement;
 //	string proceedWithOperation;

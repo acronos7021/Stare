@@ -48,6 +48,5 @@ public:
 
 	vector<MetaData> getStyles();
 
-
 };
 

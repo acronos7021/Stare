@@ -5,7 +5,7 @@
 
 Console::Console(CMDparser TheCMDparser)
 {
-	cmd = TheCMDparser;
+	cmdParser = TheCMDparser;
 }
 
 
@@ -13,12 +13,12 @@ Console::~Console()
 {
 }
 
-void Console::MessageLoop(int argc, char *argv[])
+void Console::MessageLoop( int argc, char *argv[])
 {
 	std::cout << "Welcome to the Stare plagerism detector." << endl;
 
 
-	CMDparser cmdParser;
+	//CMDparser cmdParser;
 	if (argc > 1)
 	{
 		// a command was entered on the command line that started the program

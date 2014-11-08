@@ -391,47 +391,6 @@ void DocumentDatabase::insertDocumentText(int DocumentID, std::deque<std::vector
 				wpd.AddTokenCount(currWordToken, nextWordToken, StyleID);
 			}
 
-			//int prevNum, nextNum;
-			//if (isWordToken(currWordToken))
-			//{
-			//	// set default value if previous token is not found
-			//	prevWordToken = -1;
-			//	//search for previous token
-			//	prevNum = wordNum;
-			//	while (prevNum>0)
-			//	{
-			//		--prevNum;
-			//		if (isWordToken(document[sentenceNum][prevNum]))
-			//		{
-			//			prevWordToken = document[sentenceNum][prevNum];
-			//			break;
-			//		}
-			//	} 
-
-			//	// set default value if next token is not found
-			//	nextWordToken = -1;
-			//	// search for next token
-			//	nextNum = wordNum;
-			//	while (nextNum<lastWordNum-1)
-			//	{
-			//		++nextNum;
-			//		if (isWordToken(document[sentenceNum][nextNum]))
-			//		{
-			//			nextWordToken = document[sentenceNum][nextNum];
-			//			break;
-			//		}
-			//	}
-			//	wpd.AddTokenCount(currWordToken, nextWordToken, StyleID);
-			//}
-			//else
-			//{
-			//	// its a symbol so the token path doesn't matter
-			//	prevWordToken = -1;
-			//	nextWordToken = -1;
-			//}
-
-
-
 			SentenceID = startSentenceID + sentenceNum;
 
 			// bind to prepared statement. 

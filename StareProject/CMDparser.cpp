@@ -399,30 +399,30 @@ void CMDparser::Leven(vector<string> cmdParams)
 
 void CMDparser::Brian(vector<string> cmdParams)
 {
-	DocumentDatabase dBase;
-	dBase.CreateDatabase(false);
-	//Tokenizer t;
-	//t.tokenizeFile(string("../StareProject/Documents/HenryV.txt"));
-	////std::deque<std::vector<int>> 
-	//t.save_BAV(string("e:/tmp/HenryVreconstruct.txt"));
-
-	//HMMengine hmm(db, tokenizer);
-	Stopwatch sw;
-
-
-	MetaData metaData;
-	metaData.DocumentText = "../StareProject/Documents/HenryV.txt"; // ReadFile(cmdList[1]);
-	metaData.action = ActionType::Learn;
-	metaData.Author = "Shakespere";
-	metaData.Title = "Henry V";
-	metaData.PublishDate = "1619";
-	cout << "Learning document -> " << metaData.Author << " : " << metaData.Title;
-
-	//hmm.learn(metaData);
-
-	//Execute("test");
+	//DocumentDatabase dBase;
 	//dBase.CreateDatabase(false);
-	hmm.learn(metaData);
+	////Tokenizer t;
+	////t.tokenizeFile(string("../StareProject/Documents/HenryV.txt"));
+	//////std::deque<std::vector<int>> 
+	////t.save_BAV(string("e:/tmp/HenryVreconstruct.txt"));
+
+	////HMMengine hmm(db, tokenizer);
+	//Stopwatch sw;
+
+
+	//MetaData metaData;
+	//metaData.DocumentText = "../StareProject/Documents/HenryV.txt"; // ReadFile(cmdList[1]);
+	//metaData.action = ActionType::Learn;
+	//metaData.Author = "Shakespere";
+	//metaData.Title = "Henry V";
+	//metaData.PublishDate = "1619";
+	//cout << "Learning document -> " << metaData.Author << " : " << metaData.Title;
+
+	////hmm.learn(metaData);
+
+	////Execute("test");
+	////dBase.CreateDatabase(false);
+	//hmm.learn(metaData);
 	//dBase.insertDocument("fred", "sam book", "2341");
 	//sqlite3* db = dBase.openDB();
 	//int styleID = dBase.getStyleID(db, "fred");

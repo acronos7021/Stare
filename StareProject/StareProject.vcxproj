@@ -85,7 +85,9 @@
     <ClCompile Include="DocumentDatabase.cpp" />
     <ClCompile Include="HMMengine.cpp" />
     <ClCompile Include="HTMLgenerator.cpp" />
+    <ClCompile Include="jsoncpp.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PHPsocket.cpp" />
     <ClCompile Include="Stopwatch.cpp" />
     <ClCompile Include="TokenDatabase.cpp" />
     <ClCompile Include="Tokenizer.cpp" />
@@ -99,6 +101,9 @@
     <ClInclude Include="DocumentDatabase.h" />
     <ClInclude Include="HMMengine.h" />
     <ClInclude Include="HTMLgenerator.h" />
+    <ClInclude Include="json-forwards.h" />
+    <ClInclude Include="json.h" />
+    <ClInclude Include="PHPsocket.h" />
     <ClInclude Include="sqlite3.h" />
     <ClInclude Include="Stopwatch.h" />
     <ClInclude Include="TokenDatabase.h" />

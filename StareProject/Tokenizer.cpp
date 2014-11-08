@@ -94,11 +94,6 @@ string Tokenizer::rebuildSent(vector<int>sent)
 	return ss.str();
 }
 
-void Tokenizer::print_BAV()
-{
-	for (int i = 0; i < (int)sentID.size(); i++)
-		cout << rebuildSent(sentID[i]);
-}
 
 void Tokenizer::save_BAV(std::string filename)
 {
@@ -113,22 +108,18 @@ void Tokenizer::save_BAV(std::string filename)
 		for (int i = 0; i < (int)sentID.size(); i++)
 			t << rebuildSent(sentID[i]);
 	}
-}
+}//end of rebuildDoc
 
 vector<int> Tokenizer::getNextSentence() //vector<int> Tokenizer::getNextSentence2()
 {
 	vector<int> temp; // vector<int> temp
-	if (index >(int) sentID.size() - 1) //(index > sentID.size() - 1)
-	{
-		return temp;
-	}
-	else
+	if (index <(int) sentID.size()) //(index > sentID.size() - 1)
 	{
 		temp = sentID[index]; //temp = sentID[index];
 		index++;
 		//sentences.erase(sentences.begin());
-		return temp;
 	}
+	return temp;
 }
 
 

@@ -2,7 +2,7 @@ using namespace std;
 
 //#include <iostream>
 //#include <vector>
-//#include "CMDparser.h"
+#include "CMDparser.h"
 //#include "HMMengine.h"
 #include "Console.h"
 #include "CMDparser.h"
@@ -12,20 +12,10 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-	//MetaData md = CMDparser::parseCMD(argc, argv);
-
-	//HMMengine hGen = HMMengine(md);
-	// Open the only copy of the database
-
-	//db.open();
 	CMDparser cmd;
 	Console c(cmd);
+	//HeipClass heipClass;
+	//heipClass.heipMethod(cmd)   // on the class side use  helpMethod(CMDparser &cmdParser);
 	c.MessageLoop(argc, argv);
 
-
-	//StyleDatabase test("aisql.db3");
-
-
-
-	//system("pause");
 }

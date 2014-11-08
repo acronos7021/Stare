@@ -9,6 +9,7 @@
 //#include "DataStructs.h"
 #include "TokenDatabase.h"
 
+
 class Tokenizer
 {
 public:
@@ -30,7 +31,7 @@ public:
 		};
 	};
 
-	//std::string file;
+
 	int index;
 
 	//std::deque<std::vector<std::string>> sentence;

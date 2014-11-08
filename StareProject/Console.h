@@ -11,7 +11,8 @@ public:
 	Console(CMDparser TheCMDparser);
 	~Console();
 
-	CMDparser cmd;
+
+	CMDparser cmdParser;
 
 	void MessageLoop(int argc, char *argv[]);
 };

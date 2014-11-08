@@ -39,13 +39,10 @@
     <ClCompile Include="Stopwatch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TokenDatabase.cpp">
+    <ClCompile Include="PHPsocket.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="WordPairCountDatabase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DocumentDatabase.cpp">
+    <ClCompile Include="jsoncpp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -77,13 +74,13 @@
     <ClInclude Include="Stopwatch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TokenDatabase.h">
+    <ClInclude Include="PHPsocket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="WordPairCountDatabase.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="json.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="DocumentDatabase.h">
+    <ClInclude Include="json-forwards.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

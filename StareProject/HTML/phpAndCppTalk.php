@@ -17,15 +17,15 @@ $object->init();
 //----------------------------------
 // Being a client. Test data.
 //----------------------------------
-$data = "Hello i am a client";
+$data = $HTTP_RAW_POST_DATA;
 $object->request($data);
 //----------------------------------
 // Being a server. Test data.
 //----------------------------------
-//$result = $object->getData();
-//echo $result;
+$result = $object->getData();
+echo $result;
 //----------------------------------
-$object->closeSocket();
+//$object->closeSocket();
 
 class phpAndCppTalk
 {

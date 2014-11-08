@@ -47,6 +47,7 @@ HTMLgenerator::HTMLgenerator(string DestinationFilename, int documentID, vector<
 			output << "</div>";
 
 
+
 			//Generate the left column first (That's the document that the user gave us)
 			//output << "<div id='doc-wrapper'><div id='left-column'>";
 			//output << db.getSentence(rankingList[i].foundSentenceID - 2) << "  ";

@@ -26,25 +26,26 @@
 #compare (the middle sentence is the one that is the match.  The sentences before and after show context)
 {
   "clientID": "ID",
-  "command": "compare",
+  "command": "compare|checkCompare",
   "status": "#of characters process",
   "documentText": "the document text here",
+  "overallCertainty": "someValue",
   "ranking": [
     {
       "origSnip": ["sentence1","sentence2","sentence3"], 
       "dataBaseSnip":["sentence1","sentence2","sentence3"],
       "certainty": "someValue",
-      "sentenceID": "someValue",
-      "foundDocumentID": "SomeValue",
-      "foundSentenceID": "someValue"
+      "documentTitle": "someTitle",
+      "foundDocumentID": "SomeDocID",
+      "foundSentenceID": "someSentID"
     },
     {
       "origSnip": ["sentence1","sentence2","sentence3"], 
       "dataBaseSnip":["sentence1","sentence2","sentence3"],
       "certainty": "someValue",
-      "sentenceID": "someValue",
-      "foundDocumentID": "SomeValue",
-      "foundSentenceID": "someValue"
+      "documentTitle": "someTitle",
+      "foundDocumentID": "SomeDocID",
+      "foundSentenceID": "someSentID"
     }
   ]
 }
