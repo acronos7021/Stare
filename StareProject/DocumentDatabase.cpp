@@ -348,7 +348,7 @@ bool DocumentDatabase::getPrevAndNext(int sentenceNum, int wordNum, int &prevWor
 	else
 	{
 		prevWordToken = -1;
-		nextWordToken - -1;
+		nextWordToken = -1;
 		return false;
 	}
 }
