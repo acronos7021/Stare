@@ -3,6 +3,7 @@
 #include "DocumentDatabase.h"
 #include "WordPairCountDatabase.h"
 #include "sqlite3.h"
+#include "Tokenizer.h"
 
 
 DocumentDatabase::DocumentDatabase()
@@ -123,6 +124,7 @@ int DocumentDatabase::getDocumentID(sqlite3* db, int StyleID, std::string title)
 				break;
 			}
 		}
+		sqlite3_finalize(stmt);
 	}
 	return retAns;
 }
@@ -266,6 +268,7 @@ int DocumentDatabase::incrementSentenceID(sqlite3* db, int byAmount)
 			sqlite3_exec(db, insertStr.str().c_str(), NULL, NULL, NULL);
 			currentSentenceID = 0;
 		}
+		sqlite3_finalize(select_statement);
 	}
 	else
 	{
@@ -290,6 +293,64 @@ vector<StyleCounts> DocumentDatabase::getPathWordCountPerStyle(int currToken, in
 		retVect.push_back(StyleCounts(i, TotalWordCountsByStyle[i].Author,countVect.StyleCounts[i]));
 	}
 	return retVect;
+}
+
+bool DocumentDatabase::isWordToken(int token)
+{
+	// Words are only made out of letters, so only letters are considered word tokens.  
+	if ((token >= 65 && token <= 90) || (token >= 97 && token <= 122))
+		return true;
+	else if (token > 255)
+		return true;
+	else
+		return false;
+}
+
+// returns true if the currWordToken is actually a WordToken
+bool DocumentDatabase::getPrevAndNext(int sentenceNum, int wordNum, int &prevWordToken, int &nextWordToken, const std::deque<std::vector<int>> &document)
+{
+	int lastWordNum = document[sentenceNum].size();
+	if (isWordToken(document[sentenceNum][wordNum]))
+	{
+		int prevNum, nextNum;
+		if (isWordToken(document[sentenceNum][wordNum]))
+		{
+			// set default value if previous token is not found
+			prevWordToken = -1;
+			//search for previous token
+			prevNum = wordNum;
+			while (prevNum > 0)
+			{
+				--prevNum;
+				if (isWordToken(document[sentenceNum][prevNum]))
+				{
+					prevWordToken = document[sentenceNum][prevNum];
+					break;
+				}
+			}
+
+			// set default value if next token is not found
+			nextWordToken = -1;
+			// search for next token
+			nextNum = wordNum;
+			while (nextNum < lastWordNum - 1)
+			{
+				++nextNum;
+				if (isWordToken(document[sentenceNum][nextNum]))
+				{
+					nextWordToken = document[sentenceNum][nextNum];
+					break;
+				}
+			}
+		}
+		return true;
+	}
+	else
+	{
+		prevWordToken = -1;
+		nextWordToken - -1;
+		return false;
+	}
 }
 
 void DocumentDatabase::insertDocumentText(int DocumentID, std::deque<std::vector<int>> document)
@@ -324,30 +385,52 @@ void DocumentDatabase::insertDocumentText(int DocumentID, std::deque<std::vector
 		for (wordNum = 0; wordNum < lastWordNum; wordNum++)
 		{
 			// Load all variables into the correct type to be inserted into the prepared statement.
-			if (wordNum>0)
-			{
-				// middle or end of sentence
-				prevWordToken = document[sentenceNum][wordNum - 1];
-			}
-			else
-			{
-				// Start of sentence
-				prevWordToken = -1;
-			}
-
-			if (wordNum + 1 < lastWordNum)
-			{
-				// Start or middle of sentence
-				nextWordToken = document[sentenceNum][wordNum + 1];
-			}
-			else
-			{
-				// end of sentence
-				nextWordToken = -1;
-			}
-
 			currWordToken = document[sentenceNum][wordNum];
-			//currWordSize = document[sentenceNum][wordNum].size();
+			if (getPrevAndNext(sentenceNum, wordNum, prevWordToken, nextWordToken, document))
+			{
+				wpd.AddTokenCount(currWordToken, nextWordToken, StyleID);
+			}
+
+			//int prevNum, nextNum;
+			//if (isWordToken(currWordToken))
+			//{
+			//	// set default value if previous token is not found
+			//	prevWordToken = -1;
+			//	//search for previous token
+			//	prevNum = wordNum;
+			//	while (prevNum>0)
+			//	{
+			//		--prevNum;
+			//		if (isWordToken(document[sentenceNum][prevNum]))
+			//		{
+			//			prevWordToken = document[sentenceNum][prevNum];
+			//			break;
+			//		}
+			//	} 
+
+			//	// set default value if next token is not found
+			//	nextWordToken = -1;
+			//	// search for next token
+			//	nextNum = wordNum;
+			//	while (nextNum<lastWordNum-1)
+			//	{
+			//		++nextNum;
+			//		if (isWordToken(document[sentenceNum][nextNum]))
+			//		{
+			//			nextWordToken = document[sentenceNum][nextNum];
+			//			break;
+			//		}
+			//	}
+			//	wpd.AddTokenCount(currWordToken, nextWordToken, StyleID);
+			//}
+			//else
+			//{
+			//	// its a symbol so the token path doesn't matter
+			//	prevWordToken = -1;
+			//	nextWordToken = -1;
+			//}
+
+
 
 			SentenceID = startSentenceID + sentenceNum;
 
@@ -365,13 +448,13 @@ void DocumentDatabase::insertDocumentText(int DocumentID, std::deque<std::vector
 
 			//sqlite3_clear_bindings(stmt);
 			sqlite3_reset(HMMtokenPaths_stmt);
-			wpd.AddTokenCount(currWordToken, nextWordToken, StyleID);
+
 		}
 	}
 
-	char word_counts_buffer[] = "INSERT INTO WordCounts (CurrentToken,NextToken,Count) VALUES (?1, ?2, ?3)";// "StyleID,DocumentID,SentenceID,CurrentToken,NextToken,PreviousToken) VALUES (?1, ?2, ?3, ?4, ?5, ?6)";
-	sqlite3_stmt* word_counts_stmt;
-	int error2 = sqlite3_prepare_v2(db, word_counts_buffer, strlen(word_counts_buffer), &word_counts_stmt, NULL);
+	//char word_counts_buffer[] = "INSERT INTO WordCounts (CurrentToken,NextToken,Count) VALUES (?1, ?2, ?3)";// "StyleID,DocumentID,SentenceID,CurrentToken,NextToken,PreviousToken) VALUES (?1, ?2, ?3, ?4, ?5, ?6)";
+	//sqlite3_stmt* word_counts_stmt;
+	//int error2 = sqlite3_prepare_v2(db, word_counts_buffer, strlen(word_counts_buffer), &word_counts_stmt, NULL);
 
 	sqlite3_exec(db, "COMMIT TRANSACTION", NULL, NULL, NULL);
 	sqlite3_finalize(HMMtokenPaths_stmt);
@@ -495,10 +578,16 @@ void DocumentDatabase::CreateDatabase(bool confirmation)
 
 	cout << "Setup default values" << endl;
 	// Load Initial Values
-	insert(db,"INSERT INTO Variables (LastSentenceID,LastTokenID) VALUES (0,2)");
+	insert(db,"INSERT INTO Variables (LastSentenceID,LastTokenID) VALUES (0,256)");
+	insert(db, "BEGIN TRANSACTION");
 
-	insert(db, "INSERT INTO Tokens (TokenID,Word) VALUES (1,CHAR(13))");
-	insert(db, "INSERT INTO Tokens (TokenID,Word) VALUES (2,CHAR(9))");
+	for (int i = 0; i < 256; i++)
+	{
+		stringstream ss;
+		ss << "INSERT INTO Tokens (TokenID,Word) VALUES ("<<i<<",CHAR(" << i << "))";
+		insert(db, ss.str().c_str());
+	}
+	insert(db, "COMMIT TRANSACTION");
 	close(db);
 	//LoadTokenMap();
 }

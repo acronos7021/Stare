@@ -1,14 +1,17 @@
 #pragma once
 #include<vector>
 #include<string>
+#include "CMDparser.h"
 
 using namespace std;
 
 class Console
 {
 public:
-	Console();
+	Console(CMDparser TheCMDparser);
 	~Console();
+
+	CMDparser cmd;
 
 	void MessageLoop(int argc, char *argv[]);
 };

@@ -5,7 +5,7 @@ using namespace std;
 //#include "CMDparser.h"
 //#include "HMMengine.h"
 #include "Console.h"
-#include "Database.h"
+#include "CMDparser.h"
 //#include "DataStructs.h"
 
 //StyleDatabase& db = StyleDatabase();
@@ -18,8 +18,8 @@ int main(int argc, char *argv[])
 	// Open the only copy of the database
 
 	//db.open();
-
-	Console c;
+	CMDparser cmd;
+	Console c(cmd);
 	c.MessageLoop(argc, argv);
 
 

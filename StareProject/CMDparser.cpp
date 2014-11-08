@@ -84,7 +84,6 @@ void CMDparser::Learn(vector<string> cmdList)
 	metaData.Title = cmdList[3];
 	metaData.PublishDate = cmdList[4];
 	cout << "Learning document -> " << metaData.Author << " : " << metaData.Title;
-	HMMengine hmm;
 	hmm.learn(metaData);
 }
 void CMDparser::Compare(vector<string> cmdList)
@@ -107,7 +106,7 @@ void CMDparser::Compare(vector<string> cmdList)
 	metaData.Title = cmdList[3];
 	metaData.PublishDate = cmdList[4];
 	cout << "Comparing document -> " << metaData.Author << " : " << metaData.Title;
-	HMMengine hmm;
+	//hmm(db, tokenizer);
 	hmm.compare(metaData);
 }
 void CMDparser::Create(vector<string> cmdList)
@@ -125,7 +124,7 @@ void CMDparser::Create(vector<string> cmdList)
 	metaData.DocumentText = ReadFile(cmdList[1]);
 	metaData.action = ActionType::Create;
 	metaData.Author = cmdList[2];
-	HMMengine hmm;
+	//HMMengine hmm(db, tokenizer);
 	hmm.create(metaData);
 }
 
@@ -265,7 +264,7 @@ string CMDparser::getDocument(int DocumentID)
 
 void CMDparser::learn(string author, string title, string date, string text)
 {
-	HMMengine hmm;
+	//HMMengine hmm(db, tokenizer);
 	hmm.compare(MetaData(author, title, date, text));
 	string sam = "good";
 }
@@ -356,26 +355,26 @@ void CMDparser::Brandon(vector<string> cmdParams)
 	//cout << "The long long on our platform is " << (sizeof(long long)* 8) << " bits" << endl;
 	//StyleDatabase& test = StyleDatabase::getInstance();
 	//test.open("BrianAIsql.db3");
-	StyleDatabase db;
-	db.clearDatabase();
-	db.insertAuthor("Brian");
-	int StyleID = db.retrieveAuthorStyleID("Brian");
-	//test.insertDocument(StyleID, "Brian book", "1996");
-	db.retrieve("Styles", "Author", "Author", "Sam");
-	int DocumentID = db.insertDocument("Sam", "Sams Book", "1900");  // test new path
-	DocumentID = db.insertDocument("Brian", "Brians other book.", "1998"); // test same author, new book
-	DocumentID = db.insertDocument("Brian", "Brian book", "1996"); // test same author, same book.
-	vector<string> sentVect1;
-	sentVect1.push_back("This");
-	sentVect1.push_back("is");
-	sentVect1.push_back("a");
-	sentVect1.push_back("test");
-	db.insertSentence(DocumentID, sentVect1);
-	db.insertSentence(DocumentID, sentVect1); // test duplicate words.
-	vector<string> sentVect2;
-	sentVect2.push_back(".");
-	db.insertSentence(DocumentID, sentVect2); // test short sentence.
-	db.close();
+	//StyleDatabase db;
+	//db.clearDatabase();
+	//db.insertAuthor("Brian");
+	//int StyleID = db.retrieveAuthorStyleID("Brian");
+	////test.insertDocument(StyleID, "Brian book", "1996");
+	//db.retrieve("Styles", "Author", "Author", "Sam");
+	//int DocumentID = db.insertDocument("Sam", "Sams Book", "1900");  // test new path
+	//DocumentID = db.insertDocument("Brian", "Brians other book.", "1998"); // test same author, new book
+	//DocumentID = db.insertDocument("Brian", "Brian book", "1996"); // test same author, same book.
+	//vector<string> sentVect1;
+	//sentVect1.push_back("This");
+	//sentVect1.push_back("is");
+	//sentVect1.push_back("a");
+	//sentVect1.push_back("test");
+	//db.insertSentence(DocumentID, sentVect1);
+	//db.insertSentence(DocumentID, sentVect1); // test duplicate words.
+	//vector<string> sentVect2;
+	//sentVect2.push_back(".");
+	//db.insertSentence(DocumentID, sentVect2); // test short sentence.
+	//db.close();
 }
 
 void CMDparser::Blake(vector<string> cmdParams)
@@ -400,10 +399,16 @@ void CMDparser::Leven(vector<string> cmdParams)
 
 void CMDparser::Brian(vector<string> cmdParams)
 {
-	HMMengine hmm;
+	DocumentDatabase dBase;
+	dBase.CreateDatabase(false);
+	//Tokenizer t;
+	//t.tokenizeFile(string("../StareProject/Documents/HenryV.txt"));
+	////std::deque<std::vector<int>> 
+	//t.save_BAV(string("e:/tmp/HenryVreconstruct.txt"));
+
+	//HMMengine hmm(db, tokenizer);
 	Stopwatch sw;
 
-	DocumentDatabase dBase;
 
 	MetaData metaData;
 	metaData.DocumentText = "../StareProject/Documents/HenryV.txt"; // ReadFile(cmdList[1]);
@@ -413,15 +418,15 @@ void CMDparser::Brian(vector<string> cmdParams)
 	metaData.PublishDate = "1619";
 	cout << "Learning document -> " << metaData.Author << " : " << metaData.Title;
 
-	hmm.learn(metaData);
+	//hmm.learn(metaData);
 
 	//Execute("test");
-	dBase.CreateDatabase(false);
+	//dBase.CreateDatabase(false);
 	hmm.learn(metaData);
-	dBase.insertDocument("fred", "sam book", "2341");
-	sqlite3* db = dBase.openDB();
-	int styleID = dBase.getStyleID(db, "fred");
-	std::cout << styleID;
+	//dBase.insertDocument("fred", "sam book", "2341");
+	//sqlite3* db = dBase.openDB();
+	//int styleID = dBase.getStyleID(db, "fred");
+	//std::cout << styleID;
 
 	//sw.start();
 	//Tokenizer tokenizer = Tokenizer();

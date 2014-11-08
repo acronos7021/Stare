@@ -20,22 +20,23 @@ struct WordPairCountStruct
 
 	WordPairCountStruct(int styleID)
 	{
-		count++;
-		StyleCounts[styleID]++;
-		hasChanged = true;
+		count = 0;
+		addStyle(styleID, 1);
 	}
 
-	void addStyle(int styleID)
-	{
-		count++;
-		StyleCounts[styleID]++;
-		hasChanged = true;
-	}
+	//void addStyle(int styleID)
+	//{
+	//	count++;
+	//	StyleCounts[styleID]++;
+	//	hasChanged = true;
+	//}
 
 	void addStyle(int styleID, int set_count)
 	{
-		StyleCounts[styleID] = count;
-		count = set_count;
+		if ((int)StyleCounts.size() <= styleID)
+			StyleCounts.resize(styleID + 1);
+		StyleCounts[styleID] += set_count;
+		count += set_count;
 		hasChanged = true;
 	}
 

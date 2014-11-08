@@ -13,8 +13,8 @@ HTMLgenerator::HTMLgenerator(string DestinationFilename, int documentID, vector<
 
 	//StyleDatabase& db = StyleDatabase::getInstance();
 	//db.open("aisql.db3");
-	StyleDatabase db;
-	db.open();
+	//StyleDatabase db;
+	//db.open();
 	string sentence; // the current sentence the function is working with
 	stringstream output; // the output that will be saved to the DestinationFilename
 	
@@ -92,7 +92,7 @@ HTMLgenerator::HTMLgenerator(string DestinationFilename, int documentID, vector<
 	std::ostream outStream(&fb);
 	outStream << output.str();
 	fb.close();
-	db.close();
+	//db.close();
 
 }
 

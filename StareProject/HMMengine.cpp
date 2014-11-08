@@ -3,6 +3,8 @@
 
 HMMengine::HMMengine()
 {
+	//dataBase = db;
+	//tokenizer = tokenizer_in;
 	//switch (metaData.action)
 	//{
 	//	case ActionType::Learn:
@@ -24,8 +26,7 @@ HMMengine::~HMMengine()
 int HMMengine::learn(MetaData metaData)
 {
 	// Tokenize the document we want to learn
-	Tokenizer tokenizer = Tokenizer();
-	std::deque<std::vector<int>> documentTokens = tokenizer.tokenizeDoc(metaData.DocumentText);
+	std::deque<std::vector<int>> documentTokens = tokenizer.tokenizeFile(metaData.DocumentText);
 
 	// insert it into the database;
 	int documentID = dataBase.insertDocument( metaData.Author, metaData.Title, metaData.PublishDate);
@@ -35,9 +36,7 @@ int HMMengine::learn(MetaData metaData)
 
 void HMMengine::compare(MetaData metaData)
 {
-
-	Tokenizer tokenizer = Tokenizer();
-	std::deque<std::vector<int>> documentTokens = tokenizer.tokenizeDoc(metaData.DocumentText);
+	std::deque<std::vector<int>> documentTokens = tokenizer.tokenizeFile(metaData.DocumentText);
 
 	vector<StyleCounts> totalWordCountsPerStyle = dataBase.getTotalWordCountPerStyle();
 
@@ -51,21 +50,26 @@ void HMMengine::compare(MetaData metaData)
 		{
 			// every word of every sentence except the last word in the sentence should be here.
 			// This does a compare of each pair with the database.  It increments a count and loads it into a map for each pair found.
-			vector<StyleCounts> wordCountsPerPath = dataBase.getPathWordCountPerStyle(documentTokens[s][w], documentTokens[s][w + 1]);
-			for (unsigned int i = 0; i < wordCountsPerPath.size(); i++)
+			int prevWordToken, nextWordToken;
+			if (dataBase.getPrevAndNext(s, w, prevWordToken, nextWordToken, documentTokens))
 			{
-				map<int, StyleCounter>::iterator it = pairCountsPerStyle.find(wordCountsPerPath[i].StyleID);
-				if (it == pairCountsPerStyle.end())
+				// this is a WordToken and nextWordToken has been calculated.
+				vector<StyleCounts> wordCountsPerPath = dataBase.getPathWordCountPerStyle(documentTokens[s][w], nextWordToken);
+				for (unsigned int i = 0; i < wordCountsPerPath.size(); i++)
 				{
-					// not in the list, so insert a hit counter with the current count.
-					pairCountsPerStyle.insert(std::pair<int, StyleCounter>(wordCountsPerPath[i].StyleID, StyleCounter(wordCountsPerPath[i].Count)));
-				}
-				else
-				{
-					// already exists so increment the hits for that style.
-					it->second.SentenceCount += wordCountsPerPath[i].Count;
-					it->second.TotalCount += wordCountsPerPath[i].Count;
+					map<int, StyleCounter>::iterator it = pairCountsPerStyle.find(wordCountsPerPath[i].StyleID);
+					if (it == pairCountsPerStyle.end())
+					{
+						// not in the list, so insert a hit counter with the current count.
+						pairCountsPerStyle.insert(std::pair<int, StyleCounter>(wordCountsPerPath[i].StyleID, StyleCounter(wordCountsPerPath[i].Count)));
+					}
+					else
+					{
+						// already exists so increment the hits for that style.
+						it->second.SentenceCount += wordCountsPerPath[i].Count;
+						it->second.TotalCount += wordCountsPerPath[i].Count;
 
+					}
 				}
 			}
 		}
@@ -109,6 +113,7 @@ void HMMengine::compare(MetaData metaData)
 				// the sentence did not have any hits for this style.
 			}
 		}
+		
 	}
 }
 

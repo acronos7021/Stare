@@ -7,9 +7,9 @@ using namespace std;
 Tokenizer::Tokenizer()
 {
 	index = 0;
-	punctuation[0] = '.';
-	punctuation[1] = '!';
-	punctuation[2] = '?';
+	//punctuation[0] = '.';
+	//punctuation[1] = '!';
+	//punctuation[2] = '?';
 };
 
 Tokenizer:: ~Tokenizer()
@@ -19,42 +19,106 @@ Tokenizer:: ~Tokenizer()
 
 inline bool Tokenizer::checkIgnore(char c)
 {
-	if ((c == 32 && c >= 34 && c <= 45 || c == 47 || c >= 58 && c <= 62 || c == 64 || c >= 91 && c <= 96 || c >= 123 && c <= 126 || c >= 128) || (c == '\"' || c == ',' ||
-		c == '(' || c == ')' || c == '\'' || c == '-'))
-	{
+	// Words are only made out of letters, so only letters are considered word tokens.  
+	if ((c >= 65 && c <= 90) || (c >= 97 && c <= 122))
+		return false;
+	else
 		return true;
-	}
-	return false;
 }
 
 inline bool Tokenizer::checkPunctuation(char c)
 {
-	for (unsigned i = 0; i < sizeof(punctuation); i++)
-	{
-		if (c == (char)punctuation[i])
-		{
-			return true;
-		}
-	}
+
+	if (c == '.') return true;
+	if (c == '!') return true;
+	if (c == '?') return true;
 	return false;
+}
+
+std::deque<std::vector<int>> Tokenizer::tokenizeFile(string filename)
+{
+	return tokenizeDoc(readFile(filename));
+}
+
+std::deque<std::vector<int>> Tokenizer::tokenizeDoc(string &document)
+{
+	index = 0;  
+	sentID.clear();
+	loc ind;
+	ind.start = &document[0];
+	ind.end = &document[0];
+	char* done = &document[document.size() ];
+	vector <int> currSentence; // vector <int> tmp;
+
+	while (ind.end != done)
+	{
+		if (checkPunctuation((char)*ind.end))
+		{
+			// We've reached the end of a sentence
+			if (ind.start != ind.end)
+				currSentence.push_back(tdb.GetToken(ind.toString())); // push last word
+			currSentence.push_back((int) *ind.end); // push the punctuation mark
+			sentID.push_back(currSentence); // push the sentence
+			currSentence.clear();
+			ind.start = ++ind.end;
+		}
+		else if (checkIgnore((char)*ind.end))
+		{
+			// We've reached the end of a word
+			if (ind.start != ind.end)
+				currSentence.push_back(tdb.GetToken(ind.toString())); // push word
+			currSentence.push_back((int)*ind.end); // push the symbol character.
+			ind.start = ++ind.end;
+		}
+		else
+		{
+			// it must be part of a word so get the next char
+			++ind.end;
+		}
+	} 
+	// we've reached the end of the document.
+	// it is possible the last word didn't end in a sentence, so clean up that last word and sentence
+	if (ind.start != ind.end)
+		currSentence.push_back(tdb.GetToken(ind.toString()));
+	if (currSentence.size() != 0)
+		sentID.push_back(currSentence);
+	tdb.FlushTokenCache();
+	return sentID;
+}
+
+string Tokenizer::rebuildSent(vector<int>sent)
+{
+	stringstream ss;
+	for (unsigned int i = 0; i < sent.size(); i++)
+		ss << tdb.GetString(sent[i]);
+	return ss.str();
 }
 
 void Tokenizer::print_BAV()
 {
 	for (int i = 0; i < (int)sentID.size(); i++)
+		cout << rebuildSent(sentID[i]);
+}
+
+void Tokenizer::save_BAV(std::string filename)
+{
+	using std::ofstream;
+	ofstream t(filename);
+	if (!t.is_open())
 	{
-		for (int j = 0; j < (int)sentID[i].size(); j++)
-		{
-			cout << sentID[i][j] << " ";
-		}
-		cout << endl;
+		cout << "can't open '" << filename << "' file for output" << endl;
+	}
+	else
+	{
+		for (int i = 0; i < (int)sentID.size(); i++)
+			t << rebuildSent(sentID[i]);
 	}
 }
 
 vector<int> Tokenizer::getNextSentence() //vector<int> Tokenizer::getNextSentence2()
 {
 	vector<int> temp; // vector<int> temp
-	if (index > (int) sentID.size() - 1) //(index > sentID.size() - 1)
+	if (index >(int) sentID.size() - 1) //(index > sentID.size() - 1)
 	{
 		return temp;
 	}
@@ -67,147 +131,13 @@ vector<int> Tokenizer::getNextSentence() //vector<int> Tokenizer::getNextSentenc
 	}
 }
 
-void Tokenizer::tokenizeFileH()
-{
-	loc* ind = new loc();
-	ind->start = &file[0];
-	ind->end = &file[0];
-	char* done = &file[file.size() - 1];
-	vector <int> tmp; // vector <int> tmp;
 
-	while (ind->end != done)
-	{
-		if (!(ind->start == ind->end && *ind->end == 32))
-		{
-			if (checkIgnore((char)*ind->end))
-			{
-				tmp.push_back(db.GetToken(ind->toString()));
-				if (*ind->end != 32)
-				{
-					tmp.push_back(db.GetToken(ind->toStringE()));
-				}
-				ind->start = ++ind->end;
-			}
-			else if (checkPunctuation((char)*ind->end))
-			{
-				tmp.push_back(db.GetToken(ind->toString()));
-				tmp.push_back(db.GetToken(ind->toStringE()));
-				sentID.push_back(tmp); // sentID.push_back(tmp);
-				tmp.clear();
-				ind->start = ++ind->end;
-			}
-			else
-			{
-				++ind->end;
-			}
-		}
-		else
-		{
-			ind->start = ++ind->end;
-		}
-		if (ind->end == done)
-		{
-			tmp.push_back(db.GetToken(ind->toString()));
-			tmp.push_back(db.GetToken(ind->toStringE()));
-			sentID.push_back(tmp); // sentID.push_back(tmp);
-			tmp.clear();
-		}
-	} //end of loop
-} //end of method
-
-void Tokenizer::tokenizeFile(string filename)
-{
-	index = 0;
-	readFile(filename);
-	file.c_str();
-	tokenizeFileH();
-}
-
-std::deque<std::vector<int>> Tokenizer::tokenizeDoc(string document)
-{
-	index = 0;
-	file = document;
-	file.c_str();
-	loc* ind = new loc();
-	ind->start = &file[0];
-	ind->end = &file[0];
-	char* done = &file[file.size() - 1];
-	vector <int> tmp; // vector <int> tmp;
-
-	while (ind->end != done)
-	{
-		if (!(ind->start == ind->end && *ind->end == 32))
-		{
-			if (checkIgnore((char)*ind->end))
-			{
-				tmp.push_back(db.GetToken(ind->toString()));
-				if (*ind->end != 32)
-				{
-					tmp.push_back(db.GetToken(ind->toStringE()));
-				}
-				ind->start = ++ind->end;
-			}
-			else if (checkPunctuation((char)*ind->end))
-			{
-				tmp.push_back(db.GetToken(ind->toString()));
-				tmp.push_back(db.GetToken(ind->toStringE()));
-				sentID.push_back(tmp); // sentID.push_back(tmp);
-				tmp.clear();
-				ind->start = ++ind->end;
-			}
-			else
-			{
-				++ind->end;
-			}
-		}
-		else
-		{
-			ind->start = ++ind->end;
-		}
-		if (ind->end == done)
-		{
-			tmp.push_back(db.GetToken(ind->toString()));
-			tmp.push_back(db.GetToken(ind->toStringE()));
-			sentID.push_back(tmp); // sentID.push_back(tmp);
-			tmp.clear();
-		}
-	} //end of loop
-	return sentID;
-}
-
-string Tokenizer::rebuildSent(vector<int>sent)
-{
-	string s;
-	char c;
-	for (int i = 0; i < (int) sent.size(); i++)
-	{
-		if (sent[i] < 128 && sent[i] >= 0)
-		{
-			c = (char)sent[i];
-			if (checkPunctuation(c) || checkIgnore(c))
-			{
-				s.pop_back();
-				s += (char)sent[i];
-			}
-			else
-			{
-				s += (char)sent[i];
-				s += " ";
-			}
-		}
-		else
-		{
-			s += std::to_string(sent[i]) + " "; //s += db.getString(sent[i]) + " ";
-		}
-	}
-	return s;
-}//end of rebuildDoc
-
-void Tokenizer::readFile(string fileName)
+string Tokenizer::readFile(string fileName)
 {
 	using std::ifstream;
 	ifstream t(fileName);
 	stringstream buffer;
+	string documentText ="";
 	if (!t.is_open())
 	{
 		cout << "can't open '" << fileName << "' file for input" << endl;
@@ -215,38 +145,8 @@ void Tokenizer::readFile(string fileName)
 	else
 	{
 		buffer << t.rdbuf();
-		file = buffer.str();
+		documentText = buffer.str();
 	}
+	return documentText;
 }
 
-//int main()
-//{
-//	string testfile = "The Man of Adamant.txt";
-//	string testfile2 = "Test.txt";
-//	Tokenizer test;
-//	Stopwatch s;
-//	s.start();
-//	test.tokenizeFile(testfile);
-//	s.end();
-//
-//	test.print_BAV();
-//	std::cout << "\n\n" << s.getTimeInMicroseconds() << " Ms\n\n";
-//	/*
-//	if ((c == 32 && c >= 34 && c <= 45 || c == 47 || c >= 58 && c <= 62 || c == 64 || c >= 91 && c <= 96 || c >= 123 && c <= 126 || c >= 128) || (c == '\"' || c == '\,' ||
-//	c == '\(' || c == '\)' || c == '\'' || c == '\-'))*/
-//
-//	/*vector<int>testID;
-//	testID.push_back(256);
-//	testID.push_back(345);
-//	testID.push_back(756);
-//	testID.push_back(876);
-//	testID.push_back(44);
-//	testID.push_back(65);
-//	testID.push_back(256);
-//	testID.push_back(33);
-//	string sentence = test.rebuildDoc(testID);
-//
-//	cout << sentence << endl;*/
-//
-//	system("pause");
-//}

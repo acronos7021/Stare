@@ -13,7 +13,9 @@ class HMMengine
 public:
 	HMMengine();
 	~HMMengine();
+
 	DocumentDatabase dataBase;
+	Tokenizer tokenizer;
 
 	int learn(MetaData metaData);
 	void compare(MetaData metaData);

@@ -40,6 +40,8 @@ public:
 	//int getSentenceID(int docID);
 	int incrementSentenceID(sqlite3* db, int byAmount);
 
+	bool isWordToken(int token);
+	bool getPrevAndNext(int sentenceNum, int wordNum, int &prevWordToken, int &nextWordToken, const std::deque<std::vector<int>> &document);
 	void incrementWordStyleCounts(int StyleID, int count);
 	void createWordStyleCounts(int StyleID, std::string author);
 

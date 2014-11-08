@@ -7,7 +7,7 @@
 #include <deque>
 #include <stdexcept>
 //#include "DataStructs.h"
-#include "Database.h"
+#include "TokenDatabase.h"
 
 class Tokenizer
 {
@@ -16,29 +16,21 @@ public:
 	{
 		char* start;
 		char* end;
-		std::string s;
+
 		loc::loc() : start(0), end(0) {};
 
 		std::string toString()
 		{
-			s.clear();
-			while (start != end) // hits the symbol
-			{
-				s += *start;
-				start++;
-			}
-			return s;
+			return (std::string(start, end - start));
 		};
 
-		std::string toStringE()
+		std::string toStringE()  // return string without the last character,
 		{
-			s.clear();
-			s += *end;
-			return s;
+			return (std::string(start, end - start - 1));
 		};
 	};
 
-	std::string file;
+	//std::string file;
 	int index;
 
 	//std::deque<std::vector<std::string>> sentence;
@@ -48,10 +40,12 @@ public:
 	Tokenizer();
 	~Tokenizer();
 
+	TokenDatabase tdb;
+
 	//@param: char c
 	//@return: true if the character is a symbol, false otherwise
 	//@logic: assist in identifing if a char is a symbol or not
-	inline bool checkIgnore(char c);
+	static inline bool checkIgnore(char c);
 
 	//@param: char c
 	//@return: true if the character is a punctuation mark, false otherwise
@@ -61,7 +55,7 @@ public:
 	//@param: a string filename
 	//@return: void
 	//@logic: calls tokenizeFileH() to tokenize the entire document into a deque<vector<int>> sentID
-	void tokenizeFile(std::string filename);
+	std::deque<std::vector<int>> tokenizeFile(std::string filename);
 
 	//@param: void
 	//@return: void
@@ -71,7 +65,8 @@ public:
 	//@param: string document (a single string that is the entire document)
 	//@return: void
 	//@logic: tokenizes the entire document into a deque<vector<int>> sentID
-	std::deque<std::vector<int>> tokenizeDoc(std::string document);
+	//std::deque<std::vector<int>> tokenizeDoc(std::string document);
+	std::deque<std::vector<int>> tokenizeDoc(std::string &document);
 
 	//@param: vector<int> sent
 	//@return: a string that is a reconstructed sentence
@@ -86,10 +81,13 @@ public:
 	//@param: string filename
 	//@return: void
 	//@logic: reads a file and puts it into one string
-	void readFile(std::string filename);
+	//void readFile(std::string filename);
+	std::string readFile(std::string filename);
 
 	//@param: void
 	//@return: void
 	//@logic: prints the master list
 	void print_BAV();
+
+	void save_BAV(std::string filename);
 };

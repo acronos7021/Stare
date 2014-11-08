@@ -5,11 +5,14 @@ using namespace std;
 #include <iostream>
 #include <vector>
 #include "DataStructs.h"
+#include "HMMengine.h"
 
 //  Takes the command line arguments and uses it to load the MetaData struct.
 class CMDparser
 {
 public:
+	HMMengine hmm;
+
 	bool parseCMD(vector<string> cmdList);
 	void Learn(vector<string> cmdList);
 	void Compare(vector<string> cmdList);

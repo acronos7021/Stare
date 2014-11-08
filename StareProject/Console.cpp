@@ -3,8 +3,9 @@
 #include "Tokenizer.h"
 #include "Database.h"
 
-Console::Console()
+Console::Console(CMDparser TheCMDparser)
 {
+	cmd = TheCMDparser;
 }
 
 
