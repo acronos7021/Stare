@@ -8,6 +8,41 @@
 #include "sqlite3.h"
 #include "DataStructs.h"
 
+struct Documents
+{
+	int DocumentID;
+	std::string Author;
+	std::string Title;
+	std::string PublishDate;
+	int startSentenceID;
+	int endSentenceID;
+
+	Documents(int docID, std::string author, std::string title, std::string pubDate, int start, int end)
+	{
+		DocumentID = docID;
+		Author = author;
+		Title = title;
+		PublishDate = pubDate;
+		startSentenceID = start;
+		endSentenceID = end;
+	}
+
+};
+
+struct Styles
+{
+	int StyleID;
+	std::string Author;
+
+	Styles(int styleID, std::string author)
+	{
+		StyleID = styleID;
+		Author = author;
+	}
+};
+
+
+
 class DocumentDatabase
 {
 public:
@@ -22,6 +57,11 @@ public:
 	void close(sqlite3 *db);
 	bool isOpen;
 
+	
+	std::deque<std::vector<int>> TotalSentenceList;
+	vector<Documents> documentList;
+	std::vector<Styles> StyleList;
+
 	// to stay
 	WordPairCountDatabase wpd;
 	std::vector<StyleCounts> TotalWordCountsByStyle;
@@ -29,6 +69,7 @@ public:
 	//Use this to create a new Document
 	//  if a Style (author) doesn’t exist and add it to the Style table.  
 	//returns the DocumentID of the new Document.
+	int getDocumentIndex(int DocumentID);
 	int insertDocument(sqlite3* db, int styleID, std::string title, std::string publishDate);
 
 	int getDocumentID(sqlite3* db, int styleID, std::string title);

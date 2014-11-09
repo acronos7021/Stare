@@ -60,6 +60,8 @@ int DocumentDatabase::getStyleID(sqlite3* db, std::string author)
 		}
 		sqlite3_finalize(stmt);
 	}
+	if (retAns != -1)
+		StyleList.push_back(Styles(retAns, author));
 	return retAns;
 }
 
@@ -185,6 +187,7 @@ int DocumentDatabase::insertDocument(sqlite3* db, int styleID, std::string title
 
 int DocumentDatabase::insertDocument(std::string Author, std::string Title, std::string PublishDate)
 {
+
 	sqlite3* db = openDB();
 	int documentID = getDocumentID(db,Author, Title);
 	if (documentID == -1)
@@ -205,6 +208,7 @@ int DocumentDatabase::insertDocument(std::string Author, std::string Title, std:
 		// Just Return DocumentID
 	}
 	close(db);
+	documentList.push_back(Documents(documentID, Author, Title, PublishDate, -1, -1));
 	return documentID;
 }
 
@@ -353,11 +357,29 @@ bool DocumentDatabase::getPrevAndNext(int sentenceNum, int wordNum, int &prevWor
 	}
 }
 
+int DocumentDatabase::getDocumentIndex(int DocumentID)
+{
+	for (unsigned int i = 0; i < documentList.size(); i++)
+	{
+		if (documentList[i].DocumentID == DocumentID)
+			return i;
+	}
+	return -1;
+}
+
 void DocumentDatabase::insertDocumentText(int DocumentID, std::deque<std::vector<int>> document)
 {
 	//char* errorMessage;
 
-	//FlushTokenCache();
+	// add all of the sentences to the TotalSentenceList
+	int documentIndex = getDocumentIndex(DocumentID);
+	if (documentIndex != -1)
+	{
+		documentList[documentIndex].startSentenceID = TotalSentenceList.size();
+		documentList[documentIndex].endSentenceID = TotalSentenceList.size() + document.size();
+	}
+	TotalSentenceList.insert(TotalSentenceList.end(), document.begin(), document.end());
+
 	sqlite3* db = openDB();
 	// Preallocate all of the sentenceIDs that we will need.
 	int StyleID = getStyleID(db,DocumentID);

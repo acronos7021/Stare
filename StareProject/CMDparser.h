@@ -4,14 +4,18 @@ using namespace std;
 
 #include <iostream>
 #include <vector>
+#include <thread>
 #include "DataStructs.h"
 #include "HMMengine.h"
+#include "EngineStatus.h"
+
 
 //  Takes the command line arguments and uses it to load the MetaData struct.
 class CMDparser
 {
 public:
 	HMMengine hmm;
+	vector<EngineStatus*> engineProcesses;
 
 	bool parseCMD(vector<string> cmdList);
 	void Learn(vector<string> cmdList);
@@ -38,7 +42,7 @@ public:
 
 
 	void learn(string author, string title, string date, string text);
-	CompareResult compare(int clientID, string text);
+	CompareResult compare(int clientID, string &text);
 	string create(int clientID, string author, int numOfSentences);
 
 	int checkCompareStatus(int clientID);  // done is 100

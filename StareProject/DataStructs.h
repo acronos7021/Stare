@@ -89,6 +89,8 @@ struct StyleCertaintyItem
 // the final product that is returned from compare
 struct CompareResult
 {
+	// The percentage of the document that is completely compared.  100 means the document is finished and the other information should be filled.
+	int percentComplete;
 	// a list of certainties for each style ranked by highest probability to lowest
 	vector<StyleCertaintyItem> documentCertainties;
 	// a list of the sentence that look suspicious throughout the document

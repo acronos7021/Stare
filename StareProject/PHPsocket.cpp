@@ -1,4 +1,6 @@
+#include <thread>
 #include "PHPsocket.h"
+
 
 
 PHPsocket::PHPsocket()

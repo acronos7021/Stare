@@ -84,7 +84,7 @@ void CMDparser::Learn(vector<string> cmdList)
 	metaData.Title = cmdList[3];
 	metaData.PublishDate = cmdList[4];
 	cout << "Learning document -> " << metaData.Author << " : " << metaData.Title;
-	hmm.learn(metaData);
+	hmm.learnFromFile(metaData);
 }
 void CMDparser::Compare(vector<string> cmdList)
 {
@@ -107,7 +107,7 @@ void CMDparser::Compare(vector<string> cmdList)
 	metaData.PublishDate = cmdList[4];
 	cout << "Comparing document -> " << metaData.Author << " : " << metaData.Title;
 	//hmm(db, tokenizer);
-	hmm.compare(metaData);
+	hmm.compareWithFile(metaData);
 }
 void CMDparser::Create(vector<string> cmdList)
 {
@@ -250,70 +250,58 @@ bool CMDparser::isAlphaNumeric(char c)
 }
 
 /******************************   PHPconnector functions  ************************************/
+//***********  STUBS    STUBS
+//string CMDparser::getSentences(int rangeStart, int rangeEnd)
+//{
+//	return "This is sentence 3.  This is sentence 4.";
+//} 
 
-string CMDparser::getSentences(int rangeStart, int rangeEnd)
-{
-	return "This is sentence 3.  This is sentence 4.";
-}
+//string CMDparser::getDocument(int DocumentID)
+//{
+//	return"This is sentence 1.  This is sentence 2. This is sentence 3.  This is sentence 4.";
+//} 
 
-string CMDparser::getDocument(int DocumentID)
-{
-	return"This is sentence 1.  This is sentence 2. This is sentence 3.  This is sentence 4.";
-}
+//CompareResult CMDparser::compare(int clientID, string text)
+//{
+//	//HMMengine hmm;
+//	//hmm.compare(MetaData("", "", "", text));
+//	vector<SentenceRanking> test;
+//
+//	SentenceBlob sbSource;
+//	sbSource.NextNextSentenceStr = "Sentence 9";
+//	sbSource.NextSentenceStr = "Sentence 8";
+//	sbSource.SentenceStr = "Sentence 7";
+//	sbSource.PrevSentenceStr = "Sentence 6";
+//	sbSource.PrevPrevSentenceStr = "Sentence 5";
+//	sbSource.SentenceID = 7;
+//
+//	SentenceBlob sbFound;
+//	sbFound.NextNextSentenceStr = "Sentence 9";
+//	sbFound.NextSentenceStr = "Sentence 8";
+//	sbFound.SentenceStr = "Sentence 7";
+//	sbFound.PrevSentenceStr = "Sentence 6";
+//	sbFound.PrevPrevSentenceStr = "Sentence 5";
+//	sbFound.SentenceID = 7;
+//
+//	test.push_back(SentenceRanking("Dickens", "A tale of two cities", sbSource, sbFound, .57));
+//	test.push_back(SentenceRanking("Mark Twain", "Huckleberry Finn", sbSource, sbFound, .57));
+//
+//	StyleCertaintyItem style1;
+//	style1.certainty = .73;
+//	style1.StyleID = 2;
+//	style1.StyleName = "Mark Twain";
+//
+//	vector<StyleCertaintyItem> ci;
+//	ci.push_back(style1);
+//
+//	CompareResult cr;
+//	cr.documentCertainties = ci;
+//	cr.sentenceRankings = test;
+//
+//	return cr;
+//}
 
-
-void CMDparser::learn(string author, string title, string date, string text)
-{
-	//HMMengine hmm(db, tokenizer);
-	hmm.compare(MetaData(author, title, date, text));
-	string sam = "good";
-}
-
-CompareResult CMDparser::compare(int clientID, string text)
-{
-	//HMMengine hmm;
-	//hmm.compare(MetaData("", "", "", text));
-	vector<SentenceRanking> test;
-
-	SentenceBlob sbSource;
-	sbSource.NextNextSentenceStr = "Sentence 9";
-	sbSource.NextSentenceStr = "Sentence 8";
-	sbSource.SentenceStr = "Sentence 7";
-	sbSource.PrevSentenceStr = "Sentence 6";
-	sbSource.PrevPrevSentenceStr = "Sentence 5";
-	sbSource.SentenceID = 7;
-
-	SentenceBlob sbFound;
-	sbFound.NextNextSentenceStr = "Sentence 9";
-	sbFound.NextSentenceStr = "Sentence 8";
-	sbFound.SentenceStr = "Sentence 7";
-	sbFound.PrevSentenceStr = "Sentence 6";
-	sbFound.PrevPrevSentenceStr = "Sentence 5";
-	sbFound.SentenceID = 7;
-
-	test.push_back(SentenceRanking("Dickens","A tale of two cities", sbSource,sbFound, .57));
-	test.push_back(SentenceRanking("Mark Twain", "Huckleberry Finn", sbSource,sbFound,.57));
-
-	StyleCertaintyItem style1;
-	style1.certainty = .73;
-	style1.StyleID = 2;
-	style1.StyleName = "Mark Twain";
-
-	vector<StyleCertaintyItem> ci;
-	ci.push_back(style1);
-
-	CompareResult cr;
-	cr.documentCertainties = ci;
-	cr.sentenceRankings = test;
-
-	return cr;
-}
-
-string CMDparser::create(int clientID, string author, int numOfSentences)
-{
-	return "Now is the time for all good men to come to the aid of their country.";
-}
-
+// these are no longer needed
 int CMDparser::checkCompareStatus(int clientID)  // done is 100
 {
 	return 25;
@@ -322,6 +310,132 @@ int CMDparser::checkCreateStatus(int clientID)     // done is 100
 {
 	return 25;
 }
+
+string CMDparser::getSentences(int rangeStart, int rangeEnd)
+{
+	std::stringstream ss;
+	if ((int) hmm.dataBase.TotalSentenceList.size() >= rangeStart)
+		ss << "These sentences do not exist in the database.";
+	else
+	{
+
+		if ((int) hmm.dataBase.TotalSentenceList.size() >= rangeEnd)
+			rangeEnd = hmm.dataBase.TotalSentenceList.size();
+
+		for (int i = rangeStart; i < rangeEnd; i++)
+		{
+			ss << hmm.tokenizer.rebuildSent(hmm.dataBase.TotalSentenceList[i]);
+		}
+	}
+	return ss.str();
+
+}
+
+
+
+string CMDparser::getDocument(int DocumentID)
+{
+	std::stringstream ss;
+
+	int documentIndex = hmm.dataBase.getDocumentIndex(DocumentID);
+	if (documentIndex != -1)
+	{
+		for (int i = hmm.dataBase.documentList[documentIndex].startSentenceID;
+			 i < hmm.dataBase.documentList[documentIndex].endSentenceID;
+			 i++)
+		{
+			ss << hmm.tokenizer.rebuildSent(hmm.dataBase.TotalSentenceList[i]);
+		}
+	}
+	else
+	{
+		ss << "Cannot find this document in the database";
+	}
+
+	return ss.str();
+}
+
+void CMDparser::learn(string author, string title, string date, string text)
+{
+	hmm.learn(MetaData(author, title, date, text));
+}
+
+CompareResult CMDparser::compare(int clientID, string &text)
+{
+		//HMMengine hmm;
+		//hmm.compare(MetaData("", "", "", text));
+
+	// search for the active process
+	CompareResult cr;
+	int foundProcessIndex = -1; // if not found
+	for (unsigned int i = 0; i < engineProcesses.size(); i++)
+	{
+		if (engineProcesses[i]->getClientID() == clientID)
+		{
+			// We found it.
+			foundProcessIndex = i;
+			if (engineProcesses[i]->getPercentComplete() == 100)
+			{
+				// the process is complete, so return it
+				cr = engineProcesses[i]->getResult();
+				// delete the object
+				delete(engineProcesses[i]);
+				engineProcesses.erase(engineProcesses.begin() + i);
+			}
+			else
+			{
+				//process is not complete, so return status.
+				CompareResult cr;
+				cr.percentComplete = engineProcesses[i]->getPercentComplete();
+			}
+		}
+	}
+	if (foundProcessIndex == -1)
+	{
+		// it was not found in the list.
+		if (text == "")
+		{
+			// this is an error.  Either it timed out, they never sent it before.  
+			CompareResult cr;
+			cr.percentComplete = -1;
+		}
+		else
+		{
+			// this is a new request so we should get started.
+			EngineStatus* engineStatus = new EngineStatus(clientID);
+			engineProcesses.push_back(engineStatus);
+			std::thread t(hmm.compareThreadEngine, hmm, engineStatus, text);
+		}
+	}
+	return cr;
+
+
+
+
+
+
+
+
+
+	//int status = hmm.compareCheck(clientID);
+
+	//if (hmm.compareCheck(clientID))
+	//{
+	//	cr.percentComplete = status;
+	//}
+	//else
+	//{
+	//}
+	//return hmm.compare()
+
+}
+
+string CMDparser::create(int clientID, string author, int numOfSentences)
+{
+	return "Now is the time for all good men to come to the aid of their country.";
+}
+
+
 
 vector<MetaData> CMDparser::getDocuments()
 {

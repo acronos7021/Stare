@@ -83,6 +83,7 @@
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="Database.cpp" />
     <ClCompile Include="DocumentDatabase.cpp" />
+    <ClCompile Include="EngineStatus.cpp" />
     <ClCompile Include="HMMengine.cpp" />
     <ClCompile Include="HTMLgenerator.cpp" />
     <ClCompile Include="jsoncpp.cpp" />
@@ -99,6 +100,7 @@
     <ClInclude Include="Database.h" />
     <ClInclude Include="DataStructs.h" />
     <ClInclude Include="DocumentDatabase.h" />
+    <ClInclude Include="EngineStatus.h" />
     <ClInclude Include="HMMengine.h" />
     <ClInclude Include="HTMLgenerator.h" />
     <ClInclude Include="json-forwards.h" />
