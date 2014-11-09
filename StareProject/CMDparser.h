@@ -17,6 +17,7 @@ public:
 	HMMengine hmm;
 	vector<EngineStatus*> engineProcesses;
 
+	void doCreateDatabase(bool confirm);
 	bool parseCMD(vector<string> cmdList);
 	void Learn(vector<string> cmdList);
 	void Compare(vector<string> cmdList);
@@ -50,7 +51,7 @@ public:
 
 	vector<MetaData> getDocuments();
 
-	vector<MetaData> getStyles();
+	std::vector<std::string> getStyles();
 
 };
 

@@ -13,9 +13,9 @@ using namespace std;
 int main(int argc, char *argv[])
 {
 	CMDparser cmd;
-	Console c(cmd);
+	Console c;
 	//HeipClass heipClass;
 	//heipClass.heipMethod(cmd)   // on the class side use  helpMethod(CMDparser &cmdParser);
-	c.MessageLoop(argc, argv);
+	c.MessageLoop(cmd, argc, argv);
 
 }

@@ -58,7 +58,7 @@ public:
 
 	void FlushToDatabase();
 	void SyncWithDatabase();
-	void AddTotalStyleCount(int StyleID);
+	//void AddTotalStyleCount(int StyleID);
 
 private:
 	std::unordered_map<uint_fast64_t, WordPairCountStruct> WordPairCount;

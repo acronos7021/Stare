@@ -3,9 +3,9 @@
 #include "Tokenizer.h"
 #include "Database.h"
 
-Console::Console(CMDparser TheCMDparser)
+Console::Console()
 {
-	cmdParser = TheCMDparser;
+
 }
 
 
@@ -13,7 +13,7 @@ Console::~Console()
 {
 }
 
-void Console::MessageLoop( int argc, char *argv[])
+void Console::MessageLoop(CMDparser &TheCMDparser,int argc, char *argv[])
 {
 	std::cout << "Welcome to the Stare plagerism detector." << endl;
 
@@ -26,7 +26,7 @@ void Console::MessageLoop( int argc, char *argv[])
 		vector<string> commandList;
 		for (int i = 1; i < argc; i++)
 			commandList.push_back(argv[i]);
-		cmdParser.parseCMD(commandList);
+		TheCMDparser.parseCMD(commandList);
 	}
 	vector<string> cmdLst;
 	string cmdStr;
@@ -36,6 +36,6 @@ void Console::MessageLoop( int argc, char *argv[])
 		std::cout << endl << ">>  " ;
 		std::getline(std::cin, cmdStr);
 		cmdLst = CMDparser::getCommands(cmdStr);
-	} while (cmdParser.parseCMD(cmdLst));
+	} while (TheCMDparser.parseCMD(cmdLst));
 }
 

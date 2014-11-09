@@ -8,12 +8,10 @@ using namespace std;
 class Console
 {
 public:
-	Console(CMDparser TheCMDparser);
+	Console();
 	~Console();
 
 
-	CMDparser cmdParser;
-
-	void MessageLoop(int argc, char *argv[]);
+	void MessageLoop(CMDparser &cmdParser,int argc, char *argv[]);
 };
 

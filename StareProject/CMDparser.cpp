@@ -41,11 +41,7 @@ bool CMDparser::parseCMD(vector<string> cmdList)
 	else if (cmdList[0] == "Brian")
 		Brian(cmdList);
 	else if ((cmdList[0] == "Create") && (cmdList[1] == "Database"))
-	{
-		//db.CreateDatabase();
-		DocumentDatabase db;
-		db.CreateDatabase(false);
-	}
+		doCreateDatabase(true);
 	else if (cmdList[0] == "Execute")
 		Execute(cmdList[1]);
 	else if (cmdList[0] == "help")
@@ -64,6 +60,12 @@ bool CMDparser::parseCMD(vector<string> cmdList)
 	}
 	// load the file from the database and insert it into DocumentText
 	return true;
+}
+
+void CMDparser::doCreateDatabase(bool confirm)
+{
+	hmm.dataBase.CreateDatabase(confirm);
+	hmm.tokenizer.tdb.LoadTokenMap();
 }
 
 void CMDparser::Learn(vector<string> cmdList)
@@ -301,6 +303,34 @@ bool CMDparser::isAlphaNumeric(char c)
 //	return cr;
 //}
 
+//string CMDparser::create(int clientID, string author, int numOfSentences)
+//{
+//	return "Now is the time for all good men to come to the aid of their country.";
+//}
+//
+//
+//
+//vector<MetaData> CMDparser::getDocuments()
+//{
+//	MetaData md("Shakespere", "Henry V", "1619", "../StareProject/Documents/HenryV.txt");
+//	std::vector<MetaData> test;
+//	test.push_back(md);
+//	test.push_back(md);
+//	test.push_back(md);
+//	return test;
+//
+//}
+//
+//std::vector<MetaData> CMDparser::getStyles()
+//{
+//	MetaData md("Shakespere", "Henry V", "1619", "../StareProject/Documents/HenryV.txt");
+//	std::vector<MetaData> test;
+//	test.push_back(md);
+//	test.push_back(md);
+//	test.push_back(md);
+//	return test;
+//}
+
 // these are no longer needed
 int CMDparser::checkCompareStatus(int clientID)  // done is 100
 {
@@ -314,12 +344,12 @@ int CMDparser::checkCreateStatus(int clientID)     // done is 100
 string CMDparser::getSentences(int rangeStart, int rangeEnd)
 {
 	std::stringstream ss;
-	if ((int) hmm.dataBase.TotalSentenceList.size() >= rangeStart)
+	if ((int) hmm.dataBase.TotalSentenceList.size() <= rangeStart)
 		ss << "These sentences do not exist in the database.";
 	else
 	{
 
-		if ((int) hmm.dataBase.TotalSentenceList.size() >= rangeEnd)
+		if ((int) hmm.dataBase.TotalSentenceList.size() <= rangeEnd)
 			rangeEnd = hmm.dataBase.TotalSentenceList.size();
 
 		for (int i = rangeStart; i < rangeEnd; i++)
@@ -337,11 +367,11 @@ string CMDparser::getDocument(int DocumentID)
 {
 	std::stringstream ss;
 
-	int documentIndex = hmm.dataBase.getDocumentIndex(DocumentID);
-	if (documentIndex != -1)
+	//int documentIndex = hmm.dataBase.getDocumentListIndex(DocumentID);
+	if ((DocumentID >= 0) && (DocumentID < (int)hmm.dataBase.documentList.size()))
 	{
-		for (int i = hmm.dataBase.documentList[documentIndex].startSentenceID;
-			 i < hmm.dataBase.documentList[documentIndex].endSentenceID;
+		for (int i = hmm.dataBase.documentList[DocumentID].startSentenceID;
+			i < hmm.dataBase.documentList[DocumentID].endSentenceID;
 			 i++)
 		{
 			ss << hmm.tokenizer.rebuildSent(hmm.dataBase.TotalSentenceList[i]);
@@ -439,23 +469,29 @@ string CMDparser::create(int clientID, string author, int numOfSentences)
 
 vector<MetaData> CMDparser::getDocuments()
 {
-	MetaData md("Shakespere", "Henry V", "1619", "../StareProject/Documents/HenryV.txt");
-	std::vector<MetaData> test;
-	test.push_back(md);
-	test.push_back(md);
-	test.push_back(md);
-	return test;
+	//MetaData md("Shakespere", "Henry V", "1619", "../StareProject/Documents/HenryV.txt");
+	//std::vector<MetaData> test;
+	//test.push_back(md);
+	//test.push_back(md);
+	//test.push_back(md);
+	vector<MetaData> docList;
+	for (unsigned int i = 0; i < hmm.dataBase.documentList.size(); i++)
+		docList.push_back(MetaData(hmm.dataBase.documentList[i].Author, hmm.dataBase.documentList[i].Title, hmm.dataBase.documentList[i].PublishDate, ""));
+	return docList;
 
 }
 
-std::vector<MetaData> CMDparser::getStyles()
+std::vector<std::string> CMDparser::getStyles()
 {
-	MetaData md("Shakespere", "Henry V", "1619", "../StareProject/Documents/HenryV.txt");
-	std::vector<MetaData> test;
-	test.push_back(md);
-	test.push_back(md);
-	test.push_back(md);
-	return test;
+	//MetaData md("Shakespere", "Henry V", "1619", "../StareProject/Documents/HenryV.txt");
+	//std::vector<MetaData> test;
+	//test.push_back(md);
+	//test.push_back(md);
+	//test.push_back(md);
+	std::vector<std::string> styles;
+	for (unsigned int i = 0; i < hmm.dataBase.StyleList.size(); i++)
+		styles.push_back(hmm.dataBase.StyleList[i].Author);
+	return styles;
 }
 
 /******************************   PHPconnector functions  ************************************/
@@ -513,6 +549,13 @@ void CMDparser::Leven(vector<string> cmdParams)
 
 void CMDparser::Brian(vector<string> cmdParams)
 {
+	learn("Brian", "Test of Compare", "2014", "I want to prove that the learn interface works properly.");
+	getDocuments();
+	Execute("test");
+	getDocuments();
+	getStyles();
+	std::string showSent = getSentences(50, 56);
+	std::string showDoc =  getDocument(1);
 	//DocumentDatabase dBase;
 	//dBase.CreateDatabase(false);
 	////Tokenizer t;
