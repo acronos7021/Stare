@@ -160,9 +160,9 @@ void DocumentDatabase::initTables()
 					documentList[docID].startSentenceID = sentID;
 					currDocID = docID;
 				}
-				if ((sentID != currSentID) && (currSentID != -1))
-				{
-					// starting a new sentence
+				if ((sentID != currSentID) && (currSentID != -1)) 
+				{ 
+					// starting a new sentence 
 					vector<int> dummy;
 					if (currSentID == (int)TotalSentenceList.size())
 					{
