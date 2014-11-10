@@ -64,3 +64,18 @@
     width: 100%;
     display: inline-block;
 }
+
+#upload-box{
+    width:66%;
+    height:45%;
+    border-style:dashed;
+    border-color:#B8B8B8;
+    margin: 0 auto;
+}
+
+
+
+
+
+
+
