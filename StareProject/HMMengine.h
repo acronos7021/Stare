@@ -1,7 +1,6 @@
 #pragma once
 #include <map>
 #include <iomanip>
-#include "Database.h"
 #include "DataStructs.h"
 #include "Tokenizer.h"
 #include "HTMLgenerator.h"

@@ -5,7 +5,6 @@ using namespace std;
 #include <iostream>
 #include <vector>
 #include <thread>
-#include "DataStructs.h"
 #include "HMMengine.h"
 #include "EngineStatus.h"
 
@@ -14,7 +13,7 @@ using namespace std;
 class CMDparser
 {
 public:
-	HMMengine hmm;
+	HMMengine hmm;  
 	vector<EngineStatus*> engineProcesses;
 
 	void doCreateDatabase(bool confirm);
@@ -24,6 +23,7 @@ public:
 	void Create(vector<string> cmdList);
 
 	void Execute(string fileName);
+	void show(vector<string> cmdList);
 	void Quit(vector<string> cmdList);
 
 	string ReadFile(string fileName);

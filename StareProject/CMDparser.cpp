@@ -6,7 +6,6 @@ using namespace std;
 #include <fstream>
 #include <iostream>
 #include "Stopwatch.h"
-#include "Database.h"
 #include "CMDparser.h"
 #include "Tokenizer.h"
 #include "HMMengine.h"
@@ -40,6 +39,8 @@ bool CMDparser::parseCMD(vector<string> cmdList)
 		Leven(cmdList);
 	else if (cmdList[0] == "Brian")
 		Brian(cmdList);
+	else if (cmdList[0] == "Show")
+		show(cmdList);
 	else if ((cmdList[0] == "Create") && (cmdList[1] == "Database"))
 		doCreateDatabase(true);
 	else if (cmdList[0] == "Execute")
@@ -66,6 +67,19 @@ void CMDparser::doCreateDatabase(bool confirm)
 {
 	hmm.dataBase.CreateDatabase(confirm);
 	hmm.tokenizer.tdb.LoadTokenMap();
+}
+
+void CMDparser::show(vector<string> cmdList)
+{
+	if (cmdList[1]=="Documents")
+	{
+	  vector<MetaData> docs = CMDparser::getDocuments();
+	  for(std::vector<MetaData>::iterator d = docs.begin(); d != docs.end();++d)
+	  {
+	      cout << d->Title << endl;
+	  }
+	}
+	  
 }
 
 void CMDparser::Learn(vector<string> cmdList)
