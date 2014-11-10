@@ -1,6 +1,5 @@
 #include "Tokenizer.h"
 #include "Stopwatch.h"
-#include "Database.h"
 #include "DataStructs.h"
 using namespace std;
 

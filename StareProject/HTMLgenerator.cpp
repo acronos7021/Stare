@@ -1,7 +1,7 @@
 
 #include <sstream>
 #include "HTMLgenerator.h"
-#include "Database.h"
+
 #include <fstream>
 #include <iostream>
 
