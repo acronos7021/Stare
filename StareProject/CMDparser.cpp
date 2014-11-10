@@ -434,7 +434,7 @@ CompareResult CMDparser::compare(int clientID, string &text)
 			// this is a new request so we should get started.
 			EngineStatus* engineStatus = new EngineStatus(clientID);
 			engineProcesses.push_back(engineStatus);
-			std::thread t(hmm.compareThreadEngine, hmm, engineStatus, text);
+			//std::thread t(hmm.compareThreadEngine, hmm, engineStatus, text);
 		}
 	}
 	return cr;

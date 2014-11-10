@@ -18,7 +18,7 @@ public:
 		char* start;
 		char* end;
 
-		loc::loc() : start(0), end(0) {};
+		//loc::loc() {};
 
 		std::string toString()
 		{
@@ -67,7 +67,7 @@ public:
 	//@return: void
 	//@logic: tokenizes the entire document into a deque<vector<int>> sentID
 	//std::deque<std::vector<int>> tokenizeDoc(std::string document);
-	std::deque<std::vector<int>> tokenizeDoc(std::string &document);
+	std::deque<std::vector<int>> tokenizeDoc(std::string document);
 
 	//@param: vector<int> sent
 	//@return: a string that is a reconstructed sentence

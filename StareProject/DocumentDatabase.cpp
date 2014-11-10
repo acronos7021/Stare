@@ -1,4 +1,6 @@
 #include <iostream>
+#include <stdexcept>
+#include <cstring>
 
 #include "DocumentDatabase.h"
 #include "WordPairCountDatabase.h"
@@ -12,7 +14,7 @@ int DocumentDatabase::databaseInstanceCount = 0;
 DocumentDatabase::DocumentDatabase()
 {
 	if (databaseInstanceCount > 0)
-		throw std::exception("There can be only one!.  Somewhere else in the code another DocumentDatabase exists.");
+		throw std::runtime_error("There can be only one!.  Somewhere else in the code another DocumentDatabase exists.");
 	databaseInstanceCount++;
 	initTables();
 }
@@ -28,7 +30,7 @@ sqlite3* DocumentDatabase::openDB()
 	//const char * c = dbName.c_str();
 	sqlite3 *db;
 	if (sqlite3_open("AIsql.db3", &db) != SQLITE_OK)
-		throw std::exception("SQLite database failed to open");
+		throw std::runtime_error("SQLite database failed to open");
 	return db;
 }
 
@@ -704,9 +706,9 @@ void DocumentDatabase::CreateDatabase(bool confirmation)
 		for (unsigned int i = 0; i < tables.size(); i++)
 		{
 			cout << "Dropping " << tables[i] << endl;
-			char dropStr[500];
-			sprintf_s(dropStr, 500, "DROP TABLE %s", tables[i].c_str());
-			if (sqlite3_exec(db, dropStr, NULL, NULL, &errorMessage) != SQLITE_OK)
+			//char dropStr[500];
+			//sprintf(dropStr, 500, "DROP TABLE %s", );
+			if (sqlite3_exec(db, tables[i].c_str(), NULL, NULL, &errorMessage) != SQLITE_OK)
 			{
 				cout << errorMessage << endl;
 				cout << "Operation Failed!" << endl;

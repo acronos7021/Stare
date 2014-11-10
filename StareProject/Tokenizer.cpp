@@ -40,7 +40,7 @@ std::deque<std::vector<int>> Tokenizer::tokenizeFile(string filename)
 	return tokenizeDoc(readFile(filename));
 }
 
-std::deque<std::vector<int>> Tokenizer::tokenizeDoc(string &document)
+std::deque<std::vector<int>> Tokenizer::tokenizeDoc(string document)
 {
 	index = 0;  
 	sentID.clear();
