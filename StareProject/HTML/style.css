@@ -66,14 +66,14 @@
 }
 
 #uploadbox{
-    width:66%;
+    width:75%;
     height:45%;
     border-style:dashed;
     border-color:#B8B8B8;
     margin: 0 auto;
 }
 #uploadform{
-    margin: 12%;
+    margin: 2%;
 }
 
 #uploadbox.hover{
@@ -84,12 +84,13 @@
 }
 pre
 {
-	width: 95%;
-	height: 8em;
+	width: 75%;
+	height: 40%;
 	font-family: monospace;
 	font-size: 0.9em;
 	padding: 1px 2px;
-	margin: 0 0 1em auto;
+	margin: auto;
+    margin-bottom:2%;
 	border: 2px inset #666;
 	
 	overflow: auto;
