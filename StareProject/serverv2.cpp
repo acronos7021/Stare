@@ -49,7 +49,7 @@ void serverv2::recvData(int client_socket) {
 		std::string recvDataString = buffer;
 ///     Get data from the algorithm/database in here. the two lines below are for testing purpose.
 		PHPsocket php = PHPsocket(cmd);
-		String result = php.jsonDecoder(recvDataString);
+		std::string result = php.jsonDecoder(recvDataString);
 		
 		//std::cout << recvDataString << std::endl;
 		//std::string dataToSend = "Hello client, I have received your data ";

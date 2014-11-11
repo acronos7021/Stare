@@ -40,10 +40,10 @@ string PHPsocket::jsonDecoder(string json)
 
 String PHPsocket::doCreate(Json::Value json) {
 	
-	cmd->compare(json["clientID"], json["style"], json["numberOfSentences"]);
+	CreateResult result = cmd->compare(json["clientID"], json["style"], json["numberOfSentences"]);
+	std::string text = result.newDocument;
 	
-	Json::Value outer;
-
+	
    return "";	
 }
 String PHPsocket::getStyles() {
@@ -64,16 +64,15 @@ String PHPsocket::getStyles() {
 
 string PHPsocket::doCompare(Json::Value json)
 {
-	CMDparser cmd;
 	string ID = json["clientID"].asString();
 	int sessionID;
 	istringstream(ID) >> sessionID;
-	CompareResult result = cmd.compare(sessionID, json["documentText"].asString());
+	CompareResult result = cmd->compare(sessionID, json["documentText"].asString());
 
 	//Here I check if what compare returns is empty
 	//TODO change this to the boolean.
-	if (result.documentCertainties.empty()){
-		int progress = cmd.checkCompareStatus(sessionID);
+	if (result.percentComplete<100){
+		int progress = cmd->checkCompareStatus(sessionID);
 		Json::Value output = formCheckCompareReturn(progress);
 		return output.toStyledString();
 	}

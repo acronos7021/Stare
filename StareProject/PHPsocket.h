@@ -13,13 +13,20 @@ using namespace std;
 class PHPsocket
 {
 public:
-	PHPsocket();
+	
+	PHPsocket(CMDparser* cmd) {
+		this->cmd = cmd;
+	}
+	
 	~PHPsocket();
-
+ 	
 	Json::Value parseJSON(string json);
 	string doCompare(Json::Value json);
 	Json::Value formCheckCompareReturn(int status);
 	string doCheckCompare(Json::Value json);
 	void jsonDecoder(string json);
+	
+private:
+	CMDparser* cmd;
 };
 
