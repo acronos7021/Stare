@@ -14,7 +14,7 @@ function compareDecode(json) {
 	    var inside = "";
 	    //title area
 	    inside += '<div id="doc-wrapper"><div id="left-column"><h3>' +
-	        userDocTitle + '</h3></div>';
+	        window.userDocTitle + '</h3></div>';
 	    inside += '<div id="right-column"><h3>' + response.ranking[i]
 	        .documentTitle + '</h3></div></div>';
 	    //content area
@@ -45,7 +45,6 @@ function sendCompare(clientID, text) {
 		"command": "compare",
 		"documentText": text
 	}
-	
     //do something to send it off here
     sendMessage(compare);
     //window.location.href = 'output.html';
@@ -140,6 +139,16 @@ function generateID(){
 	return d.getTime();
 }
 
+// getElementById
+function $id(id) {
+	return document.getElementById(id);
+}
+//output info
+function Output(msg) {
+	var m = $id("messages");
+	m.innerHTML = msg;
+}
+
 function readSingleFile(evt) {
     //Retrieve the first (and only!) File from the FileList object
     var f = evt.target.files[0];
@@ -157,17 +166,7 @@ function readSingleFile(evt) {
         alert("Failed to load file");
     }
 }
-//sendCompare("TheID", "The document text will go here");
-//This is for testing
-var userDocTitle = "My Title"; // this will be set using a cookie in the future.
-//compareDecode(
-//    '{"clientID":"ID","command":"compare","status":"#of characters process","documentText":"the document text here","overallCertainty":"50","ranking":[{"origSnip":["Aenean suscipit a metus eu aliquet.","Vestibulum lacus lorem, viverra sit amet tincidunt a, pharetra vitae mi.","Aliquam egestas rutrum tincidunt."],"dataBaseSnip":["Lorem ipsum dolor sit amet, consectetur adipiscing elit.","In molestie congue libero ut feugiat.","Etiam convallis arcu sit amet elit ullamcorper, rhoncus sodales lorem consequat."],"certainty":"10","documentTitle":"someTitle","foundDocumentID":"SomeDocID","foundSentenceID":"someSentID"},{"origSnip":["sentence1","sentence2","sentence3"],"dataBaseSnip":["sentence1","sentence2","sentence3"],"certainty":"100","documentTitle":"2nd Document","foundDocumentID":"SomeDocID","foundSentenceID":"someSentID"}]}'
-//);
 
-//test generate id
-//alert("Your ID is:\n"+generateID());
-var compare = {"command":"compare","overallCertainty":"100","ranking":[{"origSnip":["sentence1","sentence2","sentence3"],"dataBaseSnip":["sentence1","sentence2","sentence3"],"certainty":"80","documentTitle":"someTitle","foundDocumentID":"SomeDocID","foundSentenceID":"someSentID"},{"origSnip":["sentence1","sentence2","sentence3"],"dataBaseSnip":["sentence1","sentence2","sentence3"],"certainty":"90","documentTitle":"someTitle","foundDocumentID":"SomeDocID","foundSentenceID":"someSentID"}]}
-//sendMessage(compare);
 
 
 
