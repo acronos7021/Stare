@@ -46,16 +46,19 @@ int HMMengine::learn(MetaData metaData)
 	return documentID;
 }
 
-void HMMengine::compareWithFile(MetaData metaData)
+void HMMengine::compareWithFile(HMMengine &hmm, MetaData metaData)
 {
 	// This is due to an early misunderstanding between Sam and Brian.  Should be fixed.
-	metaData.DocumentText = tokenizer.readFile(metaData.DocumentText);
+	std::string documentText = tokenizer.readFile(metaData.DocumentText);
         //std::thread t(hmm.compareThreadEngine, hmm, engineStatus, text);
+	EngineStatus empty(0);
+	compareThreadEngine(hmm,&empty,documentText);
 }
+//HMMengine &hmm, 
 
-
-void HMMengine::compareThreadEngine(HMMengine &hmm, EngineStatus* engineStatus, std::string &text)
+void HMMengine::compareThreadEngine(HMMengine &hmm,EngineStatus* engineStatus, std::string &text)
 {
+
 	std::deque<std::vector<int>> documentTokens = hmm.tokenizer.tokenizeFile(text);
 
 	vector<StyleCounts> totalWordCountsPerStyle = hmm.dataBase.getTotalWordCountPerStyle();

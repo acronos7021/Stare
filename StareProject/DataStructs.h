@@ -97,6 +97,14 @@ struct CompareResult
 	vector<SentenceRanking> sentenceRankings;
 };
 
+
+struct CreateResult
+{
+  std::string newDocument;
+  int percentComplete;
+};
+
+
 //struct StyleScore
 //{
 //	int StyleID;

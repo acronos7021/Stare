@@ -124,7 +124,7 @@ void CMDparser::Compare(vector<string> cmdList)
 	metaData.PublishDate = cmdList[4];
 	cout << "Comparing document -> " << metaData.Author << " : " << metaData.Title;
 	//hmm(db, tokenizer);
-	hmm.compareWithFile(metaData);
+	hmm.compareWithFile(hmm,metaData);
 }
 void CMDparser::Create(vector<string> cmdList)
 {
@@ -323,7 +323,7 @@ bool CMDparser::isAlphaNumeric(char c)
 //	return "Now is the time for all good men to come to the aid of their country.";
 //}
 //
-//
+//comparethreadEngine
 //
 //vector<MetaData> CMDparser::getDocuments()
 //{
@@ -449,7 +449,7 @@ CompareResult CMDparser::compare(int clientID, string &text)
 			// this is a new request so we should get started.
 			EngineStatus* engineStatus = new EngineStatus(clientID);
 			engineProcesses.push_back(engineStatus);
-			std::thread t(hmm.compareThreadEngine, hmm, engineStatus, text);
+			//std::thread t(hmm.compareThreadEngine, hmm, engineStatus, text);
 		}
 	}
 	return cr;
@@ -475,9 +475,12 @@ CompareResult CMDparser::compare(int clientID, string &text)
 
 }
 
-string CMDparser::create(int clientID, string author, int numOfSentences)
+CreateResult CMDparser::create(int clientID, string author, int numOfSentences)
 {
-	return "Now is the time for all good men to come to the aid of their country.";
+    CreateResult cr;
+    cr.percentComplete = 0;
+    cr.newDocument = "Now is the time for all good men to come to the aid of their country.";
+	return cr;
 }
 
 
@@ -648,7 +651,7 @@ void CMDparser::Brian(vector<string> cmdParams)
 	//int dbTime = sw.getTimeInMicroseconds();
 
 	//int sentID = 
-	//string sent = db.getSentence(sentID);
+	//string sent = db.getSentence(sentID);CreateResult
 	//Tokenizer tokenizer2 = Tokenizer("../StareProject/Documents/AChristmasCarol.txt");
 	//tokenizer2.tokenizeDoc();
 	//int docID2 = db.insertDocument("Charles Dickens", "A Christmas Carol", "1864");
