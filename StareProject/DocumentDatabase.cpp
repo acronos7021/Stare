@@ -16,7 +16,7 @@ DocumentDatabase::DocumentDatabase()
 	if (databaseInstanceCount > 0)
 		throw std::runtime_error("There can be only one!.  Somewhere else in the code another DocumentDatabase exists.");
 	databaseInstanceCount++;
-	initTables();
+	//initTables();
 }
 
 
@@ -181,7 +181,7 @@ void DocumentDatabase::initTables()
 							TotalSentenceList.push_back(dummy);
 						TotalSentenceList.push_back(sentenceTokenIDs);
 					}
-					incrementTokenAndStyleCounts(sentenceTokenIDs, styleID);
+					incrementTokenAndStyleCounts(sentenceTokenIDs, styleID,currSentID);
 					currSentID = sentID;
 					sentenceTokenIDs.clear();
 				}
@@ -203,31 +203,46 @@ void DocumentDatabase::initTables()
 	close(db);
 }
 
-void DocumentDatabase::incrementTokenAndStyleCounts(vector<int> sentence, int StyleID)
-{
-	incrementWordStyleCounts(StyleID, sentence.size());
-	int currWordToken = -1;
-	int nextWordToken = -1;
-	for (unsigned int i = 0; i < sentence.size(); i++)
-	{
-		if (isWordToken(sentence[i]))
-		{
-			currWordToken = nextWordToken;
-			nextWordToken = sentence[i];
-			wpd.AddTokenCount(currWordToken, nextWordToken, StyleID);
-		}
-	}
-	if (nextWordToken != -1)
-	{
-		// The above code processes one token behind, so process that last token.
-		currWordToken = nextWordToken;
-		nextWordToken = -1;
-		wpd.AddTokenCount(currWordToken,nextWordToken,StyleID);
-	}
 
+void DocumentDatabase::incrementTokenAndStyleCounts( vector<int> sentence, int StyleID, int sentenceID)
+{
+    //incrementWordStyleCounts(StyleID, sentence.size());
+    int currWordToken = -1;
+    int nextWordToken = -1;
+    for (unsigned int i = 0; i < sentence.size(); i++)
+    {
+	    if (isWordToken(sentence[i]))
+	    {
+		    currWordToken = nextWordToken;
+		    nextWordToken = sentence[i];
+		    //wpd.AddTokenPairCount(currWordToken, nextWordToken, StyleID);
+		    wpd.AddCounts(currWordToken,nextWordToken,StyleID,sentenceID);
+	    }
+    }
+    if (nextWordToken != -1)
+    {
+	    // The above code processes one token behind, so process that last token.
+	    currWordToken = nextWordToken;
+	    nextWordToken = -1;
+	    //wpd.AddTokenPairCount(currWordToken,nextWordToken,StyleID);
+	    wpd.AddCounts(currWordToken,nextWordToken,StyleID,sentenceID);
+    }
+    std::cout << "Sentence#" << sentenceID << std::endl;
+    for (int i = 0;i<sentence.size();i++)
+    {
+	std::cout << sentence[i] << " ";
+    }
+    std::cout << std::endl;
+    std::cout << "getTotalWordCount() " << wpd.getTotalWordCount()<< std::endl;
+    std::cout << "getWordStyleCount() " << wpd.getWordStyleCount(StyleID)<< std::endl;
+    std::cout << "getTotalWordPairCount() " << wpd.getTotalWordPairCount(currWordToken, nextWordToken) << std::endl;
+    std::cout << "getWordPairStyleCount() " << wpd.getWordPairStyleCount(currWordToken,nextWordToken,StyleID) << std::endl;
+    std::cout << std::endl;
 }
 
+
 /* Retrieve the Author Style */
+
 int DocumentDatabase::getStyleID(sqlite3* db, std::string author)
 {
 	sqlite3_stmt* stmt;
@@ -257,6 +272,7 @@ int DocumentDatabase::getStyleID(sqlite3* db, std::string author)
 	return retAns;
 }
 
+/*
 void DocumentDatabase::incrementWordStyleCounts(int StyleID, int count)
 {
 	// check if that style exists
@@ -272,6 +288,7 @@ void DocumentDatabase::incrementWordStyleCounts(int StyleID, int count)
 	}
 }
 
+
 void DocumentDatabase::createWordStyleCounts( int StyleID, std::string author)
 {
 	// check if that style exists
@@ -282,6 +299,7 @@ void DocumentDatabase::createWordStyleCounts( int StyleID, std::string author)
 	}
 	TotalWordCountsByStyle[StyleID] = StyleCounts(StyleID, author, 0);
 }
+*/
 
 int DocumentDatabase::getDocumentID(sqlite3* db, std::string Author, std::string title)
 {
@@ -362,7 +380,7 @@ int DocumentDatabase::insertStyle(sqlite3* db, std::string author)
 	std::string str = "INSERT INTO Styles (Author) VALUES('" + author + "');";
 	int StyleID = insert(db,str);
 	//int StyleID = getStyleID(author);
-	createWordStyleCounts( StyleID, author);
+	//createWordStyleCounts( StyleID, author);
 	//StyleList.push_back(Styles(StyleID, author));
 	addToStyleList(StyleID, author);
 	return StyleID;
@@ -478,11 +496,14 @@ int DocumentDatabase::incrementSentenceID(sqlite3* db, int byAmount)
 	return currentSentenceID;
 }
 
+/*
 const vector<StyleCounts> DocumentDatabase::getTotalWordCountPerStyle()
 {
 	return TotalWordCountsByStyle;
 }
+*/
 
+/*
 vector<StyleCounts> DocumentDatabase::getPathWordCountPerStyle(int currToken, int nextToken)
 {
 	vector<StyleCounts> retVect;
@@ -493,6 +514,7 @@ vector<StyleCounts> DocumentDatabase::getPathWordCountPerStyle(int currToken, in
 	}
 	return retVect;
 }
+*/
 
 bool DocumentDatabase::isWordToken(int token)
 {
@@ -607,10 +629,11 @@ void DocumentDatabase::insertDocumentText(int DocumentID, std::deque<std::vector
 	// insert all words in all sentences into HMMtokenPaths
 	for (sentenceNum = 0; sentenceNum < numberOfSentences; sentenceNum++)
 	{
+	  	SentenceID = startSentenceID + sentenceNum;
 		lastWordNum = document[sentenceNum].size();
-		//TotalWordCountsByStyle[StyleID].Count += lastWordNum;
-		incrementTokenAndStyleCounts(document[sentenceNum], StyleID);
-		//incrementWordStyleCounts(StyleID, lastWordNum); 
+			//TotalWordCountsByStyle[StyleID].Count += lastWordNum;
+		incrementTokenAndStyleCounts(document[sentenceNum], StyleID,SentenceID);
+			//incrementWordStyleCounts(StyleID, lastWordNum); 
 		for (wordNum = 0; wordNum < lastWordNum; wordNum++)
 		{
 			// Load all variables into the correct type to be inserted into the prepared statement.
@@ -621,7 +644,7 @@ void DocumentDatabase::insertDocumentText(int DocumentID, std::deque<std::vector
 			//	wpd.AddTokenCount(currWordToken, nextWordToken, StyleID);
 			//}
 
-			SentenceID = startSentenceID + sentenceNum;
+
 
 			// bind to prepared statement. 
 			sqlite3_bind_int(HMMtokenPaths_stmt, 1, StyleID);
@@ -634,7 +657,8 @@ void DocumentDatabase::insertDocumentText(int DocumentID, std::deque<std::vector
 			if (prevWordToken != -1) sqlite3_bind_int(HMMtokenPaths_stmt, 6, prevWordToken);
 			else sqlite3_bind_null(HMMtokenPaths_stmt, 6);
 			sqlite3_step(HMMtokenPaths_stmt);
-
+			//int sentenceID = (int)sqlite3_last_insert_rowid(db);
+			//wpd.AddCounts(currWordToken,nextWordToken,StyleID,sentenceID);
 			//sqlite3_clear_bindings(stmt);
 			sqlite3_reset(HMMtokenPaths_stmt);
 
@@ -782,4 +806,5 @@ void DocumentDatabase::CreateDatabase(bool confirmation)
 	documentList.clear();
 	StyleList.clear();
 	TotalSentenceList.clear();
+	wpd.clearAll();
 }

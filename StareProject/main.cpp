@@ -16,6 +16,17 @@ int main(int argc, char *argv[])
 	
 
 	CMDparser cmd;
+	
+	
+	MetaData md;
+	md.DocumentText = "../Documents/AMidsummerNightsDream.txt";
+	md.Author = "Shakespere";
+	md.Title = "A Midnight Summer Dream" ;
+	md.PublishDate = "1605" ;
+	cmd.hmm.learnFromFile(md);
+
+	cmd.hmm.dataBase.initTables();
+	
 	serverv2 PHPconnect;
 	PHPconnect.initEngine(&cmd);
 	PHPconnect.startServer();

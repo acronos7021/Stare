@@ -28,7 +28,8 @@ int HMMengine::learnFromFile(MetaData metaData)
 {
 	// Tokenize the document we want to learn
 	std::deque<std::vector<int>> documentTokens = tokenizer.tokenizeFile(metaData.DocumentText);
-
+	//int testint = documentTokens.size();
+	//std::cout << metaData.DocumentText;
 	// insert it into the database;
 	int documentID = dataBase.insertDocument( metaData.Author, metaData.Title, metaData.PublishDate);
 	dataBase.insertDocumentText(documentID, documentTokens);
@@ -56,8 +57,11 @@ void HMMengine::compareWithFile(HMMengine &hmm, MetaData metaData)
 }
 //HMMengine &hmm, 
 
+
 void HMMengine::compareThreadEngine(HMMengine &hmm,EngineStatus* engineStatus, std::string &text)
 {
+}
+/*
 
 	std::deque<std::vector<int>> documentTokens = hmm.tokenizer.tokenizeDoc(text);
 
@@ -139,7 +143,7 @@ void HMMengine::compareThreadEngine(HMMengine &hmm,EngineStatus* engineStatus, s
 
 	}
 }
-
+*/
 
 
 //void HMMengine::compare(MetaData metaData)

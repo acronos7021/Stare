@@ -11,7 +11,108 @@ PHPsocket::~PHPsocket()
 {
 }
 
+/*
+std::string PHPsocket::sanitize(std::string &in_str)
+{
+    std::stringstream out_str;
+    for (std::string::size_type i = 0; i < in_str.length(); ++i)
+    {
+	switch (in_str[i]) {
+	case '"':
+	out_str << "\\\"";
+	break;
+	case '/':
+	out_str <<  "\\/";
+	break;
+	case '\b':
+	out_str <<  "\\b";
+	break;
+	case '\f':
+	out_str <<  "\\f";
+	break;
+	case '\n':
+	out_str <<  "\\n";
+	break;
+	case '\r':
+	out_str << "\\r";
+	break;
+	case '\t':
+	out_str <<  "\\t";
+	break;
+	case '\\':
+	out_str <<  "\\\\";
+	break;
+	default:
+	out_str << in_str[i];
+	break;
+	}
+    }
+    return out_str.str();
+}
 
+enum State {ESCAPED,UNESCAPED};
+
+std::string PHPsocket::desanitize(std::string &in_str)
+{
+    State s = UNESCAPED;
+    std::string out_str;
+    out_str.reserve(in_str.length());
+    for (std::string::size_type i = 0; i < in_str.length(); ++i)
+    {
+	switch(s)
+	{
+	    case ESCAPED:
+	    {
+		switch(in_str[i])
+		{
+		    case '"':
+		    out_str += '\"';
+		    break;
+		    case '/':
+		    out_str += '/';
+		    break;
+		    case 'b':
+		    out_str += '\b';
+		    break;
+		    case 'f':
+		    out_str += '\f';
+		    break;
+		    case 'n':
+		    out_str += '\n';
+		    break;
+		    case 'r':
+		    out_str += '\r';
+		    break;
+		    case 't':
+		    out_str += '\t';
+		    break;
+		    case '\\':
+		    out_str += '\\';
+		    break;
+		    default:
+		    out_str += in_str[i];
+		    break;
+		}
+		s = UNESCAPED;
+		break;
+	    }
+	    case UNESCAPED:
+	    {
+		switch(in_str[i])
+		{
+		    case '\\':
+		    s = ESCAPED;
+		    break;
+		    default:
+		    out_str += in_str[i];
+		    break;
+		}
+	    }
+	}
+    }
+    return out_str;
+}
+*/
 
 std::string PHPsocket::jsonDecoder(std::string json)
 {
