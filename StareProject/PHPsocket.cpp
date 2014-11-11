@@ -2,8 +2,9 @@
 #include "PHPsocket.h"
 #include "serverv2.h"
 
-PHPsocket::PHPsocket()
+PHPsocket::PHPsocket(CMDparser* cmd)
 {
+  this->cmd = cmd;	
 }
 
 PHPsocket::~PHPsocket()
@@ -12,11 +13,11 @@ PHPsocket::~PHPsocket()
 
 
 
-string PHPsocket::jsonDecoder(string json)
+std::string PHPsocket::jsonDecoder(std::string json)
 {
 	Json::Value jsonObject=parseJSON(json);
-	string command = jsonObject["command"].asString();
-	string output;
+	std::string command = jsonObject["command"].asString();
+	std::string output;
 
 	if (command.compare("compare")==0){
 		output = doCompare(jsonObject);
@@ -26,29 +27,29 @@ string PHPsocket::jsonDecoder(string json)
 	    output = getStyles();
 	}
 	else if (command.compare("checkCompare") == 0){
-		string ID = jsonObject["clientID"].asString();
+		std::string ID = jsonObject["clientID"].asString();
 		int sessionID;
 		istringstream(ID) >> sessionID;
 		output = doCompare(jsonObject);
 	}
 	
 	else if (command.compare("create")==0) {
-		output = doCreate();
+		output = doCreate(jsonObject);
 	}
 	return output;
 }
 
-String PHPsocket::doCreate(Json::Value json) {
+std::string PHPsocket::doCreate(Json::Value json) {
 	
-	CreateResult result = cmd->compare(json["clientID"], json["style"], json["numberOfSentences"]);
+	CreateResult result = cmd->create(json["clientID"].asInt(), json["style"].asString(), json["numberOfSentences"].asInt());
 	std::string text = result.newDocument;
 	
 	
-   return "";	
+   return text;	
 }
-String PHPsocket::getStyles() {
+std::string PHPsocket::getStyles() {
     
-	vector<string> styles = cmd->getStyles();
+	vector<std::string> styles = cmd->getStyles();
 	
 	Json::Value outer;
 	Json::Value inner;
@@ -62,9 +63,9 @@ String PHPsocket::getStyles() {
 	return outer.toStyledString();
 }
 
-string PHPsocket::doCompare(Json::Value json)
+std::string PHPsocket::doCompare(Json::Value json)
 {
-	string ID = json["clientID"].asString();
+	std::string ID = json["clientID"].asString();
 	int sessionID;
 	istringstream(ID) >> sessionID;
 	CompareResult result = cmd->compare(sessionID, json["documentText"].asString());
@@ -116,7 +117,7 @@ Json::Value PHPsocket::formCheckCompareReturn(int status)
 	return compare;
 }
 
-Json::Value PHPsocket::parseJSON(string json)
+Json::Value PHPsocket::parseJSON(std::string json)
 {
 	Json::Value root;
 	Json::Reader reader;
@@ -127,10 +128,11 @@ Json::Value PHPsocket::parseJSON(string json)
 	{
 		// Report failures and their locations 
 		// in the document.
-		cout << "Failed to parse JSON" << endl
+		std::cout << "Failed to parse JSON" << std::endl
 			<< reader.getFormattedErrorMessages()
 			<< endl;
-		return NULL;
+		Json::Value jvnull;
+		return jvnull;
 	}
 	return root;
 }

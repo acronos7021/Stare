@@ -14,17 +14,16 @@ class PHPsocket
 {
 public:
 	
-	PHPsocket(CMDparser* cmd) {
-		this->cmd = cmd;
-	}
-	
+	PHPsocket(CMDparser* cmd); 
 	~PHPsocket();
  	
-	Json::Value parseJSON(string json);
-	string doCompare(Json::Value json);
+	Json::Value parseJSON(std::string json);
+	std::string doCompare(Json::Value json);
 	Json::Value formCheckCompareReturn(int status);
-	string doCheckCompare(Json::Value json);
-	void jsonDecoder(string json);
+	std::string doCheckCompare(Json::Value json);
+	std::string jsonDecoder(std::string json);
+	std::string getStyles();
+	std::string doCreate(Json::Value json);
 	
 private:
 	CMDparser* cmd;

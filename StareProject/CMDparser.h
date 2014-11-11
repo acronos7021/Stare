@@ -43,7 +43,7 @@ public:
 
 
 	void learn(string author, string title, string date, string text);
-	CompareResult compare(int clientID, string &text);
+	CompareResult compare(int clientID, string text);
 	CreateResult create(int clientID, string author, int numOfSentences);
 
 	int checkCompareStatus(int clientID);  // done is 100

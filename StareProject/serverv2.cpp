@@ -48,14 +48,16 @@ void serverv2::recvData(int client_socket) {
 		if (recvDataSize >= 0) buffer[recvDataSize] = '\0';
 		std::string recvDataString = buffer;
 ///     Get data from the algorithm/database in here. the two lines below are for testing purpose.
-		PHPsocket php = PHPsocket(cmd);
-		std::string result = php.jsonDecoder(recvDataString);
-		
+		PHPsocket php2(cmd);//cmd);
+		std::cout << recvDataString << std::endl; 
+		std::string result = php2.jsonDecoder(recvDataString);
+		std::cout << result << std::endl;
 		//std::cout << recvDataString << std::endl;
 		//std::string dataToSend = "Hello client, I have received your data ";
 		dataInChars = result.c_str();
 		int dataSendSize = result.length();
 		int sent_ok = send(client_socket, dataInChars, dataSendSize, NULL);
+		
 	}
 
 void serverv2::listening(){

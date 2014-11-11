@@ -47,7 +47,7 @@ function sendCompare(clientID, text) {
 	
     //do something to send it off here
     sendMessage(compare);
-    window.location.href = 'output.html';
+    //window.location.href = 'output.html';
 }
 
 function checkCompare(id){
@@ -80,7 +80,7 @@ function callback(response){
         window.location.href = 'output.html'; 
     }
     else if(json.command=="checkCompare"){
-        if(json.hasOwnProperty("documentText")){
+        if(json.hasOwnProperty("ranking")){
             compareDecode(JSON.stringify(json));
             return;
         }

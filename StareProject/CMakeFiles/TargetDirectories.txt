@@ -1,0 +1,1 @@
+/home/aiproject/Stare/StareProject/build/CMakeFiles/stare.dir

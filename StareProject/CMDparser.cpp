@@ -278,45 +278,45 @@ bool CMDparser::isAlphaNumeric(char c)
 //	return"This is sentence 1.  This is sentence 2. This is sentence 3.  This is sentence 4.";
 //} 
 
-//CompareResult CMDparser::compare(int clientID, string text)
-//{
-//	//HMMengine hmm;
-//	//hmm.compare(MetaData("", "", "", text));
-//	vector<SentenceRanking> test;
-//
-//	SentenceBlob sbSource;
-//	sbSource.NextNextSentenceStr = "Sentence 9";
-//	sbSource.NextSentenceStr = "Sentence 8";
-//	sbSource.SentenceStr = "Sentence 7";
-//	sbSource.PrevSentenceStr = "Sentence 6";
-//	sbSource.PrevPrevSentenceStr = "Sentence 5";
-//	sbSource.SentenceID = 7;
-//
-//	SentenceBlob sbFound;
-//	sbFound.NextNextSentenceStr = "Sentence 9";
-//	sbFound.NextSentenceStr = "Sentence 8";
-//	sbFound.SentenceStr = "Sentence 7";
-//	sbFound.PrevSentenceStr = "Sentence 6";
-//	sbFound.PrevPrevSentenceStr = "Sentence 5";
-//	sbFound.SentenceID = 7;
-//
-//	test.push_back(SentenceRanking("Dickens", "A tale of two cities", sbSource, sbFound, .57));
-//	test.push_back(SentenceRanking("Mark Twain", "Huckleberry Finn", sbSource, sbFound, .57));
-//
-//	StyleCertaintyItem style1;
-//	style1.certainty = .73;
-//	style1.StyleID = 2;
-//	style1.StyleName = "Mark Twain";
-//
-//	vector<StyleCertaintyItem> ci;
-//	ci.push_back(style1);
-//
-//	CompareResult cr;
-//	cr.documentCertainties = ci;
-//	cr.sentenceRankings = test;
-//
-//	return cr;
-//}
+CompareResult CMDparser::compare(int clientID, string text)
+{
+	//HMMengine hmm;
+	//hmm.compare(MetaData("", "", "", text));
+	vector<SentenceRanking> test;
+
+	SentenceBlob sbSource;
+	sbSource.NextNextSentenceStr = "Sentence 9";
+	sbSource.NextSentenceStr = "Sentence 8";
+	sbSource.SentenceStr = "Sentence 7";
+	sbSource.PrevSentenceStr = "Sentence 6";
+	sbSource.PrevPrevSentenceStr = "Sentence 5";
+	sbSource.SentenceID = 7;
+
+	SentenceBlob sbFound;
+	sbFound.NextNextSentenceStr = "Sentence 9";
+	sbFound.NextSentenceStr = "Sentence 8";
+	sbFound.SentenceStr = "Sentence 7";
+	sbFound.PrevSentenceStr = "Sentence 6";
+	sbFound.PrevPrevSentenceStr = "Sentence 5";
+	sbFound.SentenceID = 7;
+
+	test.push_back(SentenceRanking("Dickens", "A tale of two cities", sbSource, sbFound, .57));
+	test.push_back(SentenceRanking("Mark Twain", "Huckleberry Finn", sbSource, sbFound, .57));
+
+	StyleCertaintyItem style1;
+	style1.certainty = .73;
+	style1.StyleID = 2;
+	style1.StyleName = "Mark Twain";
+
+	vector<StyleCertaintyItem> ci;
+	ci.push_back(style1);
+
+	CompareResult cr;
+	cr.documentCertainties = ci;
+	cr.sentenceRankings = test;
+        cr.percentComplete = 100;
+	return cr;
+}
 
 //string CMDparser::create(int clientID, string author, int numOfSentences)
 //{
@@ -405,7 +405,8 @@ void CMDparser::learn(string author, string title, string date, string text)
 	hmm.learn(MetaData(author, title, date, text));
 }
 
-CompareResult CMDparser::compare(int clientID, string &text)
+/*
+CompareResult CMDparser::compare(int clientID, string text)
 {
 		//HMMengine hmm;
 		//hmm.compare(MetaData("", "", "", text));
@@ -474,6 +475,7 @@ CompareResult CMDparser::compare(int clientID, string &text)
 	//return hmm.compare()
 
 }
+*/
 
 CreateResult CMDparser::create(int clientID, string author, int numOfSentences)
 {
