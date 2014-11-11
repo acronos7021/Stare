@@ -1,7 +1,6 @@
 #include <thread>
 #include "PHPsocket.h"
-
-
+#include "serverv2.h"
 
 PHPsocket::PHPsocket()
 {
@@ -11,7 +10,9 @@ PHPsocket::~PHPsocket()
 {
 }
 
-void PHPsocket::jsonDecoder(string json)
+
+
+string PHPsocket::jsonDecoder(string json)
 {
 	Json::Value jsonObject=parseJSON(json);
 	string command = jsonObject["command"].asString();
@@ -20,18 +21,45 @@ void PHPsocket::jsonDecoder(string json)
 	if (command.compare("compare")==0){
 		output = doCompare(jsonObject);
 	}
+	
+	else if (command.compare("getStyles") == 0) {
+	    output = getStyles();
+	}
 	else if (command.compare("checkCompare") == 0){
 		string ID = jsonObject["clientID"].asString();
 		int sessionID;
 		istringstream(ID) >> sessionID;
 		output = doCompare(jsonObject);
 	}
+	
+	else if (command.compare("create")==0) {
+		output = doCreate();
+	}
+	return output;
+}
 
+String PHPsocket::doCreate(Json::Value json) {
+	
+	cmd->compare(json["clientID"], json["style"], json["numberOfSentences"]);
+	
+	Json::Value outer;
 
-
-
-	cout << output << endl;
-	//send off the output to the socket here
+   return "";	
+}
+String PHPsocket::getStyles() {
+    
+	vector<string> styles = cmd->getStyles();
+	
+	Json::Value outer;
+	Json::Value inner;
+	
+	for(int i = 0; i < styles.size(); i++) {
+	   inner.append(styles[i]);
+	}
+	outer["command"]="getStyles";
+	outer["styles"] = inner;
+	
+	return outer.toStyledString();
 }
 
 string PHPsocket::doCompare(Json::Value json)

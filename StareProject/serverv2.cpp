@@ -1,4 +1,5 @@
 #include "serverv2.h"
+#include "PHPsocket.h"
 
 void serverv2::initEngine(CMDparser* cmdin)  {
 
@@ -47,10 +48,13 @@ void serverv2::recvData(int client_socket) {
 		if (recvDataSize >= 0) buffer[recvDataSize] = '\0';
 		std::string recvDataString = buffer;
 ///     Get data from the algorithm/database in here. the two lines below are for testing purpose.
-		std::cout << recvDataString << std::endl;
-		std::string dataToSend = "Hello client, I have received your data ";
-		dataInChars = dataToSend.c_str();
-		int dataSendSize = dataToSend.length();
+		PHPsocket php = PHPsocket(cmd);
+		String result = php.jsonDecoder(recvDataString);
+		
+		//std::cout << recvDataString << std::endl;
+		//std::string dataToSend = "Hello client, I have received your data ";
+		dataInChars = result.c_str();
+		int dataSendSize = result.length();
 		int sent_ok = send(client_socket, dataInChars, dataSendSize, NULL);
 	}
 
