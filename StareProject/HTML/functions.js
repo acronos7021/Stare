@@ -1,9 +1,10 @@
 function compareDecode(json) {
     var response = JSON.parse(json);
     
-    //TODO add most of HTML for output page.  removed from template due to progress bar.
-    //TODO replace output HTML with what would be needed for update page instead.
-    
+    var outputHTML = '<html><head><title>STARE</title><link rel="stylesheet" type="text/css" href="style.css" /></head><div id="wrapper"><h1>STARE</h1><p>This is STARE. A plagiarism detector.</p><p>Your document was plagiarized: <b><span id="certainty"></span>%</b></p><div id="plagiarism"><!-- This is where javascript inserts compare --></div></div><script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha256.js"></script><script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script><script src="functions.js"></script></html>';
+    document.open();
+    document.write(outputHTML);
+    document.close();
     //add the overall certainty
     document.getElementById('certainty').innerHTML = response.overallCertainty;
     //Start body of plagarized document
@@ -47,7 +48,7 @@ function sendCompare(clientID, text) {
 	
     //do something to send it off here
     sendMessage(compare);
-    window.location.href = 'output.html';
+    //window.location.href = 'output.html';
 }
 
 function checkCompare(id){
@@ -76,11 +77,14 @@ function sendMessage(string){
 function callback(response){
     var json = JSON.parse(response);
     if(json.command=="compare"){
-        //compareDecode(JSON.stringify(json));
-        window.location.href = 'output.html'; 
+        if(json.hasOwnProperty("ranking")){
+            compareDecode(JSON.stringify(json));
+            return;
+        }
+        //window.location.href = 'output.html'; 
     }
     else if(json.command=="checkCompare"){
-        if(json.hasOwnProperty("documentText")){
+        if(json.hasOwnProperty("ranking")){
             compareDecode(JSON.stringify(json));
             return;
         }
