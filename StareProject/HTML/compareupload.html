@@ -42,8 +42,10 @@
             e.stopPropagation();
             e.preventDefault();
             e.target.className = (e.type == "dragover" ? "hover" : "");
+            saveE=e;
         }
         var saveE;
+        var contents;
         // file selection
         function FileSelectHandler(e) {
 
@@ -56,7 +58,17 @@
             // process last File object
             f = files[files.length-1];
             ParseFile(f);
-            saveE=e;
+            var r = new FileReader();
+            r.onload = function(e) {
+                contents = e.target.result;
+            }
+            r.readAsText(f);
+        }
+        
+        function submitButtonPress(){
+            var id = generateID();
+            document.cookie="id="+id;
+            sendCompare(id, window.contents);
         }
         var userDocTitle;
         function ParseFile(file) {
@@ -72,7 +84,7 @@
                         "</strong> bytes</p>"+
                         "<p><strong>Preview Uploaded Document:</strong></p><pre>" +
                         e.target.result.replace(/</g, "&lt;").replace(/>/g, "&gt;") +
-                        "</pre>"+"<input type='button' value='Submit' id='submitbutton' onclick='readSingleFile(saveE);'>"
+                        "</pre>"+"<input type='button' value='Submit' id='submitbutton' onclick='submitButtonPress();'>"
                     );
                 }
                 reader.readAsText(file);
