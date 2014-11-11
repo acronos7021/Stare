@@ -20,6 +20,19 @@ int main(int argc, char *argv[])
 	PHPconnect.initEngine(&cmd);
 	PHPconnect.startServer();
 	Console c;
+
+	
 	c.MessageLoop(cmd, argc, argv);	
 
 }
+
+
+/*
+ * 	
+	MetaData md;
+	md.DocumentText = "../Documents/AMidsummerNightsDream.txt";
+	md.Author = "Shakespere";
+	md.Title = "A Midnight Summer Dream" ;
+	md.PublishDate = "1605" ;
+	cmd.hmm.compareWithFile(cmd.hmm,md);
+	*/

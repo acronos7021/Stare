@@ -59,7 +59,7 @@ void HMMengine::compareWithFile(HMMengine &hmm, MetaData metaData)
 void HMMengine::compareThreadEngine(HMMengine &hmm,EngineStatus* engineStatus, std::string &text)
 {
 
-	std::deque<std::vector<int>> documentTokens = hmm.tokenizer.tokenizeFile(text);
+	std::deque<std::vector<int>> documentTokens = hmm.tokenizer.tokenizeDoc(text);
 
 	vector<StyleCounts> totalWordCountsPerStyle = hmm.dataBase.getTotalWordCountPerStyle();
 
