@@ -50,8 +50,8 @@ void HMMengine::compareWithFile(MetaData metaData)
 {
 	// This is due to an early misunderstanding between Sam and Brian.  Should be fixed.
 	metaData.DocumentText = tokenizer.readFile(metaData.DocumentText);
+        //std::thread t(hmm.compareThreadEngine, hmm, engineStatus, text);
 }
-
 
 
 void HMMengine::compareThreadEngine(HMMengine &hmm, EngineStatus* engineStatus, std::string &text)

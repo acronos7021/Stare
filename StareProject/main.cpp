@@ -1,5 +1,6 @@
 using namespace std;
 
+#include "serverv2.h"
 //#include <iostream>
 //#include <vector>
 #include "CMDparser.h"
@@ -12,10 +13,13 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
+	
+
 	CMDparser cmd;
+	serverv2 PHPconnect;
+	PHPconnect.initEngine(&cmd);
+	PHPconnect.startServer();
 	Console c;
-	//HeipClass heipClass;
-	//heipClass.heipMethod(cmd)   // on the class side use  helpMethod(CMDparser &cmdParser);
-	c.MessageLoop(cmd, argc, argv);
+	c.MessageLoop(cmd, argc, argv);	
 
 }
