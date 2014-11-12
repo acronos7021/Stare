@@ -221,21 +221,14 @@ Json::Value PHPsocket::formCheckCompareReturn(int status)
 
 Json::Value PHPsocket::parseJSON(std::string json)
 {
+    Json::StyledWriter styledWriter;
 	Json::Value root;
 	Json::Reader reader;
-	bool parsedSuccess = reader.parse(json,
-		root,
-		false);
-	if (!parsedSuccess)
-	{
-		// Report failures and their locations 
-		// in the document.
-		std::cout << "Failed to parse JSON" << std::endl
-			<< reader.getFormattedErrorMessages()
-			<< endl;
-		Json::Value jvnull;
-		return jvnull;
-	}
+    bool parsingSuccessful = reader.parse(json, root);
+    if (parsingSuccessful)
+    {
+        std::cout << styledWriter.write(root) << std::endl;
+    }
 	return root;
 }
 
