@@ -11,8 +11,8 @@ PHPsocket::~PHPsocket()
 {
 }
 
-/*
-std::string PHPsocket::sanitize(std::string &in_str)
+
+std::string PHPsocket::sanitize(std::string in_str)
 {
     std::stringstream out_str;
     for (std::string::size_type i = 0; i < in_str.length(); ++i)
@@ -52,7 +52,7 @@ std::string PHPsocket::sanitize(std::string &in_str)
 
 enum State {ESCAPED,UNESCAPED};
 
-std::string PHPsocket::desanitize(std::string &in_str)
+std::string PHPsocket::desanitize(std::string in_str)
 {
     State s = UNESCAPED;
     std::string out_str;
@@ -112,7 +112,7 @@ std::string PHPsocket::desanitize(std::string &in_str)
     }
     return out_str;
 }
-*/
+
 
 std::string PHPsocket::jsonDecoder(std::string json)
 {
@@ -137,6 +137,7 @@ std::string PHPsocket::jsonDecoder(std::string json)
 	else if (command.compare("create")==0) {
 		output = doCreate(jsonObject);
 	}
+	
 	return output;
 }
 

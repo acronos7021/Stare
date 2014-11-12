@@ -22,8 +22,8 @@ $object->request($data);
 //----------------------------------
 // Being a server. Test data.
 //----------------------------------
-$result = $object->getData();
-echo $result;
+//$result = $object->getData();
+//echo $result;
 //----------------------------------
 //$object->closeSocket();
 
@@ -50,9 +50,8 @@ class phpAndCppTalk
     {
         socket_connect($this->socket, $this->host, $this->port) or die("Could not connect to server\n");
         socket_write($this->socket,$data, strlen($data)) or die("couldn't write");
-        $this->data = socket_read($this->socket, 3000);
-        echo $this->data;
-
+        $cppdata = socket_read($this->socket,8000000) or die("something is wrong");;
+        echo $cppdata;
       //  echo "A connection is found!\n";
     }
 
@@ -76,6 +75,7 @@ class phpAndCppTalk
         echo "a connection is found\r\n";
         $this->data = socket_read($childSocket, 3000);
         socket_close($childSocket);
+        
     }
 
     public function closeSocket() {

@@ -32,8 +32,6 @@ private:
 	sockaddr_in info;
         int descriptor;
 
-	char buffer[3000];
-
 	const char* dataInChars;
 
 	void sendData();

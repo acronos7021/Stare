@@ -24,8 +24,8 @@ public:
 	std::string jsonDecoder(std::string json);
 	std::string getStyles();
 	std::string doCreate(Json::Value json);
-	//std::string sanitize(std::string);
-	//std::string desanitize(std::string);
+	std::string sanitize(std::string);
+	std::string desanitize(std::string);
 	
 private:
 	CMDparser* cmd;
