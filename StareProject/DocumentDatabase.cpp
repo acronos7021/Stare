@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <cstring>
+#include <set>
 
 #include "DocumentDatabase.h"
 #include "WordPairCountDatabase.h"
@@ -53,7 +54,6 @@ void DocumentDatabase::addToStyleList(int StyleID, std::string author)
 	}
 	StyleList[StyleID] = Styles(StyleID, author);
 }
-
 
 void DocumentDatabase::addToDocumentList(int DocumentID, std::string Author, std::string Title, std::string PublishDate, int startSentenceID, int endSentenceID)
 {
@@ -209,6 +209,8 @@ void DocumentDatabase::incrementTokenAndStyleCounts( vector<int> sentence, int S
     //incrementWordStyleCounts(StyleID, sentence.size());
     int currWordToken = -1;
     int nextWordToken = -1;
+
+
     for (unsigned int i = 0; i < sentence.size(); i++)
     {
 	    if (isWordToken(sentence[i]))
@@ -217,6 +219,7 @@ void DocumentDatabase::incrementTokenAndStyleCounts( vector<int> sentence, int S
 		    nextWordToken = sentence[i];
 		    //wpd.AddTokenPairCount(currWordToken, nextWordToken, StyleID);
 		    wpd.AddCounts(currWordToken,nextWordToken,StyleID,sentenceID);
+
 	    }
     }
     if (nextWordToken != -1)
@@ -226,18 +229,9 @@ void DocumentDatabase::incrementTokenAndStyleCounts( vector<int> sentence, int S
 	    nextWordToken = -1;
 	    //wpd.AddTokenPairCount(currWordToken,nextWordToken,StyleID);
 	    wpd.AddCounts(currWordToken,nextWordToken,StyleID,sentenceID);
+
     }
-    std::cout << "Sentence#" << sentenceID << std::endl;
-    for (int i = 0;i<sentence.size();i++)
-    {
-	std::cout << sentence[i] << " ";
-    }
-    std::cout << std::endl;
-    std::cout << "getTotalWordCount() " << wpd.getTotalWordCount()<< std::endl;
-    std::cout << "getWordStyleCount() " << wpd.getWordStyleCount(StyleID)<< std::endl;
-    std::cout << "getTotalWordPairCount() " << wpd.getTotalWordPairCount(currWordToken, nextWordToken) << std::endl;
-    std::cout << "getWordPairStyleCount() " << wpd.getWordPairStyleCount(currWordToken,nextWordToken,StyleID) << std::endl;
-    std::cout << std::endl;
+
 }
 
 
@@ -601,6 +595,8 @@ void DocumentDatabase::insertDocumentText(int DocumentID, std::deque<std::vector
 
 	// add all of the sentences to the TotalSentenceList
 	//int documentIndex = getDocumentListIndex(DocumentID);
+	if ((DocumentID < 0) || DocumentID >= documentList.size())
+	     return;   //  There is an error.  Kill the insert.  ensureDocumentIDexists(DocumentID);
 	if (DocumentID != -1)
 	{
 		documentList[DocumentID].startSentenceID = TotalSentenceList.size();

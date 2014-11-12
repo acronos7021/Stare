@@ -58,11 +58,51 @@ void HMMengine::compareWithFile(HMMengine &hmm, MetaData metaData)
 //HMMengine &hmm, 
 
 
+	// total count of all words in all documments
+	const int getTotalWordCount();
+	// total count of all words for each style.
+	const int getWordStyleCount(int StyleID);
+	// total count of all words of a specific pair
+	const int getTotalWordPairCount(int currWordToken , int nextWordToken);
+	// total count of all words of a specific pair and specific style.
+	const int getWordPairStyleCount(int currWordToken , int nextWordToken,int StyleID);
+
+	const std::set<int> getSentenceList(int currWordToken, int nextWordToken);
+
 void HMMengine::compareThreadEngine(HMMengine &hmm,EngineStatus* engineStatus, std::string &text)
 {
-}
+    std::deque<std::vector<int>> documentTokens = hmm.tokenizer.tokenizeDoc(text);
+    
 /*
+    
+    int stylesCount = 0;
+    for (int st = 0; st < hmm.dataBase.StyleList.size(); ++st)
+	if (hmm.dataBase.StyleList[st] != 0)
+	    stylesCount++;
+    
+    for (int s = 0; s < (int)documentTokens.size(); s++)
+    {
+	    int sentSize = documentTokens[s].size() - 1;
+	    for (int w = 0; w < sentSize; w++)
+	    {
+		int prevWordToken, nextWordToken, currWordToken;
+		if (hmm.dataBase.getPrevAndNext(s, w, prevWordToken, nextWordToken, documentTokens))
+		{
+		    // Should be a valid word token at this time.
+		    currWordToken = documentTokens[s][w];
+		    for (int styleID = 0; 
+		    float probPerStyle = getWordPairStyleCount(currWordToken , nextWordToken, StyleID)/
+		    getTotalWordPairCount(currWordToken, nextWordToken)
 
+	getWordPairStyleCount(int currWordToken , int nextWordToken,int StyleID);
+		    getTotalWordPairCount
+		    *      (getTotalWordCount - getWordStyleCount)/(getTotalWordCount/stylesCount)
+		}
+	    }
+    }*/
+}
+
+/*
 	std::deque<std::vector<int>> documentTokens = hmm.tokenizer.tokenizeDoc(text);
 
 	vector<StyleCounts> totalWordCountsPerStyle = hmm.dataBase.getTotalWordCountPerStyle();

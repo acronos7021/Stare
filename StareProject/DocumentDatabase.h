@@ -80,6 +80,7 @@ public:
 	vector<Documents> documentList;
 	std::vector<Styles> StyleList;
 	void addToDocumentList(int DocumentID, std::string Author, std::string Title, std::string PublishDate, int startSentenceID, int endSentenceID);
+	//void ensureDocumentIDexists(DocumentID);
 
 	void addToStyleList(int StyleID, std::string author); // adds to the local data struct.
 	int insertStyle(sqlite3* db, std::string author); // adds to both the local data struct and sqlite database

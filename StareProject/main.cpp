@@ -11,10 +11,28 @@ using namespace std;
 
 //StyleDatabase& db = StyleDatabase();
 
+
+void BrianMain(CMDparser *cmd)
+{
+	cmd->hmm.dataBase.initTables();  
+  
+	MetaData md;
+	md.DocumentText = "../Documents/AMidsummerNightsDream.txt";
+	md.Author = "Shakespere";
+	md.Title = "A Midnight Summer Dream" ;
+	md.PublishDate = "1605" ;
+	cmd->hmm.learnFromFile(md);
+
+
+}
+
+
 int main(int argc, char *argv[])
 {
 	
 	CMDparser cmd;
+	
+	BrianMain(&cmd);
 	
 	serverv2 PHPconnect;
 	PHPconnect.initEngine(&cmd);
@@ -26,18 +44,6 @@ int main(int argc, char *argv[])
 
 }
 
-
-void BrianMain(CMDparser *cmd)
-{
-  	MetaData md;
-	md.DocumentText = "../Documents/AMidsummerNightsDream.txt";
-	md.Author = "Shakespere";
-	md.Title = "A Midnight Summer Dream" ;
-	md.PublishDate = "1605" ;
-	cmd->hmm.learnFromFile(md);
-
-	cmd->hmm.dataBase.initTables();  
-}
 
 
 /*
