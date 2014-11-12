@@ -14,6 +14,8 @@ using namespace std;
 
 void BrianMain(CMDparser *cmd)
 {
+
+
 	cmd->hmm.dataBase.initTables();  
   
 	MetaData md;
@@ -21,7 +23,7 @@ void BrianMain(CMDparser *cmd)
 	md.Author = "Shakespere";
 	md.Title = "A Midnight Summer Dream" ;
 	md.PublishDate = "1605" ;
-	cmd->hmm.learnFromFile(md);
+	cmd->hmm.compareWithFile(cmd->hmm, md);
 
 
 }

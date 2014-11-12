@@ -126,6 +126,7 @@ string Tokenizer::readFile(string fileName)
 {
 	using std::ifstream;
 	ifstream t(fileName);
+    int myerror = errno;
 	stringstream buffer;
 	string documentText ="";
 	if (!t.is_open())
