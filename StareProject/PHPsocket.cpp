@@ -206,7 +206,7 @@ std::string PHPsocket::doCompare(Json::Value json)
 		rankingObj["certainty"] = result.sentenceRankings[i].certainty;
 		compare["ranking"].append(rankingObj);
 	}
-
+	std::cout<< compare.toStyledString() <<std::endl;
 	return compare.toStyledString();
 }
 

@@ -39,7 +39,7 @@ class phpAndCppTalk
     {
         $this->host = "127.0.0.1";
         $this->port = 3456;
-        $this->socket = socket_create(AF_INET, SOCK_STREAM, 0) or die("Could not create socket\n");
+        $this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP) or die("Could not create socket\n");
     }
 
     public function request($data) {
@@ -50,8 +50,8 @@ class phpAndCppTalk
     {
         socket_connect($this->socket, $this->host, $this->port) or die("Could not connect to server\n");
         socket_write($this->socket,$data, strlen($data)) or die("couldn't write");
-        $cppdata = socket_read($this->socket,8000000) or die("something is wrong");;
-        echo $cppdata;
+        $cppdata = socket_read($this->socket,8000000) or die("something is wrong");
+        echo $cppdata.trim();
       //  echo "A connection is found!\n";
     }
 

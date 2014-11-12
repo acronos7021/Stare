@@ -44,10 +44,16 @@ void serverv2::startServer() {
 void serverv2::recvData(int client_socket) {
            char buffer[8000000];
 	   long buffersize = sizeof(buffer);
-	   int recvDataSize = recv(client_socket, buffer, sizeof(buffer) - 1, NULL);
-		// will implement error checking later. 
-		if (recvDataSize >= 0) buffer[recvDataSize] = '\0';
-		std::string recvDataString = buffer;
+	   long x = buffersize;
+		int bytesRead = 0;
+		int out;
+		    std::cout<< bytesRead <<std::endl;
+		    std::cout<< buffer <<std::endl;
+		    out = read(client_socket, buffer + bytesRead, x - bytesRead);
+		    bytesRead += out;
+		std::cout << out << std::endl;
+		std::cout<< buffer <<std::endl;
+		std::string recvDataString = std::string(buffer);
 ///     Get data from the algorithm/database in here. the two lines below are for testing purpose.
 		PHPsocket php2(cmd);//cmd);
 		std::cout << recvDataString << std::endl; 
