@@ -74,6 +74,7 @@ function sendMessage(string){
 }
 
 function callback(response){
+    response=response.trim();
     var json = JSON.parse(response);
     if(json.command=="compare"){
         if(json.hasOwnProperty("ranking")){
