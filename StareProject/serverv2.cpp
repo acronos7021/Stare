@@ -42,7 +42,8 @@ void serverv2::startServer() {
 //----------------------------------------------------------------------------------------------------
 
 void serverv2::recvData(int client_socket) {
-
+           char buffer[8000000];
+	   long buffersize = sizeof(buffer);
 	   int recvDataSize = recv(client_socket, buffer, sizeof(buffer) - 1, NULL);
 		// will implement error checking later. 
 		if (recvDataSize >= 0) buffer[recvDataSize] = '\0';

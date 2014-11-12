@@ -50,7 +50,7 @@ class phpAndCppTalk
     {
         socket_connect($this->socket, $this->host, $this->port) or die("Could not connect to server\n");
         socket_write($this->socket,$data, strlen($data)) or die("couldn't write");
-        $this->data = socket_read($this->socket, 3000);
+        $this->data = socket_read($this->socket,3000000);
         echo $this->data;
 
       //  echo "A connection is found!\n";
