@@ -74,12 +74,22 @@ void CMDparser::show(vector<string> cmdList)
 {
 	if (cmdList[1]=="Documents")
 	{
-	  vector<MetaData> docs = CMDparser::getDocuments();
+	  vector<MetaData> docs = getDocuments();
 	  for(std::vector<MetaData>::iterator d = docs.begin(); d != docs.end();++d)
 	  {
 	      cout << d->Title << endl;
 	  }
 	}
+    else if (cmdList[1]=="Styles")
+    {
+        std::vector<std::string> styles = getStyles();
+        for(std::vector<std::string>::iterator s = styles.begin(); s != styles.end();++s)
+        {
+            cout << *s << endl;
+        }
+
+    }
+
 	  
 }
 
@@ -262,6 +272,7 @@ bool CMDparser::isAlphaNumeric(char c)
 		((c >= 'A') && (c <= 'Z')) ||
 		((c >= '0') && (c <= '9')))
 		return true;
+
 	else
 		return false;
 }
@@ -496,7 +507,8 @@ vector<MetaData> CMDparser::getDocuments()
 	//test.push_back(md);
 	vector<MetaData> docList;
 	for (unsigned int i = 0; i < hmm.dataBase.documentList.size(); i++)
-		docList.push_back(MetaData(hmm.dataBase.documentList[i].Author, hmm.dataBase.documentList[i].Title, hmm.dataBase.documentList[i].PublishDate, ""));
+        if (hmm.dataBase.documentList[i].Author != "")
+		    docList.push_back(MetaData(hmm.dataBase.documentList[i].Author, hmm.dataBase.documentList[i].Title, hmm.dataBase.documentList[i].PublishDate, ""));
 	return docList;
 
 }
@@ -509,8 +521,10 @@ std::vector<std::string> CMDparser::getStyles()
 	//test.push_back(md);
 	//test.push_back(md);
 	std::vector<std::string> styles;
-	for (unsigned int i = 0; i < hmm.dataBase.StyleList.size(); i++)
-		styles.push_back(hmm.dataBase.StyleList[i].Author);
+	for (unsigned int i = 0; i < hmm.dataBase.StyleList.size(); i++) {
+        if (hmm.dataBase.StyleList[i].Author != "")
+            styles.push_back(hmm.dataBase.StyleList[i].Author);
+    }
 	return styles;
 }
 

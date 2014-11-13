@@ -62,25 +62,23 @@ struct StyleCalculator
     int StyleID;
     double sentProbability;
     double docProbability;
-    int docProbCount;
-    int sentProbCount;
+
 
     StyleCalculator(int id,double sentProb, double docProb)
     {
         StyleID = id;
         sentProbability = sentProb;
         docProbability = docProb;
-        docProbCount = 0;
-        sentProbCount = 0;
     }
 
-    void addToAverage(double NormProb)
+    void addToAverage(double NormProb,int sentProbCount, int docProbCount)
     {
-        ++sentProbCount;
-        ++docProbCount;
+        std::cout << "SentProbcount:" << sentProbCount << "    DocProbCount:" << docProbCount << std::endl;
         sentProbability = sentProbability * ((sentProbCount - 1) / sentProbCount) + NormProb / sentProbCount;
         docProbability = docProbability * ((docProbCount - 1) / docProbCount) + NormProb / docProbCount;
     }
+
+
 };
 
 
@@ -98,12 +96,13 @@ void HMMengine::compareThreadEngine(HMMengine &hmm,EngineStatus* engineStatus, s
             styleCalcs.insert(std::pair<int,StyleCalculator>(st, StyleCalculator(st,(double)0,(double) 0)));
         }
     if (stylesCount<1) return;
-    //int docProbCount = 0;
-    //int sentProbCount = 0;
+    int docProbCount = 0;
+    int sentProbCount = 0;
     //double SentenceProb, DocProb=0;
 
     for (size_t s = 0; s < documentTokens.size(); s++) {
         size_t sentSize = documentTokens[s].size() - 1;
+        sentProbCount=0;
         for (size_t w = 0; w < sentSize; w++) {
             int prevWordToken, nextWordToken, currWordToken;
             if (hmm.dataBase.getPrevAndNext(s, w, prevWordToken, nextWordToken, documentTokens)) {
@@ -114,13 +113,15 @@ void HMMengine::compareThreadEngine(HMMengine &hmm,EngineStatus* engineStatus, s
                     std::cout << "How deep does the rabit hole go? " << std::endl;
                     int totalwpc = hmm.dataBase.wpd.getTotalWordPairCount(currWordToken, nextWordToken);
                     if (totalwpc > 0) {
+                        docProbCount++;
+                        sentProbCount++;
                         int wordpairstylecount = hmm.dataBase.wpd.getWordPairStyleCount(currWordToken, nextWordToken, it->second.StyleID);
                         std::cout << "wordpairstylecount:" << wordpairstylecount << "    totalwpc:" << totalwpc << std::endl;
                         double WPprob = (double)wordpairstylecount / totalwpc;
                         double NormProb = WPprob *
                                 (hmm.dataBase.wpd.getTotalWordCount() - hmm.dataBase.wpd.getWordStyleCount(it->second.StyleID)) /
                                 ((double)hmm.dataBase.wpd.getTotalWordCount() / stylesCount);
-                        it->second.addToAverage(NormProb);
+                        it->second.addToAverage(NormProb, sentProbCount,docProbCount);
                         std::cout << "    WPprob:" << WPprob << "    NormProb:" << NormProb << std::endl;
                         std::cout << "    style:" << it->second.StyleID
                                 << "      sentProb:" << it->second.sentProbability << "   DocProb:" << it->second.docProbability << std::endl;

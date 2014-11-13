@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
 	
 	CMDparser cmd;
 	
-	BrianMain(&cmd);
+	//BrianMain(&cmd);
 	
 	serverv2 PHPconnect;
 	PHPconnect.initEngine(&cmd);
