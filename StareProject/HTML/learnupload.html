@@ -73,13 +73,13 @@
 				<label for="publishYear">Publish Year</label>
 				<input type="number" onkeypress="return /\d/.test(String.fromCharCode(((event||window.event).which||(event||window.event).which)));" class="form-control" id="publishYear" placeholder="Numbers Only, Example: '1988'">
 			</div>
-			<button type="button" class="btn btn-default" onclick='learn();'>Submit</button>
 		</form>
         <div id="uploadbox">
             <form id="uploadform">
                 <label for="fileselect">Drag or Choose a File Here:</label>
                 <input type="file" id="fileselect"><br /><br />
 				<div id="messages"></div>
+				<button type="button" class="btn btn-default" onclick='learn();'>Submit</button>
 			</form>
 		</div>
      </div>
@@ -99,7 +99,7 @@
     <script>
          // call initialization file
         if (window.File && window.FileList && window.FileReader) {
-            InitUpload();
+            InitLearn();
             var saveE;
             var contents;
             var userDocTitle;
