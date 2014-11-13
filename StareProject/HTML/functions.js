@@ -1,10 +1,9 @@
 function compareDecode(json) {
     var response = JSON.parse(json);
     
-    var outputHTML = '<html><head><title>STARE</title><link rel="stylesheet" type="text/css" href="style.css" /></head><div id="wrapper"><h1>STARE</h1><p>This is STARE. A plagiarism detector.</p><p>Your document was plagiarized: <b><span id="certainty"></span>%</b></p><div id="plagiarism"><!-- This is where javascript inserts compare --></div></div><script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha256.js"></script><script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script><script src="functions.js"></script></html>';
-    document.open();
-    document.write(outputHTML);
-    document.close();
+    var outputHTML = '<p>Your document was plagiarized: <b><span id="certainty"></span>%</b></p><div id="plagiarism"><!-- This is where javascript inserts compare --></div>';
+    document.getElementById('wrapper').innerHTML = outputHTML;
+    
     //add the overall certainty
     document.getElementById('certainty').innerHTML = response.overallCertainty;
     //Start body of plagarized document
@@ -237,7 +236,3 @@ function ParseFile(file) {
         reader.readAsText(file);
     }
 }   
-
-
-
-
