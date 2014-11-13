@@ -247,7 +247,9 @@ function createSubmitButtonPress(){
 }
 
 function fillCreate(json){
-	var outputHTML = '<p class="lead">'+ json.document +'</p>';
+	var select = document.getElementById("styleSelect");
+    var selectedText = select.options[select.selectedIndex].text;
+	var outputHTML = '<h2>Style of '+ selectedText +'</h2><p class="lead" style="width:50%; margin: 0 auto;">'+ json.document +'</p>';
     document.getElementById('wrapper').innerHTML = outputHTML;
 }
 
