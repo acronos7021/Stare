@@ -22,15 +22,15 @@ function compareDecode(json) {
 	        response.ranking[i].origSnip[0] +
 	        '  <div id="popup" style="background-color: yellow;">' +
 	        response.ranking[i].origSnip[1] +
-	        '<span>This section was plagiarized: <b>' + response.ranking[
-	            i].certainty + '%</b></span></div>  ' + response.ranking[
+	        '<span>This section was plagiarized: <br><b>' + Math.round(response.ranking[
+	            i].certainty*100) + '%</b></span></div>  ' + response.ranking[
 	            i].origSnip[2] + '</div></div>';
 	    inside += '<div id="right-column"><div id=doc-box>' +
 	        response.ranking[i].dataBaseSnip[0] +
 	        '  <div id="popup" style="background-color: yellow;">' +
 	        response.ranking[i].dataBaseSnip[1] +
-	        '<span>This section was plagiarized: <b>' + response.ranking[
-	            i].certainty + '%</b></span></div>  ' + response.ranking[
+	        '<span>This section was plagiarized: <br><b>' + Math.round(response.ranking[
+	            i].certainty*100) + '%</b></span></div>  ' + response.ranking[
 	            i].dataBaseSnip[2] + '</div></div></div>';
 	    plagiarism.innerHTML = inside;
 	    document.getElementById('plagiarism').appendChild(plagiarism);
@@ -212,7 +212,7 @@ function FileSelectHandler(e) {
     r.readAsText(f);
 }
 
-function submitButtonPress(){
+function compareSubmitButtonPress(){
     var id = generateID();
     document.cookie="id="+id;
     sendCompare(id, window.contents);
@@ -226,11 +226,11 @@ function ParseFile(file) {
             Output(
                 "<p>Document information: <strong>" + file.name +
                 "</strong> type: <strong>" + file.type +
-                "</strong> size: <strong>" + file.size +
-                "</strong> bytes</p>"+
+                "</strong> size: <strong>" + Math.round(file.size/1024) +
+                "</strong> Kilobytes</p>"+
                 "<p><strong>Preview Uploaded Document:</strong></p><pre>" +
                 e.target.result.replace(/</g, "&lt;").replace(/>/g, "&gt;") +
-                "</pre>"+"<input type='button' value='Submit' id='submitbutton' onclick='submitButtonPress();'>"
+                "</pre>"+"<button type='button' class='btn btn-default' id='submitbutton' onclick='compareSubmitButtonPress();'>Submit</button>"
             );
         }
         reader.readAsText(file);
