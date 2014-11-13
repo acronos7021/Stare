@@ -94,6 +94,9 @@ function callback(response){
     else if(json.command=="getStyles"){
 		fillStyles(json);
     }
+    else if(json.command=="create"){
+		fillCreate(json);
+    }
     
 }
 
@@ -124,17 +127,6 @@ function sendLearn(text, author, title, publishDate) {
     alert(sendMessage(learn));
 }
 
-function sendCreate(id, styleID, numOfSent) {
-	var create = {
-		"clientID": id,
-		"command": "create",
-		"styleID": styleID,
-		"numberOfSentences": numOfSent
-	}
-	
-    //do something to send it off here
-    alert(sendMessage(create));
-}
 
 function generateID(){
 	var d = new Date();
@@ -232,6 +224,7 @@ function fillStyles(json){
 	
 }
 
+//TODO no comma after getStyles"
 function getStyles(){
 	var styles = {
 		"command": "getStyles",
@@ -242,7 +235,20 @@ function getStyles(){
 function createSubmitButtonPress(){
     var id = generateID();
     document.cookie="id="+id;
-    sendCompare(id, window.contents);
+    var select = document.getElementById("styleSelect");
+    var selectedText = select.options[select.selectedIndex].text;
+	var create = {
+		"command": "create",
+		"clientID": id,
+		"style": selectedText,
+		"numberOfSentences": document.getElementById('numOfSentences').value
+	}
+	sendMessage(create);
+}
+
+function fillCreate(json){
+	var outputHTML = '<p class="lead">'+ json.document +'</p>';
+    document.getElementById('wrapper').innerHTML = outputHTML;
 }
 
 function ParseFile(file) {

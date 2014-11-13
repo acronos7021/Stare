@@ -143,7 +143,14 @@ std::string PHPsocket::jsonDecoder(std::string json)
 
 std::string PHPsocket::doCreate(Json::Value json) {
     Json::Value output;
-	CreateResult result = cmd->create(json["clientID"].asInt(), json["style"].asString(), json["numberOfSentences"].asInt());
+    std::string ID = json["clientID"].asString();
+    int sessionID;
+    istringstream(ID) >> sessionID;
+
+    std::string numSentStr = json["numberOfSentences"].asString();
+    int numSentences;
+    istringstream(numSentStr) >> numSentences;
+	CreateResult result = cmd->create(sessionID, json["style"].asString(), numSentences);
     output["command"] = "create";
 	output["document"] = result.newDocument;
    return output.toStyledString();

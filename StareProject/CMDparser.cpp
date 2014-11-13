@@ -301,7 +301,14 @@ CompareResult CMDparser::compare(int clientID, string text)
 	sbFound.SentenceID = 7;
 
 	test.push_back(SentenceRanking("Dickens", "A tale of two cities", sbSource, sbFound, .57));
-	test.push_back(SentenceRanking("Mark Twain", "Huckleberry Finn", sbSource, sbFound, .57));
+	test.push_back(SentenceRanking("Mark Twain", "Huckleberry Finn", sbSource, sbFound, .23));
+    test.push_back(SentenceRanking("Mark Twain", "Huckleberry Finn", sbSource, sbFound, .78));
+    test.push_back(SentenceRanking("Mark Twain", "Huckleberry Finn", sbSource, sbFound, .23));
+    test.push_back(SentenceRanking("Mark Twain", "Huckleberry Finn", sbSource, sbFound, .41));
+    test.push_back(SentenceRanking("Mark Twain", "Huckleberry Finn", sbSource, sbFound, .54));
+    test.push_back(SentenceRanking("Mark Twain", "Huckleberry Finn", sbSource, sbFound, .23));
+    test.push_back(SentenceRanking("Mark Twain", "Huckleberry Finn", sbSource, sbFound, .45));
+    test.push_back(SentenceRanking("Mark Twain", "Huckleberry Finn", sbSource, sbFound, .13));
 
 	StyleCertaintyItem style1;
 	style1.certainty = .73;
@@ -481,7 +488,7 @@ CreateResult CMDparser::create(int clientID, string author, int numOfSentences)
 {
     CreateResult cr;
     cr.percentComplete = 0;
-    cr.newDocument = "Now is the time for all good men to come to the aid of their country.";
+    cr.newDocument = "Now is the time for all good men to come to the aid of their country. Now is the time for all good men to come to the aid of their country. Now is the time for all good men to come to the aid of their country. Now is the time for all good men to come to the aid of their country. Now is the time for all good men to come to the aid of their country. Now is the time for all good men to come to the aid of their country. Now is the time for all good men to come to the aid of their country. Now is the time for all good men to come to the aid of their country. Now is the time for all good men to come to the aid of their country. Now is the time for all good men to come to the aid of their country. Now is the time for all good men to come to the aid of their country. Now is the time for all good men to come to the aid of their country. Now is the time for all good men to come to the aid of their country. Now is the time for all good men to come to the aid of their country. Now is the time for all good men to come to the aid of their country. Now is the time for all good men to come to the aid of their country. Now is the time for all good men to come to the aid of their country. Now is the time for all good men to come to the aid of their country. Now is the time for all good men to come to the aid of their country. Now is the time for all good men to come to the aid of their country. Now is the time for all good men to come to the aid of their country. ";
 	return cr;
 }
 
