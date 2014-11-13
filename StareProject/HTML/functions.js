@@ -91,6 +91,10 @@ function callback(response){
         setTimeout(check, 1000);  //wait a second before trying again
         checkCompare(getCookie("id"));
     }
+    else if(json.command=="getStyles"){
+		fillStyles(json);
+    }
+    
 }
 
 function getCookie(cname) {
@@ -217,6 +221,30 @@ function compareSubmitButtonPress(){
     document.cookie="id="+id;
     sendCompare(id, window.contents);
 }
+
+function fillStyles(json){
+	var select = document.getElementById("styleSelect");
+	for (i=0; i < json.styles.length; ++i){
+		var option = document.createElement('option');
+		option.text = json.styles[i];
+		select.add(option, 0);
+	}
+	
+}
+
+function getStyles(){
+	var styles = {
+		"command": "getStyles",
+	}
+	sendMessage(styles);
+}
+
+function createSubmitButtonPress(){
+    var id = generateID();
+    document.cookie="id="+id;
+    sendCompare(id, window.contents);
+}
+
 function ParseFile(file) {
     window.userDocTitle=file.name;
     	// display text
