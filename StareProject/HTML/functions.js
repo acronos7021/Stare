@@ -97,6 +97,9 @@ function callback(response){
     else if(json.command=="create"){
 		fillCreate(json);
     }
+    else if(json.command=="learn"){
+		getBackLearn(json);
+    }
     
 }
 
@@ -112,21 +115,6 @@ function getCookie(cname) {
     }
     return "";
 }
-
-
-function sendLearn(text, author, title, publishDate) {
-	var learn = {
-		"command": "learn",
-		"documentText": text,
-		"author": author,
-		"title": title,
-		"publishDate": publishDate
-	}
-	
-    //do something to send it off here
-    alert(sendMessage(learn));
-}
-
 
 function generateID(){
 	var d = new Date();
@@ -249,8 +237,35 @@ function createSubmitButtonPress(){
 function fillCreate(json){
 	var select = document.getElementById("styleSelect");
     var selectedText = select.options[select.selectedIndex].text;
-	var outputHTML = '<h2>Style of '+ selectedText +'</h2><p class="lead" style="width:50%; margin: 0 auto;">'+ json.document +'</p>';
+	var outputHTML = '<h2>Style of '+ selectedText +'</h2><p class="lead" style="width:60%; margin: 0 auto;">'+ json.document +'</p>';
     document.getElementById('wrapper').innerHTML = outputHTML;
+}
+
+
+function getBackLearn(json){
+	if (json.result== "Success"){
+		toastr.options = {
+		  "positionClass": "toast-top-center"
+		}
+        toastr.success(document.getElementById('title').value+' uploaded successfully!', 'STARE Says');
+	}
+	
+}
+
+function learn(){
+	sendLearn(window.contents, document.getElementById('author').value, document.getElementById('title').value, document.getElementById('publishYear').value);
+}
+
+function sendLearn(text, author, title, publishDate) {
+	var learn = {
+		"command": "learn",
+		"documentText": text,
+		"author": author,
+		"title": title,
+		"publishDate": publishDate
+	}
+	
+    sendMessage(learn)
 }
 
 function ParseFile(file) {

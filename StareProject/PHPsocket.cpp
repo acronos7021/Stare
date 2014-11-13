@@ -133,12 +133,22 @@ std::string PHPsocket::jsonDecoder(std::string json)
 		istringstream(ID) >> sessionID;
 		output = doCompare(jsonObject);
 	}
-	
 	else if (command.compare("create")==0) {
 		output = doCreate(jsonObject);
 	}
+    else if (command.compare("learn")==0) {
+        output = doLearn(jsonObject);
+    }
 	
 	return output;
+}
+
+std::string PHPsocket::doLearn(Json::Value json) {
+    Json::Value output;
+    cmd->learn(json["author"].asString(), json["title"].asString(), json["publishDate"].asString(), json["documentText"].asString());
+    output["command"] = "learn";
+    output["result"] = "Success";
+    return output.toStyledString();
 }
 
 std::string PHPsocket::doCreate(Json::Value json) {
