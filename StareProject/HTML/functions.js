@@ -169,5 +169,75 @@ function readSingleFile(evt) {
 }
 
 
+//
+// initialize
+function InitUpload() {
+
+    var fileselect = $id("fileselect"),
+        uploadbox = $id("uploadbox"),
+        submitbutton = $id("submitbutton");
+
+    // file select
+    fileselect.addEventListener("change", FileSelectHandler, false);
+
+    // file drop
+    uploadbox.addEventListener("dragover", FileDragHover, false);
+    uploadbox.addEventListener("dragleave", FileDragHover, false);
+    uploadbox.addEventListener("drop", FileSelectHandler, false);
+    uploadbox.style.display = "block";
+}
+
+// file drag hover
+function FileDragHover(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    e.target.className = (e.type == "dragover" ? "hover" : "");
+    saveE=e;
+}
+// file selection
+function FileSelectHandler(e) {
+
+    // cancel event and hover styling
+    FileDragHover(e);
+
+    // fetch FileList object
+    var files = e.target.files || e.dataTransfer.files;
+
+    // process last File object
+    f = files[files.length-1];
+    ParseFile(f);
+    var r = new FileReader();
+    r.onload = function(e) {
+        contents = e.target.result;
+    }
+    r.readAsText(f);
+}
+
+function submitButtonPress(){
+    var id = generateID();
+    document.cookie="id="+id;
+    sendCompare(id, window.contents);
+}
+function ParseFile(file) {
+    window.userDocTitle=file.name;
+    	// display text
+    if (file.type.indexOf("text") == 0) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            Output(
+                "<p>Document information: <strong>" + file.name +
+                "</strong> type: <strong>" + file.type +
+                "</strong> size: <strong>" + file.size +
+                "</strong> bytes</p>"+
+                "<p><strong>Preview Uploaded Document:</strong></p><pre>" +
+                e.target.result.replace(/</g, "&lt;").replace(/>/g, "&gt;") +
+                "</pre>"+"<input type='button' value='Submit' id='submitbutton' onclick='submitButtonPress();'>"
+            );
+        }
+        reader.readAsText(file);
+    }
+}   
+
+
 
 
