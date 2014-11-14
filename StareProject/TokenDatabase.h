@@ -11,6 +11,7 @@ public:
 	TokenDatabase();
 	~TokenDatabase();
 
+
 	int insert(sqlite3* db, std::string q);
 	sqlite3* openDB();
 	void close(sqlite3 *db);

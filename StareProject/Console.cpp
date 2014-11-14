@@ -1,7 +1,6 @@
 #include "Console.h"
 #include "CMDparser.h"
 #include "Tokenizer.h"
-#include "Database.h"
 
 Console::Console()
 {

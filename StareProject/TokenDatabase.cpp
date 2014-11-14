@@ -6,7 +6,6 @@ TokenDatabase::TokenDatabase()
 	lastToken = 0;
 	lastAllocatedTokenID = 0;
 	currentAllocatedTokenID = 0;
-	LoadTokenMap();
 }
 
 
@@ -20,7 +19,7 @@ sqlite3* TokenDatabase::openDB()
 	//const char * c = dbName.c_str();
 	sqlite3 *db;
 	if (sqlite3_open("AIsql.db3", &db) != SQLITE_OK)
-		throw std::exception("SQLite database failed to open");
+		throw std::runtime_error("SQLite database failed to open");
 	return db;
 }
 
@@ -81,6 +80,8 @@ int TokenDatabase::GetToken(std::string word)
 std::string TokenDatabase::GetString(int TokenID)
 {
 	std::string word;
+	if ((TokenID < 0) || (TokenID >= reverseTokenMap.size()))
+		return "";
 	try
 	{
 		word = reverseTokenMap.find(TokenID)->second;
@@ -106,7 +107,8 @@ void TokenDatabase::FlushTokenCache()
 		// setup pre-prepared sql statements.
 		char buffer[] = "INSERT INTO Tokens VALUES (?1, ?2)";
 
-		sqlite3_prepare_v2(db, buffer, strlen(buffer), &stmt, NULL);
+		//sqlite3_prepare_v2(db, buffer, strlen(buffer), &stmt, NULL);
+		sqlite3_prepare_v2(db, "INSERT INTO Tokens VALUES (?1, ?2)", -1, &stmt, NULL);
 
 		for (std::vector<std::pair<std::string, int>>::iterator it = tokenCache.begin(); it != tokenCache.end(); ++it)
 		{

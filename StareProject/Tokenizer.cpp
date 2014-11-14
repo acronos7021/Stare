@@ -1,6 +1,5 @@
 #include "Tokenizer.h"
 #include "Stopwatch.h"
-#include "Database.h"
 #include "DataStructs.h"
 using namespace std;
 
@@ -40,7 +39,7 @@ std::deque<std::vector<int>> Tokenizer::tokenizeFile(string filename)
 	return tokenizeDoc(readFile(filename));
 }
 
-std::deque<std::vector<int>> Tokenizer::tokenizeDoc(string &document)
+std::deque<std::vector<int>> Tokenizer::tokenizeDoc(string document)
 {
 	index = 0;  
 	sentID.clear();
@@ -127,6 +126,7 @@ string Tokenizer::readFile(string fileName)
 {
 	using std::ifstream;
 	ifstream t(fileName);
+    int myerror = errno;
 	stringstream buffer;
 	string documentText ="";
 	if (!t.is_open())

@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 
-#include "Database.h"
+
 #include "DataStructs.h"
 
 class HTMLgenerator

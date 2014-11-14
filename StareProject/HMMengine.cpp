@@ -28,7 +28,8 @@ int HMMengine::learnFromFile(MetaData metaData)
 {
 	// Tokenize the document we want to learn
 	std::deque<std::vector<int>> documentTokens = tokenizer.tokenizeFile(metaData.DocumentText);
-
+	//int testint = documentTokens.size();
+	//std::cout << metaData.DocumentText;
 	// insert it into the database;
 	int documentID = dataBase.insertDocument( metaData.Author, metaData.Title, metaData.PublishDate);
 	dataBase.insertDocumentText(documentID, documentTokens);
@@ -46,17 +47,258 @@ int HMMengine::learn(MetaData metaData)
 	return documentID;
 }
 
-void HMMengine::compareWithFile(MetaData metaData)
+void HMMengine::compareWithFile(HMMengine &hmm, MetaData metaData)
 {
 	// This is due to an early misunderstanding between Sam and Brian.  Should be fixed.
-	metaData.DocumentText = tokenizer.readFile(metaData.DocumentText);
+	std::string documentText = tokenizer.readFile(metaData.DocumentText);
+        //std::thread t(hmm.compareThreadEngine, hmm, engineStatus, text);
+	EngineStatus empty(0);
+	compareThreadEngine(hmm,&empty,documentText);
+}
+//HMMengine &hmm, 
+
+
+
+struct PlagerismCalculator
+{
+	// the sentenceList is composed of each of the words in the sentence that is being compared
+	// the other diminsion is the list of all sentences where that word pair occurs in the database.
+	// sentenceList[SourceSentPos][list of all occurences]
+	std::vector<std::vector<int>> sentenceList;
+	std::vector<size_t> sentIndex;
+
+	void addWordPair(std::set<int> sentList)
+	{
+		std::vector<int> newSent;
+		for (std::set<int>::iterator it = sentList.begin(); it != sentList.end(); ++it)
+		{
+			newSent.push_back(*it);
+		}
+		if (newSent.size() > 0) sentenceList.push_back(newSent);
+	}
+
+	// returns the sentences with the closest match.
+	std::vector<int> doCalc(HMMengine &hmm)
+	{
+		std::vector<int> ret;
+
+		// create the indexes
+		for (size_t wp = 0; wp < sentenceList.size(); ++wp)
+		{
+			sentIndex.push_back(0);
+		}
+		// find the minimums
+		bool keepGoing = true;
+		int currMin = 0;
+		int nextMin = INT_MAX;
+		int currTotal = 0;
+		while (keepGoing)
+		{
+			keepGoing = false;
+			for (size_t wp = 0; wp < sentenceList.size(); ++wp)
+			{
+				// Only consider to the end of the list for each word pair.  When all lists are exhausted keepGoing will be false
+				//vector<int> compareSent = hmm.dataBase.TotalSentenceList[currMin];
+				//std::cout << "compare: " << hmm.tokenizer.rebuildSent(compareSent) << std::endl;
+				if (sentIndex[wp] < sentenceList[wp].size())
+				{
+					// There are still some items left to consider 
+					keepGoing = true;
+					if (sentenceList[wp][sentIndex[wp]] == currMin)
+					{
+						currTotal++;
+						sentIndex[wp]++;
+						if (sentIndex[wp] < sentenceList[wp].size())
+							if (sentenceList[wp][sentIndex[wp]] < nextMin)
+								nextMin = sentenceList[wp][sentIndex[wp]];
+					}
+					else if (sentenceList[wp][sentIndex[wp]]< nextMin)
+					{
+						nextMin = sentenceList[wp][sentIndex[wp]];
+
+					}
+				}
+			}
+			if (currTotal>5) 
+				ret.push_back(currMin);
+			currTotal = 0;
+			currMin = nextMin;
+			nextMin = INT_MAX;
+		}
+		return ret;
+	}
+
+	void clear()
+	{
+		sentenceList.clear();
+		std::vector<int> sentIndex;
+	}
+
+};
+
+
+
+
+// To help organize the data, one of these objects is kept to hold the calculations for each style as we
+// traverse through the document.
+struct StyleCalculator
+{
+    int StyleID;
+
+	int totalStyleCountsInSent;
+	int totalCountsInSent;
+	int totalStyleCountsInDoc;
+	int totalCountsInDoc;
+	double weight;
+
+	StyleCalculator(int id)// , double sentProb, double docProb)
+    {
+
+		StyleID = id; 
+		weight = 1; 
+
+		totalStyleCountsInSent = 0;
+		totalCountsInSent=0;
+		totalStyleCountsInDoc=0;
+		totalCountsInDoc=0;
+    }
+
+	void setWeight(double newWeight)
+	{
+		weight = newWeight;
+	}
+
+    void incrementStats(int styleCounts,int totalCounts)
+    {
+		totalStyleCountsInSent += styleCounts;
+		totalCountsInSent += totalCounts;
+		totalStyleCountsInDoc += styleCounts;
+		totalCountsInDoc += totalCounts;
+    }
+
+	double getSentProb()
+	{
+		return weight * (double)totalStyleCountsInSent / totalCountsInSent;
+	}
+
+	double getDocProb()
+	{
+		return weight * (double)totalStyleCountsInDoc / totalCountsInDoc;
+	}
+
+	void resetSentence()
+	{
+		totalStyleCountsInSent =0;
+		totalCountsInSent = 0;
+	}
+};
+
+
+
+void HMMengine::compareThreadEngine(HMMengine &hmm,EngineStatus* engineStatus, std::string &text)
+{
+    std::deque<std::vector<int>> documentTokens = hmm.tokenizer.tokenizeDoc(text);
+	
+	PlagerismCalculator plagCalc;
+
+    std::map<int,StyleCalculator> styleCalcs;
+    int stylesCount = 0;
+    for (size_t st = 0; st < hmm.dataBase.StyleList.size(); ++st)
+        if (hmm.dataBase.wpd.getWordStyleCount(st) != 0) {
+            stylesCount++;
+            styleCalcs.insert(std::pair<int,StyleCalculator>(st, StyleCalculator(st)));
+        }
+    if (stylesCount<1) return;
+
+	// assign the weight of different styles.  Styles with a larger corpus need a smaller weight.
+	for (std::map<int, StyleCalculator>::iterator it = styleCalcs.begin(); it != styleCalcs.end(); ++it)
+	{
+		int thisStyleID = it->second.StyleID;
+		int thisStyleWordCount = hmm.dataBase.wpd.getWordStyleCount(it->second.StyleID);
+		int totalWordCount = hmm.dataBase.wpd.getTotalWordCount();
+		double weight = (totalWordCount - thisStyleWordCount) / ((double)totalWordCount / stylesCount);
+		it->second.setWeight(weight);
+
+	}
+
+	//double WPprob, SentNormProb, DocNormProb;
+
+    for (size_t s = 0; s < documentTokens.size(); s++) {
+        size_t sentSize = documentTokens[s].size() - 1;
+		// It is a new sentence, so clear the stylcCalc sentence counters.
+		std::cout << "source: " << hmm.tokenizer.rebuildSent(documentTokens[s]) << std::endl;
+		std::cout << std::endl << "Sent#" << s;
+		for (std::map<int, StyleCalculator>::iterator it = styleCalcs.begin(); it != styleCalcs.end(); ++it)
+		{
+			//// Calculate Sentence Probability
+			//WPprob = (double)it->second.totalStyleCountsInSent / it->second.totalCountsInSent; // (double)wordpairstylecount / totalwpc;
+			//SentNormProb = WPprob *
+			//	(hmm.dataBase.wpd.getTotalWordCount() - hmm.dataBase.wpd.getWordStyleCount(it->second.StyleID)) /
+			//	((double)hmm.dataBase.wpd.getTotalWordCount() / stylesCount);
+			//// Calculate document Probability
+			//WPprob = (double)it->second.totalStyleCountsInDoc / it->second.totalCountsInDoc; // (double)wordpairstylecount / totalwpc;
+			//DocNormProb = WPprob *
+			//	(hmm.dataBase.wpd.getTotalWordCount() - hmm.dataBase.wpd.getWordStyleCount(it->second.StyleID)) /
+			//	((double)hmm.dataBase.wpd.getTotalWordCount() / stylesCount);
+
+			std::cout << std::fixed << std::setprecision(2) 
+				<< "   " << hmm.dataBase.StyleList[it->second.StyleID].Author << " " << it->second.getSentProb() << " : " << it->second.getDocProb() 
+				<< " (" << it->second.totalStyleCountsInDoc << ":" << it->second.totalCountsInDoc << ") ";
+			it->second.resetSentence();
+		}
+
+		std::cout << std::endl;
+
+		// Step trough all of the words this sentence.
+        for (size_t w = 0; w < sentSize; w++) 
+		{
+            int prevWordToken, nextWordToken, currWordToken;
+            if (hmm.dataBase.getPrevAndNext(s, w, prevWordToken, nextWordToken, documentTokens)) 
+			{
+				currWordToken = documentTokens[s][w];
+				// Should be a valid word token at this time.
+				std::cout << hmm.tokenizer.tdb.GetString(currWordToken) << ":" << hmm.tokenizer.tdb.GetString(nextWordToken) << std::endl;
+				plagCalc.addWordPair(hmm.dataBase.wpd.getSentenceList(currWordToken, nextWordToken));
+                //std::cout << "Sentence " << s << std::endl;
+                for (std::map<int, StyleCalculator>::iterator it = styleCalcs.begin(); it != styleCalcs.end(); ++it) 
+				{
+                    //std::cout << "How deep does the rabit hole go? " << std::endl;
+                    int totalwpc = hmm.dataBase.wpd.getTotalWordPairCount(currWordToken, nextWordToken);
+                    if (totalwpc > 0) 
+					{
+						int wordpairstylecount = hmm.dataBase.wpd.getWordPairStyleCount(currWordToken, nextWordToken, it->second.StyleID);
+						it->second.incrementStats(wordpairstylecount, totalwpc);
+                        
+                        //std::cout << "wordpairstylecount:" << wordpairstylecount << "    totalwpc:" << totalwpc << std::endl;
+                        //double WPprob = (double)wordpairstylecount / totalwpc;
+                        //double NormProb = WPprob *
+                        //        (hmm.dataBase.wpd.getTotalWordCount() - hmm.dataBase.wpd.getWordStyleCount(it->second.StyleID)) /
+                        //        ((double)hmm.dataBase.wpd.getTotalWordCount() / stylesCount);
+                        //it->second.addToAverage(NormProb);
+                        //std::cout << "    WPprob:" << WPprob << "    NormProb:" << NormProb << std::endl;
+                        //std::cout << "    style:" << it->second.StyleID
+                        //        << "      sentProb:" << it->second.sentProbability << "   DocProb:" << it->second.docProbability << std::endl;
+                    }
+                }
+            }
+        }
+		vector<int> result = plagCalc.doCalc(hmm);
+		if (result.size() > 0)
+		{
+			std::cout << "Plagerism sentences: ";
+			for (vector<int>::iterator i = result.begin(); i != result.end(); ++i)
+			{
+				std::cout << *i << "," << std::endl;
+				std::cout << "database: " << hmm.tokenizer.rebuildSent(hmm.dataBase.TotalSentenceList[*i]) << std::endl;
+
+			}
+		}
+			
+    }
 }
 
-
-
-void HMMengine::compareThreadEngine(HMMengine &hmm, EngineStatus* engineStatus, std::string &text)
-{
-	std::deque<std::vector<int>> documentTokens = hmm.tokenizer.tokenizeFile(text);
+/*
+	std::deque<std::vector<int>> documentTokens = hmm.tokenizer.tokenizeDoc(text);
 
 	vector<StyleCounts> totalWordCountsPerStyle = hmm.dataBase.getTotalWordCountPerStyle();
 
@@ -136,7 +378,7 @@ void HMMengine::compareThreadEngine(HMMengine &hmm, EngineStatus* engineStatus, 
 
 	}
 }
-
+*/
 
 
 //void HMMengine::compare(MetaData metaData)

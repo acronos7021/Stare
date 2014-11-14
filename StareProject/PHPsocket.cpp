@@ -1,51 +1,181 @@
 #include <thread>
 #include "PHPsocket.h"
+#include "serverv2.h"
 
-
-
-PHPsocket::PHPsocket()
+PHPsocket::PHPsocket(CMDparser* cmd)
 {
+  this->cmd = cmd;	
 }
 
 PHPsocket::~PHPsocket()
 {
 }
 
-void PHPsocket::jsonDecoder(string json)
+
+std::string PHPsocket::sanitize(std::string in_str)
+{
+    std::stringstream out_str;
+    for (std::string::size_type i = 0; i < in_str.length(); ++i)
+    {
+	switch (in_str[i]) {
+	case '"':
+	out_str << "\\\"";
+	break;
+	case '/':
+	out_str <<  "\\/";
+	break;
+	case '\b':
+	out_str <<  "\\b";
+	break;
+	case '\f':
+	out_str <<  "\\f";
+	break;
+	case '\n':
+	out_str <<  "\\n";
+	break;
+	case '\r':
+	out_str << "\\r";
+	break;
+	case '\t':
+	out_str <<  "\\t";
+	break;
+	case '\\':
+	out_str <<  "\\\\";
+	break;
+	default:
+	out_str << in_str[i];
+	break;
+	}
+    }
+    return out_str.str();
+}
+
+enum State {ESCAPED,UNESCAPED};
+
+std::string PHPsocket::desanitize(std::string in_str)
+{
+    State s = UNESCAPED;
+    std::string out_str;
+    out_str.reserve(in_str.length());
+    for (std::string::size_type i = 0; i < in_str.length(); ++i)
+    {
+	switch(s)
+	{
+	    case ESCAPED:
+	    {
+		switch(in_str[i])
+		{
+		    case '"':
+		    out_str += '\"';
+		    break;
+		    case '/':
+		    out_str += '/';
+		    break;
+		    case 'b':
+		    out_str += '\b';
+		    break;
+		    case 'f':
+		    out_str += '\f';
+		    break;
+		    case 'n':
+		    out_str += '\n';
+		    break;
+		    case 'r':
+		    out_str += '\r';
+		    break;
+		    case 't':
+		    out_str += '\t';
+		    break;
+		    case '\\':
+		    out_str += '\\';
+		    break;
+		    default:
+		    out_str += in_str[i];
+		    break;
+		}
+		s = UNESCAPED;
+		break;
+	    }
+	    case UNESCAPED:
+	    {
+		switch(in_str[i])
+		{
+		    case '\\':
+		    s = ESCAPED;
+		    break;
+		    default:
+		    out_str += in_str[i];
+		    break;
+		}
+	    }
+	}
+    }
+    return out_str;
+}
+
+
+std::string PHPsocket::jsonDecoder(std::string json)
 {
 	Json::Value jsonObject=parseJSON(json);
-	string command = jsonObject["command"].asString();
-	string output;
+	std::string command = jsonObject["command"].asString();
+	std::string output;
 
 	if (command.compare("compare")==0){
 		output = doCompare(jsonObject);
 	}
+	
+	else if (command.compare("getStyles") == 0) {
+	    output = getStyles();
+	}
 	else if (command.compare("checkCompare") == 0){
-		string ID = jsonObject["clientID"].asString();
+		std::string ID = jsonObject["clientID"].asString();
 		int sessionID;
 		istringstream(ID) >> sessionID;
 		output = doCompare(jsonObject);
 	}
-
-
-
-
-	cout << output << endl;
-	//send off the output to the socket here
+	
+	else if (command.compare("create")==0) {
+		output = doCreate(jsonObject);
+	}
+	
+	return output;
 }
 
-string PHPsocket::doCompare(Json::Value json)
+std::string PHPsocket::doCreate(Json::Value json) {
+	
+	CreateResult result = cmd->create(json["clientID"].asInt(), json["style"].asString(), json["numberOfSentences"].asInt());
+	std::string text = result.newDocument;
+	
+	
+   return text;	
+}
+std::string PHPsocket::getStyles() {
+    
+	vector<std::string> styles = cmd->getStyles();
+	
+	Json::Value outer;
+	Json::Value inner;
+	
+	for(int i = 0; i < styles.size(); i++) {
+	   inner.append(styles[i]);
+	}
+	outer["command"]="getStyles";
+	outer["styles"] = inner;
+	
+	return outer.toStyledString();
+}
+
+std::string PHPsocket::doCompare(Json::Value json)
 {
-	CMDparser cmd;
-	string ID = json["clientID"].asString();
+	std::string ID = json["clientID"].asString();
 	int sessionID;
 	istringstream(ID) >> sessionID;
-	CompareResult result = cmd.compare(sessionID, json["documentText"].asString());
+	CompareResult result = cmd->compare(sessionID, json["documentText"].asString());
 
 	//Here I check if what compare returns is empty
 	//TODO change this to the boolean.
-	if (result.documentCertainties.empty()){
-		int progress = cmd.checkCompareStatus(sessionID);
+	if (result.percentComplete<100){
+		int progress = cmd->checkCompareStatus(sessionID);
 		Json::Value output = formCheckCompareReturn(progress);
 		return output.toStyledString();
 	}
@@ -89,7 +219,7 @@ Json::Value PHPsocket::formCheckCompareReturn(int status)
 	return compare;
 }
 
-Json::Value PHPsocket::parseJSON(string json)
+Json::Value PHPsocket::parseJSON(std::string json)
 {
 	Json::Value root;
 	Json::Reader reader;
@@ -100,10 +230,11 @@ Json::Value PHPsocket::parseJSON(string json)
 	{
 		// Report failures and their locations 
 		// in the document.
-		cout << "Failed to parse JSON" << endl
+		std::cout << "Failed to parse JSON" << std::endl
 			<< reader.getFormattedErrorMessages()
 			<< endl;
-		return NULL;
+		Json::Value jvnull;
+		return jvnull;
 	}
 	return root;
 }

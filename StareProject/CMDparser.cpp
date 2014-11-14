@@ -5,8 +5,8 @@ using namespace std;
 #include <sstream> 
 #include <fstream>
 #include <iostream>
+#include <thread>
 #include "Stopwatch.h"
-#include "Database.h"
 #include "CMDparser.h"
 #include "Tokenizer.h"
 #include "HMMengine.h"
@@ -40,6 +40,8 @@ bool CMDparser::parseCMD(vector<string> cmdList)
 		Leven(cmdList);
 	else if (cmdList[0] == "Brian")
 		Brian(cmdList);
+	else if (cmdList[0] == "Show")
+		show(cmdList);
 	else if ((cmdList[0] == "Create") && (cmdList[1] == "Database"))
 		doCreateDatabase(true);
 	else if (cmdList[0] == "Execute")
@@ -66,6 +68,29 @@ void CMDparser::doCreateDatabase(bool confirm)
 {
 	hmm.dataBase.CreateDatabase(confirm);
 	hmm.tokenizer.tdb.LoadTokenMap();
+}
+
+void CMDparser::show(vector<string> cmdList)
+{
+	if (cmdList[1]=="Documents")
+	{
+	  vector<MetaData> docs = getDocuments();
+	  for(std::vector<MetaData>::iterator d = docs.begin(); d != docs.end();++d)
+	  {
+	      cout << d->Title << endl;
+	  }
+	}
+    else if (cmdList[1]=="Styles")
+    {
+        std::vector<std::string> styles = getStyles();
+        for(std::vector<std::string>::iterator s = styles.begin(); s != styles.end();++s)
+        {
+            cout << *s << endl;
+        }
+
+    }
+
+	  
 }
 
 void CMDparser::Learn(vector<string> cmdList)
@@ -109,7 +134,7 @@ void CMDparser::Compare(vector<string> cmdList)
 	metaData.PublishDate = cmdList[4];
 	cout << "Comparing document -> " << metaData.Author << " : " << metaData.Title;
 	//hmm(db, tokenizer);
-	hmm.compareWithFile(metaData);
+	hmm.compareWithFile(hmm,metaData);
 }
 void CMDparser::Create(vector<string> cmdList)
 {
@@ -247,6 +272,7 @@ bool CMDparser::isAlphaNumeric(char c)
 		((c >= 'A') && (c <= 'Z')) ||
 		((c >= '0') && (c <= '9')))
 		return true;
+
 	else
 		return false;
 }
@@ -263,52 +289,52 @@ bool CMDparser::isAlphaNumeric(char c)
 //	return"This is sentence 1.  This is sentence 2. This is sentence 3.  This is sentence 4.";
 //} 
 
-//CompareResult CMDparser::compare(int clientID, string text)
-//{
-//	//HMMengine hmm;
-//	//hmm.compare(MetaData("", "", "", text));
-//	vector<SentenceRanking> test;
-//
-//	SentenceBlob sbSource;
-//	sbSource.NextNextSentenceStr = "Sentence 9";
-//	sbSource.NextSentenceStr = "Sentence 8";
-//	sbSource.SentenceStr = "Sentence 7";
-//	sbSource.PrevSentenceStr = "Sentence 6";
-//	sbSource.PrevPrevSentenceStr = "Sentence 5";
-//	sbSource.SentenceID = 7;
-//
-//	SentenceBlob sbFound;
-//	sbFound.NextNextSentenceStr = "Sentence 9";
-//	sbFound.NextSentenceStr = "Sentence 8";
-//	sbFound.SentenceStr = "Sentence 7";
-//	sbFound.PrevSentenceStr = "Sentence 6";
-//	sbFound.PrevPrevSentenceStr = "Sentence 5";
-//	sbFound.SentenceID = 7;
-//
-//	test.push_back(SentenceRanking("Dickens", "A tale of two cities", sbSource, sbFound, .57));
-//	test.push_back(SentenceRanking("Mark Twain", "Huckleberry Finn", sbSource, sbFound, .57));
-//
-//	StyleCertaintyItem style1;
-//	style1.certainty = .73;
-//	style1.StyleID = 2;
-//	style1.StyleName = "Mark Twain";
-//
-//	vector<StyleCertaintyItem> ci;
-//	ci.push_back(style1);
-//
-//	CompareResult cr;
-//	cr.documentCertainties = ci;
-//	cr.sentenceRankings = test;
-//
-//	return cr;
-//}
+CompareResult CMDparser::compare(int clientID, string text)
+{
+	//HMMengine hmm;
+	//hmm.compare(MetaData("", "", "", text));
+	vector<SentenceRanking> test;
+
+	SentenceBlob sbSource;
+	sbSource.NextNextSentenceStr = "Sentence 9";
+	sbSource.NextSentenceStr = "Sentence 8";
+	sbSource.SentenceStr = "Sentence 7";
+	sbSource.PrevSentenceStr = "Sentence 6";
+	sbSource.PrevPrevSentenceStr = "Sentence 5";
+	sbSource.SentenceID = 7;
+
+	SentenceBlob sbFound;
+	sbFound.NextNextSentenceStr = "Sentence 9";
+	sbFound.NextSentenceStr = "Sentence 8";
+	sbFound.SentenceStr = "Sentence 7";
+	sbFound.PrevSentenceStr = "Sentence 6";
+	sbFound.PrevPrevSentenceStr = "Sentence 5";
+	sbFound.SentenceID = 7;
+
+	test.push_back(SentenceRanking("Dickens", "A tale of two cities", sbSource, sbFound, .57));
+	test.push_back(SentenceRanking("Mark Twain", "Huckleberry Finn", sbSource, sbFound, .57));
+
+	StyleCertaintyItem style1;
+	style1.certainty = .73;
+	style1.StyleID = 2;
+	style1.StyleName = "Mark Twain";
+
+	vector<StyleCertaintyItem> ci;
+	ci.push_back(style1);
+
+	CompareResult cr;
+	cr.documentCertainties = ci;
+	cr.sentenceRankings = test;
+        cr.percentComplete = 100;
+	return cr;
+}
 
 //string CMDparser::create(int clientID, string author, int numOfSentences)
 //{
 //	return "Now is the time for all good men to come to the aid of their country.";
 //}
 //
-//
+//comparethreadEngine
 //
 //vector<MetaData> CMDparser::getDocuments()
 //{
@@ -390,7 +416,8 @@ void CMDparser::learn(string author, string title, string date, string text)
 	hmm.learn(MetaData(author, title, date, text));
 }
 
-CompareResult CMDparser::compare(int clientID, string &text)
+/*
+CompareResult CMDparser::compare(int clientID, string text)
 {
 		//HMMengine hmm;
 		//hmm.compare(MetaData("", "", "", text));
@@ -434,7 +461,7 @@ CompareResult CMDparser::compare(int clientID, string &text)
 			// this is a new request so we should get started.
 			EngineStatus* engineStatus = new EngineStatus(clientID);
 			engineProcesses.push_back(engineStatus);
-			std::thread t(hmm.compareThreadEngine, hmm, engineStatus, text);
+			//std::thread t(hmm.compareThreadEngine, hmm, engineStatus, text);
 		}
 	}
 	return cr;
@@ -459,10 +486,14 @@ CompareResult CMDparser::compare(int clientID, string &text)
 	//return hmm.compare()
 
 }
+*/
 
-string CMDparser::create(int clientID, string author, int numOfSentences)
+CreateResult CMDparser::create(int clientID, string author, int numOfSentences)
 {
-	return "Now is the time for all good men to come to the aid of their country.";
+    CreateResult cr;
+    cr.percentComplete = 0;
+    cr.newDocument = "Now is the time for all good men to come to the aid of their country.";
+	return cr;
 }
 
 
@@ -476,7 +507,8 @@ vector<MetaData> CMDparser::getDocuments()
 	//test.push_back(md);
 	vector<MetaData> docList;
 	for (unsigned int i = 0; i < hmm.dataBase.documentList.size(); i++)
-		docList.push_back(MetaData(hmm.dataBase.documentList[i].Author, hmm.dataBase.documentList[i].Title, hmm.dataBase.documentList[i].PublishDate, ""));
+        if (hmm.dataBase.documentList[i].Author != "")
+		    docList.push_back(MetaData(hmm.dataBase.documentList[i].Author, hmm.dataBase.documentList[i].Title, hmm.dataBase.documentList[i].PublishDate, ""));
 	return docList;
 
 }
@@ -489,8 +521,10 @@ std::vector<std::string> CMDparser::getStyles()
 	//test.push_back(md);
 	//test.push_back(md);
 	std::vector<std::string> styles;
-	for (unsigned int i = 0; i < hmm.dataBase.StyleList.size(); i++)
-		styles.push_back(hmm.dataBase.StyleList[i].Author);
+	for (unsigned int i = 0; i < hmm.dataBase.StyleList.size(); i++) {
+        if (hmm.dataBase.StyleList[i].Author != "")
+            styles.push_back(hmm.dataBase.StyleList[i].Author);
+    }
 	return styles;
 }
 
@@ -633,7 +667,7 @@ void CMDparser::Brian(vector<string> cmdParams)
 	//int dbTime = sw.getTimeInMicroseconds();
 
 	//int sentID = 
-	//string sent = db.getSentence(sentID);
+	//string sent = db.getSentence(sentID);CreateResult
 	//Tokenizer tokenizer2 = Tokenizer("../StareProject/Documents/AChristmasCarol.txt");
 	//tokenizer2.tokenizeDoc();
 	//int docID2 = db.insertDocument("Charles Dickens", "A Christmas Carol", "1864");
