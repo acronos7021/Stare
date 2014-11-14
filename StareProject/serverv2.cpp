@@ -42,6 +42,7 @@ void serverv2::startServer() {
 //----------------------------------------------------------------------------------------------------
 
 void serverv2::recvData(int client_socket) {
+<<<<<<< HEAD
     char buffer[1000];
     long buffersize = sizeof(buffer);
     long x = buffersize;
@@ -61,6 +62,24 @@ void serverv2::recvData(int client_socket) {
     PHPsocket php2(cmd);//cmd);
     std::string recvDataString=input;
     std::cout << recvDataString << std::endl;
+=======
+    char buffer[8000000];
+    long buffersize = sizeof(buffer);
+    long x = buffersize;
+    int bytesRead = 0;
+    int out;
+    //std::cout<< bytesRead <<std::endl;
+    std::cout << "Incoming:" << std::endl;
+    std::cout<< buffer <<std::endl;
+    out = read(client_socket, buffer + bytesRead, x - bytesRead);
+    bytesRead += out;
+    //std::cout << out << std::endl;
+    //std::cout<< buffer <<std::endl;
+    std::string recvDataString = std::string(buffer);
+///     Get data from the algorithm/database in here. the two lines below are for testing purpose.
+    PHPsocket php2(cmd);//cmd);
+    //std::cout << recvDataString << std::endl;
+>>>>>>> 03053263e891e78c579d33d18f4265c4aed15f6e
     std::string result = php2.jsonDecoder(recvDataString);
     std::cout << "Outgoing:" << std::endl;
     std::cout << result << std::endl;
@@ -68,6 +87,7 @@ void serverv2::recvData(int client_socket) {
     //std::string dataToSend = "Hello client, I have received your data ";
     dataInChars = result.c_str();
     int dataSendSize = result.length();
+<<<<<<< HEAD
     std::string sentSoFar;
     int sent_ok=0;
     while(true) {
@@ -91,6 +111,14 @@ void serverv2::recvData(int client_socket) {
 
 void serverv2::listening(){
 
+=======
+    int sent_ok = send(client_socket, dataInChars, dataSendSize, NULL);
+
+}
+
+void serverv2::listening(){
+
+>>>>>>> 03053263e891e78c579d33d18f4265c4aed15f6e
     while (true) {
         std::cout << "Waiting for client to connect " << std::endl;
         sockaddr_in sock_in;
