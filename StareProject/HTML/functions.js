@@ -1,3 +1,4 @@
+//Compare functions
 function compareDecode(json) {
     var response = JSON.parse(json);
     
@@ -57,6 +58,14 @@ function checkCompare(id){
 	sendMessage(compare);
 }
 
+function compareSubmitButtonPress(){
+    var id = generateID();
+    document.cookie="id="+id;
+    sendCompare(id, window.contents);
+}
+
+//end compare functions
+
 function sendMessage(string){
     var data=JSON.stringify(string);
 	var xmlhttp=new XMLHttpRequest();
@@ -69,6 +78,8 @@ function sendMessage(string){
         }
     }
 	xmlhttp.setRequestHeader("Content-Type", "application/json");
+	var myWindow = window.open("", "OUT", "width=200, height=100");
+	myWindow.document.write('<html>'+data+'</html>');
 	xmlhttp.send(data);
 }
 
@@ -97,6 +108,9 @@ function callback(response){
     else if(json.command=="create"){
 		fillCreate(json);
     }
+    else if(json.command=="learn"){
+		getBackLearn(json);
+    }
     
 }
 
@@ -113,21 +127,6 @@ function getCookie(cname) {
     return "";
 }
 
-
-function sendLearn(text, author, title, publishDate) {
-	var learn = {
-		"command": "learn",
-		"documentText": text,
-		"author": author,
-		"title": title,
-		"publishDate": publishDate
-	}
-	
-    //do something to send it off here
-    alert(sendMessage(learn));
-}
-
-
 function generateID(){
 	var d = new Date();
 	var n=CryptoJS.lib.WordArray.random(128)+d.getTime();
@@ -143,24 +142,6 @@ function $id(id) {
 function Output(msg) {
 	var m = $id("messages");
 	m.innerHTML = msg;
-}
-
-function readSingleFile(evt) {
-    //Retrieve the first (and only!) File from the FileList object
-    var f = evt.target.files[0];
-    var contents;
-    if (f) {
-        var r = new FileReader();
-        r.onload = function(e) {
-            contents = e.target.result;
-            var id = generateID();
-            document.cookie="id="+id;
-            sendCompare(id, contents);
-        }
-        r.readAsText(f);
-    } else {
-        alert("Failed to load file");
-    }
 }
 
 
@@ -208,11 +189,6 @@ function FileSelectHandler(e) {
     r.readAsText(f);
 }
 
-function compareSubmitButtonPress(){
-    var id = generateID();
-    document.cookie="id="+id;
-    sendCompare(id, window.contents);
-}
 
 function fillStyles(json){
 	var select = document.getElementById("styleSelect");
@@ -249,8 +225,35 @@ function createSubmitButtonPress(){
 function fillCreate(json){
 	var select = document.getElementById("styleSelect");
     var selectedText = select.options[select.selectedIndex].text;
-	var outputHTML = '<h2>Style of '+ selectedText +'</h2><p class="lead" style="width:50%; margin: 0 auto;">'+ json.document +'</p>';
+	var outputHTML = '<h2>Style of '+ selectedText +'</h2><p class="lead" style="width:60%; margin: 0 auto;">'+ json.document +'</p>';
     document.getElementById('wrapper').innerHTML = outputHTML;
+}
+
+
+function getBackLearn(json){
+	if (json.result== "Success"){
+		toastr.options = {
+		  "positionClass": "toast-top-center"
+		}
+        toastr.success(document.getElementById('title').value+' uploaded successfully!', 'STARE Says');
+	}
+	
+}
+
+function learn(){
+	sendLearn(window.contents, document.getElementById('author').value, document.getElementById('title').value, document.getElementById('publishYear').value);
+}
+
+function sendLearn(text, author, title, publishDate) {
+	var learn = {
+		"command": "learn",
+		"documentText": text,
+		"author": author,
+		"title": title,
+		"publishDate": publishDate
+	}
+	
+    sendMessage(learn)
 }
 
 function ParseFile(file) {
@@ -272,3 +275,56 @@ function ParseFile(file) {
         reader.readAsText(file);
     }
 }   
+function InitLearn() {
+
+    var fileselect = $id("fileselect"),
+        uploadbox = $id("uploadbox"),
+        submitbutton = $id("submitbutton");
+
+    // file select
+    fileselect.addEventListener("change", learnFileSelectHandler, false);
+
+    // file drop
+    uploadbox.addEventListener("dragover", FileDragHover, false);
+    uploadbox.addEventListener("dragleave", FileDragHover, false);
+    uploadbox.addEventListener("drop", learnFileSelectHandler, false);
+    uploadbox.style.display = "block";
+}
+
+function learnParseFile(file) {
+    window.userDocTitle=file.name;
+    	// display text
+    if (file.type.indexOf("text") == 0) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            Output(
+                "<p>Document information: <strong>" + file.name +
+                "</strong> type: <strong>" + file.type +
+                "</strong> size: <strong>" + Math.round(file.size/1024) +
+                "</strong> Kilobytes</p>"+
+                "<p><strong>Preview Uploaded Document:</strong></p><pre>" +
+                e.target.result.replace(/</g, "&lt;").replace(/>/g, "&gt;") +
+                "</pre>"
+            );
+        }
+        reader.readAsText(file);
+    }
+} 
+
+function learnFileSelectHandler(e) {
+
+    // cancel event and hover styling
+    FileDragHover(e);
+
+    // fetch FileList object
+    var files = e.target.files || e.dataTransfer.files;
+
+    // process last File object
+    f = files[files.length-1];
+    learnParseFile(f);
+    var r = new FileReader();
+    r.onload = function(e) {
+        contents = e.target.result;
+    }
+    r.readAsText(f);
+} 

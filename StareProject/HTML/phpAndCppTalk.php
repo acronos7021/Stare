@@ -49,9 +49,40 @@ class phpAndCppTalk
     protected function sendData($data)
     {
         socket_connect($this->socket, $this->host, $this->port) or die("Could not connect to server\n");
-        socket_write($this->socket,$data, strlen($data)) or die("couldn't write");
-        $cppdata = socket_read($this->socket,8000000) or die("something is wrong");
-        echo $cppdata.trim();
+        //$remaining=0;
+        //while ($remaining=socket_write($this->socket,$data+$remaining, strlen($data)) > 0);
+        //Blake
+		$length = strlen($data);
+		while (true) {
+	        $sent = socket_write($this->socket, $data, $length);
+	        if ($sent === false) {
+				echo "Couldn't send";
+	            break;
+	        }
+	        //sleep(2);
+	        //echo $data;
+	        //if ($sent ==0){
+				//echo "exit loop";
+				//break;
+			//}
+	        // Check if the entire message has been sented
+	        if ($sent < $length) {  
+	            // If not sent the entire message.
+	            // Get the part of the message that has not yet been sented as message
+	            $data = substr($data, $sent);
+	            // Get the length of the not sented part
+	            $length -= $sent;
+	        } else {
+	            break;
+	        }
+            
+		}
+		socket_shutdown($this->socket, 1);
+		//echo "out of loop";
+        //blake end
+        $cppdata = socket_read($this->socket, 8000000) or die("something is wrong");
+        echo $cppdata;
+        socket_close($this->socket);
       //  echo "A connection is found!\n";
     }
 

@@ -308,7 +308,9 @@ CompareResult CMDparser::compare(int clientID, string text)
     test.push_back(SentenceRanking("Mark Twain", "Huckleberry Finn", sbSource, sbFound, .54));
     test.push_back(SentenceRanking("Mark Twain", "Huckleberry Finn", sbSource, sbFound, .23));
     test.push_back(SentenceRanking("Mark Twain", "Huckleberry Finn", sbSource, sbFound, .45));
-    test.push_back(SentenceRanking("Mark Twain", "Huckleberry Finn", sbSource, sbFound, .13));
+    for(int i=0; i<550; i++) {
+        test.push_back(SentenceRanking("Mark Twain", "Huckleberry Finn", sbSource, sbFound, .13));
+    }
 
 	StyleCertaintyItem style1;
 	style1.certainty = .73;
