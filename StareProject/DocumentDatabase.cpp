@@ -493,7 +493,7 @@ int DocumentDatabase::incrementSentenceID(sqlite3* db, int byAmount)
 			// The variable exists in the database, so read it and update it.
 			// we know there is something here or it wouldn't have given SQLITE_OK, so just read first item.
 			currentSentenceID = sqlite3_column_int(select_statement, 0);
-			std::string updateStr = "UPDATE Variables SET LastSentenceID = LastSentenceID + " + byAmount;
+			std::string updateStr = "UPDATE Variables SET LastSentenceID = LastSentenceID + " + std::to_string(byAmount);
 			sqlite3_exec(db, updateStr.c_str(), NULL, NULL, NULL);
 		}
 		else
