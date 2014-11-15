@@ -177,9 +177,15 @@ void DocumentDatabase::initTables()
 					// Starting a new document
 					documentList[docID].startSentenceID = sentID;
 					currDocID = docID;
+					std::cout << std::endl << "Loading: " << documentList[docID].Author << ":" << documentList[docID].Title << std::endl;
+
 				}
 				if ((sentID != currSentID) && (currSentID != -1)) 
 				{ 
+					if (sentID < currSentID)
+					{
+						std::cout << "It Happened ";
+					}
 					// starting a new sentence 
 					vector<int> dummy;
 					if (currSentID == (int)TotalSentenceList.size())

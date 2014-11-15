@@ -42,37 +42,29 @@ void WordPairCountDatabase::AddCounts(int currWordToken,int nextWordToken, int S
 
 
 	  // Handle nextToken Database
-	  std::map<int, std::vector<WordNextCountStruct>>::iterator ns = nextTokenStyle.find(currWordToken);
+	  std::map<int, std::map<int, WordNextCountStruct>>::iterator ns = nextTokenStyle.find(currWordToken);
 	  if (ns == nextTokenStyle.end())
 	  {
 		  //// this wordToken does not exist.  So create it.
-		  std::vector<WordNextCountStruct>  newWord;
-		  newWord.push_back(WordNextCountStruct(currWordToken,StyleID, 1));
+		  std::map<int,WordNextCountStruct>  newWord;
+		  newWord.insert(std::make_pair(nextWordToken, WordNextCountStruct(nextWordToken, StyleID, 1)));
 		  nextTokenStyle.insert(std::make_pair(currWordToken, newWord));
 	  }
 	  else
 	  {
-		  bool found = false;
-		  for (std::vector<WordNextCountStruct>::iterator s = ns->second.begin(); s != ns->second.end(); ++s)
+		  // The currWordToken is in the database, check if the new nextWordToken is.
+		  std::map<int, WordNextCountStruct>::iterator s = ns->second.find(nextWordToken);
+		  if (s == ns->second.end())
 		  {
-			  if (s->wordTokenID == nextWordToken)
-			  {
-				  found = true;
-				  s->addStyle(StyleID, 1);
-				  break;
-			  }
+			  // nextToken not found
+			  //std::map<int, WordNextCountStruct>  newWord;
+			  //newWord.insert(std::make_pair(nextWordToken, WordNextCountStruct(nextWordToken, StyleID, 1)));
+			  ns->second.insert(std::make_pair(nextWordToken, WordNextCountStruct(nextWordToken, StyleID, 1))); //= newWord;// nextTokenStyle.insert(std::make_pair(currWordToken, newWord));
 		  }
-		  if (!found)
+		  else
 		  {
-			  ns->second.push_back(WordNextCountStruct(nextWordToken, StyleID, 1));
+			  s->second.addStyle(StyleID, 1);
 		  }
-
-		  
-
-		  // Found the currWordToken.  look for nextWordToken
-		  //std::set<NextWordCountStruct>::iterator foundNext = foundCurr->second.find(nextWordToken);
-		  //ns->second
-
 	  }
 
 }
@@ -80,15 +72,17 @@ void WordPairCountDatabase::AddCounts(int currWordToken,int nextWordToken, int S
 const std::vector<WordNextCountStruct> WordPairCountDatabase::getNextToken(int currWordID, int StyleID)
 {
 	std::vector<WordNextCountStruct> ret;
-	std::map<int, std::vector<WordNextCountStruct>>::iterator mp = nextTokenStyle.find(currWordID);
+	std::map<int, std::map<int, WordNextCountStruct>>::iterator mp = nextTokenStyle.find(currWordID);
 	if (mp != nextTokenStyle.end())
 	{
 		// found it
 		if ((StyleID >= 0) && (StyleID < mp->second.size()))
 		{
-			return mp->second;
-			//for (std::set<WordNextCountStruct>::iterator it = mp->second.begin(); it != mp->second.end(); ++it)
-			//	ret.push_back(*it);
+			//return mp->second;
+			for (std::map<int, WordNextCountStruct>::iterator it = mp->second.begin(); it != mp->second.end(); ++it)
+			{
+				ret.push_back(it->second);
+			}
 		}
 	}
 

@@ -31,8 +31,12 @@ int HMMengine::learnFromFile(MetaData metaData)
 	//int testint = documentTokens.size();
 	//std::cout << metaData.DocumentText;
 	// insert it into the database;
-	int documentID = dataBase.insertDocument( metaData.Author, metaData.Title, metaData.PublishDate);
-	dataBase.insertDocumentText(documentID, documentTokens);
+	int documentID=0;
+	if (documentTokens.size() > 0)
+	{
+		documentID = dataBase.insertDocument( metaData.Author, metaData.Title, metaData.PublishDate);
+		dataBase.insertDocumentText(documentID, documentTokens);
+	}
 	return documentID;
 }
 
@@ -40,10 +44,13 @@ int HMMengine::learn(MetaData metaData)
 {
 	// Tokenize the document we want to learn
 	std::deque<std::vector<int>> documentTokens = tokenizer.tokenizeDoc(metaData.DocumentText);
-
+	int documentID=0;
 	// insert it into the database;
-	int documentID = dataBase.insertDocument(metaData.Author, metaData.Title, metaData.PublishDate);
-	dataBase.insertDocumentText(documentID, documentTokens);
+	if (documentTokens.size() > 0)
+	{
+		documentID  = dataBase.insertDocument(metaData.Author, metaData.Title, metaData.PublishDate);
+		dataBase.insertDocumentText(documentID, documentTokens);
+	}
 	return documentID;
 }
 
@@ -62,7 +69,7 @@ void HMMengine::compareWithFile(HMMengine &hmm, MetaData metaData)
 struct PlagerismCalculator
 {
 	// the sentenceList is composed of each of the words in the sentence that is being compared
-	// the other diminsion is the list of all sentences where that word pair occurs in the database.
+	// the other dimension is the list of all sentences where that word pair occurs in the database.
 	// sentenceList[SourceSentPos][list of all occurences]
 	std::vector<std::vector<int>> sentenceList;
 	std::vector<size_t> sentIndex;
@@ -127,6 +134,32 @@ struct PlagerismCalculator
 		}
 		return ret;
 	}
+
+	//std::vector<int> compare(std::vector<int> source, std::vector<int> database,int &score)
+	//{
+	//	score = 0;
+	//	vector<int> overlap;
+	//	overlap.reserve(source.size()); // defaults to 0 for all positions
+	//	for (size_t si = 0; si < source.size(); ++si)
+	//	{
+	//		for (size_t di = si; di < database.size(); ++di)
+	//		{
+	//			int di_tmp=di;
+	//			while (source[si] == database[di_tmp])
+	//			{
+	//				di_tmp++;
+	//				if (++si == source.size())
+	//					break;
+	//			}
+	//			int offset = di_tmp - di;
+	//			if (offset>1)
+	//			{
+	//				std::fill(overlap[si], overlap[si + offset], 1);
+	//			}
+	//			if (offset > score) score = offset;
+	//		}
+	//	}
+	//}
 
 	void clear()
 	{

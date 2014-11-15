@@ -115,7 +115,7 @@ public:
 private:
 
 	uint_fast64_t getWordPairBitPack(int currWordToken, int nextWordToken);
-	std::map<int, std::vector<WordNextCountStruct>> nextTokenStyle; //currTokenID = > vector<WordNextCountStruct>
+	std::map<int, std::map<int,WordNextCountStruct>> nextTokenStyle; //currTokenID = > vector<WordNextCountStruct>
 	//std::unordered_map<int, std::set<NextWordCountStruct>> nextTokenList;
 	std::unordered_map<uint_fast64_t, WordPairCountStruct> WordPairCount;
 	std::vector<int>  wordStyleCount; // the count of all words in each style
