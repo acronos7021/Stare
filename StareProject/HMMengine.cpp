@@ -257,7 +257,7 @@ void HMMengine::compareThreadEngine(HMMengine &hmm,EngineStatus* engineStatus, s
 			{
 				currWordToken = documentTokens[s][w];
 				// Should be a valid word token at this time.
-				std::cout << hmm.tokenizer.tdb.GetString(currWordToken) << ":" << hmm.tokenizer.tdb.GetString(nextWordToken) << std::endl;
+				//std::cout << hmm.tokenizer.tdb.GetString(currWordToken) << ":" << hmm.tokenizer.tdb.GetString(nextWordToken) << std::endl;
 				plagCalc.addWordPair(hmm.dataBase.wpd.getSentenceList(currWordToken, nextWordToken));
                 //std::cout << "Sentence " << s << std::endl;
                 for (std::map<int, StyleCalculator>::iterator it = styleCalcs.begin(); it != styleCalcs.end(); ++it) 
