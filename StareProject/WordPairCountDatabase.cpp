@@ -119,7 +119,8 @@ bool WordPairCountDatabase::isWordToken(int wordID, int styleID)
 		{
 			if (nw->second.StyleCounts.size() > styleID)
 			{
-				if (nw->second.StyleCounts[styleID]>0)  return true;
+				if (nw->second.StyleCounts[styleID]>0)  
+					return true;
 			}
 		}
 	}
