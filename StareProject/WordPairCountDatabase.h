@@ -112,6 +112,8 @@ public:
 
 	const std::vector<WordNextCountStruct> getNextToken(int currWordID,int StyleID);
 
+	bool isWordToken(int wordID,int styleID);
+
 private:
 
 	uint_fast64_t getWordPairBitPack(int currWordToken, int nextWordToken);

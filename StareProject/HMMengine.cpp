@@ -536,7 +536,7 @@ string HMMengine::createDoc(int styleID, int length)
 					random = 65; // A
 				}
 			}
-			if (/*Just need this: error hmm.dataBase.isWordToken(random, styleID) == true*/random > 256)
+			if (dataBase.wpd.isWordToken(random, styleID) == true)
 			{
 				tmp = createHelper(styleID, random);
 				s += tokenizer.rebuildSent(tmp);
@@ -558,7 +558,7 @@ vector<int> HMMengine::createHelper(int styleID, int wordID)
 	int curr = wordID;
 	Tokenizer tok;
 	vector<int> hold;
-	int threshold = 15;
+	int threshold = 10;
 	hold.push_back(curr);
 	srand(time(0));
 
@@ -567,61 +567,48 @@ vector<int> HMMengine::createHelper(int styleID, int wordID)
 	int thres = (int)(rand() % 6);
 	int max = 0;
 
-	std::set<NextWordCountStruct> dataA;
-	vector<NextWordCountStruct>dataW;
-	//dataW = error hmm.dataBase.wpd.getNextTokens(curr, styleID);
-	for (int i = 0; i < dataA.size(); i++)
+	vector<WordNextCountStruct>dataW;
+	dataW = dataBase.wpd.getNextToken(curr, styleID);
+	for (int i = 0; i < dataW.size(); i++)
 	{
 		max += dataW[i].count;
 	}
 
-	//for (NextWordCountStruct a : dataA)
-	//{
-	//	max += a.count;
-	//}
-
 	int  ind = 0;
 	bool lock = false;
-
-	//std::set<NextWordCountStruct>::iterator it = dataA.begin();
 
 	while (!tok.checkPunctuation((char)(curr)) && thres <= threshold)
 	{
 		random = (float)(rand() % 101) / 100;
 		lock = true;
+		ind = 0;
+		percent = 0.0;
 		while (lock)
 		{
-			if (dataW.size() >= 1)
+			if (dataW.size() >= 1 && ind < dataW.size())
 			{
-				percent += (dataW[ind].count / max); //percent += (it->count / max);
-				if (random <= percent /*&& error hmm.dataBase.isWordToken(random, styleID) == true*/)
+				percent += ((float)dataW[ind].count / (float)max);
+				if (random <= percent )//&& dataBase.wpd.isWordToken(random, styleID) == true) Function almost always ret false
 				{
-					hold.push_back(dataW[ind].TokenID); //hold.push_back();
-					curr = dataW[ind].TokenID;
+					/*if (tok.checkPunctuation((char)(curr)))
+					{
+						hold.pop_back();
+					}*/
+					hold.push_back(dataW[ind].wordTokenID);
+					hold.push_back((int)'&');
+					curr = dataW[ind].wordTokenID;
 					lock = false;
 				}
-
-				if (ind <= dataW.size() - 1 && lock == true)
-				{
-					ind++;
-				}
-				else
-				{
-					lock = false;
-					ind = 0;
-					percent = 0.0;
-				}
+				ind++;
 			}
 			else
 			{
 				lock = false;
-				thres = threshold + 1;
 			}
 		}//end of inner loop
 
 		max = 0;
-		dataW.clear();
-		//dataW = error hmm.dataBase.wpd.getNextTokens(curr, styleID);
+		dataW = dataBase.wpd.getNextToken(curr, styleID);
 		for (int i = 0; i < dataW.size(); i++)
 		{
 			max += dataW[i].count;
@@ -629,9 +616,9 @@ vector<int> HMMengine::createHelper(int styleID, int wordID)
 		thres++;
 	}//end of outer loop
 
-	hold.push_back(curr);
 	if (thres > threshold)
 	{
+		hold.pop_back();
 		hold.push_back(46); // always a period
 	}
 

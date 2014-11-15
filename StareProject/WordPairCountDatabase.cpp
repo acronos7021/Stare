@@ -8,6 +8,9 @@ WordPairCountDatabase::~WordPairCountDatabase()
 {
 }
 
+
+
+
 uint_fast64_t WordPairCountDatabase::getWordPairBitPack(int currWordToken, int nextWordToken)
 {
     return ((uint_fast64_t)currWordToken << 32) + (uint_fast64_t)nextWordToken;
@@ -84,15 +87,29 @@ const std::vector<WordNextCountStruct> WordPairCountDatabase::getNextToken(int c
 	if (mp != nextTokenStyle.end())
 	{
 		// found it
-		if ((StyleID >= 0) && (StyleID < mp->second.size()))
-		{
-			return mp->second;
-			//for (std::set<WordNextCountStruct>::iterator it = mp->second.begin(); it != mp->second.end(); ++it)
-			//	ret.push_back(*it);
-		}
+		return mp->second;
 	}
 
 	return ret;
+}
+
+bool WordPairCountDatabase::isWordToken(int wordID, int styleID)
+{
+	std::vector<WordNextCountStruct> ret;
+	std::map<int, std::vector<WordNextCountStruct>>::iterator mp = nextTokenStyle.find(wordID);
+	if (mp != nextTokenStyle.end())
+	{
+		// found it
+		for (std::vector<WordNextCountStruct>::iterator nw = mp->second.begin(); nw != mp->second.end(); ++nw)
+		{
+			if (nw->StyleCounts.size() > styleID)
+			{
+				if (nw->StyleCounts[styleID]>0)  return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 const int WordPairCountDatabase::getTotalWordCount()

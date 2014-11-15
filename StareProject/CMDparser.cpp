@@ -138,21 +138,23 @@ void CMDparser::Compare(vector<string> cmdList)
 }
 void CMDparser::Create(vector<string> cmdList)
 {
-	if (cmdList.size() != 3)
-	{
-		if (cmdList.size() != 1) // it is not a request for help
-			cout << "Invalid Parameters" << endl;
-		cout << "example: learn [filename][Author]" << endl;
-		cout << "All arguements should be in quotes." << endl;
-		return;
-	}
+	//if (cmdList.size() != 3)
+	//{
+	//	if (cmdList.size() != 1) // it is not a request for help
+	//		cout << "Invalid Parameters" << endl;
+	//	cout << "example: learn [filename][Author]" << endl;
+	//	cout << "All arguements should be in quotes." << endl;
+	//	return;
+	//}
+	int StyleID = atoi( cmdList[1].c_str());
+	int size = atoi(cmdList[2].c_str());
 
-	MetaData metaData;
-	metaData.DocumentText = ReadFile(cmdList[1]);
-	metaData.action = ActionType::Create;
-	metaData.Author = cmdList[2];
-	//HMMengine hmm(db, tokenizer);
-	hmm.create(metaData);
+	//MetaData metaData;
+	//metaData.DocumentText = ReadFile(cmdList[1]);
+	//metaData.action = ActionType::Create;
+	//metaData.Author = cmdList[2];
+	////HMMengine hmm(db, tokenizer);
+	cout << hmm.createDoc(StyleID, size) << endl;
 }
 
 string CMDparser::ReadFile(string fileName)
