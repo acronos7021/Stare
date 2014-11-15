@@ -538,3 +538,122 @@ void HMMengine::create(MetaData metaData)
 {
 
 }
+
+
+string HMMengine::createDoc(int styleID, int length)
+{
+	string s = "";
+	vector<int> tmp;
+	srand(time(0));
+
+	int random;
+	int maxTok = tokenizer.tdb.tokenMap.size();
+
+	int count = 0;
+	bool lock = false;
+
+	while (count < length && maxTok > 256)
+	{
+		random = (int)(rand() % maxTok);
+		lock = true;
+		while (lock)
+		{
+			if (random <= 256)
+			{
+				if (random < 128)
+				{
+					random = 73; // I
+				}
+				else
+				{
+					random = 65; // A
+				}
+			}
+			if (dataBase.wpd.isWordToken(random, styleID) == true)
+			{
+				tmp = createHelper(styleID, random);
+				s += tokenizer.rebuildSent(tmp);
+				s += " ";
+				lock = false;
+				count++;
+			}
+			else
+			{
+				random = (int)(rand() % maxTok);
+			}
+		}//end of inner loop
+	}//end of outer loop
+	return s;
+} //end of createDoc2()
+
+vector<int> HMMengine::createHelper(int styleID, int wordID)
+{
+	int curr = wordID;
+	Tokenizer tok;
+	vector<int> hold;
+	int threshold = 10;
+	hold.push_back(curr);
+	srand(time(0));
+
+	float random;
+	float percent = 0.0;
+	int thres = (int)(rand() % 6);
+	int max = 0;
+
+	vector<WordNextCountStruct>dataW;
+	dataW = dataBase.wpd.getNextToken(curr, styleID);
+	for (int i = 0; i < dataW.size(); i++)
+	{
+		max += dataW[i].count;
+	}
+
+	int  ind = 0;
+	bool lock = false;
+
+	while (!tok.checkPunctuation((char)(curr)) && thres <= threshold)
+	{
+		random = (float)(rand() % 101) / 100;
+		lock = true;
+		ind = 0;
+		percent = 0.0;
+		while (lock)
+		{
+			if (dataW.size() >= 1 && ind < dataW.size())
+			{
+				percent += ((float)dataW[ind].count / (float)max);
+				if (random <= percent )//&& dataBase.wpd.isWordToken(random, styleID) == true) Function almost always ret false
+				{
+					/*if (tok.checkPunctuation((char)(curr)))
+					{
+						hold.pop_back();
+					}*/
+					hold.push_back(dataW[ind].wordTokenID);
+					hold.push_back((int)'&');
+					curr = dataW[ind].wordTokenID;
+					lock = false;
+				}
+				ind++;
+			}
+			else
+			{
+				lock = false;
+			}
+		}//end of inner loop
+
+		max = 0;
+		dataW = dataBase.wpd.getNextToken(curr, styleID);
+		for (int i = 0; i < dataW.size(); i++)
+		{
+			max += dataW[i].count;
+		}
+		thres++;
+	}//end of outer loop
+
+	if (thres > threshold)
+	{
+		hold.pop_back();
+		hold.push_back(46); // always a period
+	}
+
+	return hold;
+}//end of createDocH2()
