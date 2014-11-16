@@ -72,7 +72,6 @@ struct PlagerismCalculator
 	// the other dimension is the list of all sentences where that word pair occurs in the database.
 	// sentenceList[SourceSentPos][list of all occurences]
 	std::vector<std::vector<int>> sentenceList;
-	std::vector<size_t> sentIndex;
 
 	void addWordPair(std::set<int> sentList)
 	{
@@ -88,55 +87,132 @@ struct PlagerismCalculator
 	std::vector<int> doCalc(HMMengine &hmm)
 	{
 		std::vector<int> ret;
+		std::vector<size_t> sentIndex; // the index of the selected word pair list
+		sentIndex.resize(sentenceList.size());
 
+		int biggest_chain = 0;
 
-//		std::vector<int> sortedWordPairs;
+		std::vector<int> sortedWordPairs;
 
-//		for (int i = 0;i < )
-		// create the indexes
+		// setup the search array.  Each item in the array represents one word pair and contain
+		// an integer value of the index in sentenceList that they represent.  These are kept
+		// in sorted order and the processing is always done on the smallest item.
+		sortedWordPairs.resize(sentenceList.size()+1);
+		sortedWordPairs[sentenceList.size()] = -1;
+		int i,newItem,tmpItem,chain;
+
+		for (i = 0; i < sortedWordPairs.size(); ++i)
+		{
+			sortedWordPairs[i] = i;
+		}
+
 		for (size_t wp = 0; wp < sentenceList.size(); ++wp)
 		{
-			sentIndex.push_back(0);
-		}
-		// find the minimums
-		bool keepGoing = true;
-		int currMin = 0;
-		int nextMin = INT_MAX;
-		int currTotal = 0;
-		while (keepGoing)
-		{
-			keepGoing = false;
-			for (size_t wp = 0; wp < sentenceList.size(); ++wp)
+			i = wp;
+			newItem = sentenceList[wp][0];
+			while (i>0)
 			{
-				// Only consider to the end of the list for each word pair.  When all lists are exhausted keepGoing will be false
-				//vector<int> compareSent = hmm.dataBase.TotalSentenceList[currMin];
-				//std::cout << "compare: " << hmm.tokenizer.rebuildSent(compareSent) << std::endl;
-				if (sentIndex[wp] < sentenceList[wp].size())
+				if (newItem < sentenceList[sortedWordPairs[i-1]][0])
 				{
-					// There are still some items left to consider 
-					keepGoing = true;
-					if (sentenceList[wp][sentIndex[wp]] == currMin)
-					{
-						currTotal++;
-						sentIndex[wp]++;
-						if (sentIndex[wp] < sentenceList[wp].size())
-							if (sentenceList[wp][sentIndex[wp]] < nextMin)
-								nextMin = sentenceList[wp][sentIndex[wp]];
-					}
-					else if (sentenceList[wp][sentIndex[wp]]< nextMin)
-					{
-						nextMin = sentenceList[wp][sentIndex[wp]];
+					sortedWordPairs[i] = sortedWordPairs[i - 1];
+					--i;
+				}
+				else
+					break;
+			}
+			sortedWordPairs[i] = wp;
+		}
 
+		// search 
+		while (sortedWordPairs[0] != -1) // search until the list is empty
+		{
+			i = 0;
+			chain = 0;
+			while ((sortedWordPairs[i + 1] != -1) && (sentenceList[sortedWordPairs[i]][sentIndex[sortedWordPairs[i]]] == sentenceList[sortedWordPairs[i + 1]][sentIndex[sortedWordPairs[i + 1]]]))
+			{
+				++chain;
+				++i;
+			}
+			if (chain > biggest_chain)
+				biggest_chain = chain;
+			if (chain > 5)
+				ret.push_back(sentenceList[sortedWordPairs[i]][0]);
+
+			while (sentenceList[sortedWordPairs[0]][sentIndex[sortedWordPairs[0]]] <= sentenceList[sortedWordPairs[1]][sentIndex[sortedWordPairs[1]]])
+			{
+				++sentIndex[sortedWordPairs[0]];
+				if (sentIndex[sortedWordPairs[0]] >= sentenceList[sortedWordPairs[0]].size())
+				{
+					// we have reached the end of this word pair chain, so delete it from the list and add -1 at the end
+					i = 0;
+					while (sortedWordPairs[i] != -1)
+					{
+						sortedWordPairs[i] = sortedWordPairs[i + 1];
+						++i;
 					}
 				}
 			}
-			if (currTotal>5) 
-				ret.push_back(currMin);
-			currTotal = 0;
-			currMin = nextMin;
-			nextMin = INT_MAX;
+			// see if there is only one word pair left.
+			if (sortedWordPairs[1] == -1)
+				return ret;
+			// list is out of order, so resort list
+			i = 0;
+			while ((sortedWordPairs[i + 1] != -1) && (sentenceList[sortedWordPairs[i]][sentIndex[sortedWordPairs[i]]] > sentenceList[sortedWordPairs[i + 1]][sentIndex[sortedWordPairs[i + 1]]]))
+			{
+				// swap items
+				tmpItem = sortedWordPairs[i];
+				sortedWordPairs[i] = sortedWordPairs[i + 1];
+				sortedWordPairs[i + 1] = tmpItem;
+				++i;
+			}
 		}
-		sentenceList.clear();
+
+
+
+		//// create the indexes
+		//for (size_t wp = 0; wp < sentenceList.size(); ++wp)
+		//{
+		//	sentIndex.push_back(0);
+		//}
+		//// find the minimums
+		//bool keepGoing = true;
+		//int currMin = 0;
+		//int nextMin = INT_MAX;
+		//int currTotal = 0;
+		//while (keepGoing)
+		//{
+		//	keepGoing = false;
+		//	for (size_t wp = 0; wp < sentenceList.size(); ++wp)
+		//	{
+		//		// Only consider to the end of the list for each word pair.  When all lists are exhausted keepGoing will be false
+		//		//vector<int> compareSent = hmm.dataBase.TotalSentenceList[currMin];
+		//		//std::cout << "compare: " << hmm.tokenizer.rebuildSent(compareSent) << std::endl;
+		//		if (sentIndex[wp] < sentenceList[wp].size())
+		//		{
+		//			// There are still some items left to consider 
+		//			keepGoing = true;
+		//			if (sentenceList[wp][sentIndex[wp]] == currMin)
+		//			{
+		//				currTotal++;
+		//				sentIndex[wp]++;
+		//				if (sentIndex[wp] < sentenceList[wp].size())
+		//					if (sentenceList[wp][sentIndex[wp]] < nextMin)
+		//						nextMin = sentenceList[wp][sentIndex[wp]];
+		//			}
+		//			else if (sentenceList[wp][sentIndex[wp]]< nextMin)
+		//			{
+		//				nextMin = sentenceList[wp][sentIndex[wp]];
+
+		//			}
+		//		}
+		//	}
+		//	if (currTotal>5) 
+		//		ret.push_back(currMin);
+		//	currTotal = 0;
+		//	currMin = nextMin;
+		//	nextMin = INT_MAX;
+		//}
+		//sentenceList.clear();
 		return ret;
 	}
 
@@ -449,6 +525,13 @@ void HMMengine::compareThreadEngine(HMMengine &hmm,EngineStatus* engineStatus, s
 				vector<int> plagerized = plagCalc.compare(documentTokens[s], hmm.dataBase.TotalSentenceList[*i], score);
 				SentenceRanking newRank = createSentenceRanking(hmm, documentTokens, plagerized, s, *i,score);
 				cr.sentenceRankings.push_back(newRank);
+
+
+				std::cout << "source: " << hmm.tokenizer.rebuildSent(documentTokens[s]) << std::endl;
+				std::cout << std::endl << "Sent#" << s << std::endl;
+
+				std::cout << *i << ", score =>" << score << std::endl;
+				std::cout << "database: " << hmm.tokenizer.rebuildSent(plagerized) << std::endl;
 			}
 
 			//std::cout << "Plagerism sentences: ";
