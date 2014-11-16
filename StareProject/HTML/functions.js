@@ -78,8 +78,6 @@ function sendMessage(string){
         }
     }
 	xmlhttp.setRequestHeader("Content-Type", "application/json");
-	var myWindow = window.open("", "OUT", "width=200, height=100");
-	myWindow.document.write('<html>'+data+'</html>');
 	xmlhttp.send(data);
 }
 
@@ -91,7 +89,6 @@ function callback(response){
             compareDecode(JSON.stringify(json));
             return;
         }
-        //window.location.href = 'output.html'; 
     }
     else if(json.command=="checkCompare"){
         if(json.hasOwnProperty("ranking")){
