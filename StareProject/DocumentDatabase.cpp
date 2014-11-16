@@ -266,6 +266,20 @@ void DocumentDatabase::incrementTokenAndStyleCounts( vector<int> sentence, int S
 }
 
 
+
+int DocumentDatabase::getStyleIDfromDocumentID(int DocID)
+{
+	if ((DocID < 0) || (DocID >= documentList.size()))
+		return -1;
+	for (int i = 0; i < StyleList.size(); ++i)
+	{
+		if (StyleList[i].Author == documentList[DocID].Author)
+			return StyleList[i].StyleID;
+	}
+	return -1;
+}
+
+
 /* Retrieve the Author Style */
 
 int DocumentDatabase::getStyleID(sqlite3* db, std::string author)
@@ -325,6 +339,22 @@ void DocumentDatabase::createWordStyleCounts( int StyleID, std::string author)
 	TotalWordCountsByStyle[StyleID] = StyleCounts(StyleID, author, 0);
 }
 */
+
+int DocumentDatabase::GetDocIDfromSentID(int sentID)
+{
+	if ((sentID < 0) || (sentID >= TotalSentenceList.size()))
+		return -1;
+	else
+	{
+		for (int i = 0; i < documentList.size(); ++i)
+		{
+			if ((sentID >= documentList[i].startSentenceID) && (sentID < documentList[i].endSentenceID))
+				return i;
+		}
+	}
+	return -1;
+}
+
 
 int DocumentDatabase::getDocumentID(sqlite3* db, std::string Author, std::string title)
 {
@@ -677,12 +707,15 @@ void DocumentDatabase::insertDocumentText(int DocumentID, std::deque<std::vector
 			sqlite3_bind_int(HMMtokenPaths_stmt, 1, StyleID);
 			sqlite3_bind_int(HMMtokenPaths_stmt, 2, DocumentID);
 			sqlite3_bind_int(HMMtokenPaths_stmt, 3, SentenceID);
-			if (currWordToken != -1) sqlite3_bind_int(HMMtokenPaths_stmt, 4, currWordToken);
-			else sqlite3_bind_null(HMMtokenPaths_stmt, 4);
-			if (nextWordToken != -1) sqlite3_bind_int(HMMtokenPaths_stmt, 5, nextWordToken);
-			else sqlite3_bind_null(HMMtokenPaths_stmt, 5);
-			if (prevWordToken != -1) sqlite3_bind_int(HMMtokenPaths_stmt, 6, prevWordToken);
-			else sqlite3_bind_null(HMMtokenPaths_stmt, 6);
+			sqlite3_bind_int(HMMtokenPaths_stmt, 4, currWordToken);
+			sqlite3_bind_int(HMMtokenPaths_stmt, 5, nextWordToken);
+			sqlite3_bind_int(HMMtokenPaths_stmt, 6, prevWordToken);
+			//if (currWordToken != -1) sqlite3_bind_int(HMMtokenPaths_stmt, 4, currWordToken);
+			//else sqlite3_bind_null(HMMtokenPaths_stmt, 4);
+			//if (nextWordToken != -1) sqlite3_bind_int(HMMtokenPaths_stmt, 5, nextWordToken);
+			//else sqlite3_bind_null(HMMtokenPaths_stmt, 5);
+			//if (prevWordToken != -1) sqlite3_bind_int(HMMtokenPaths_stmt, 6, prevWordToken);
+			//else sqlite3_bind_null(HMMtokenPaths_stmt, 6);
 			sqlite3_step(HMMtokenPaths_stmt);
 			//int sentenceID = (int)sqlite3_last_insert_rowid(db);
 			//wpd.AddCounts(currWordToken,nextWordToken,StyleID,sentenceID);

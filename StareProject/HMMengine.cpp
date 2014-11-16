@@ -89,6 +89,10 @@ struct PlagerismCalculator
 	{
 		std::vector<int> ret;
 
+
+//		std::vector<int> sortedWordPairs;
+
+//		for (int i = 0;i < )
 		// create the indexes
 		for (size_t wp = 0; wp < sentenceList.size(); ++wp)
 		{
@@ -132,6 +136,7 @@ struct PlagerismCalculator
 			currMin = nextMin;
 			nextMin = INT_MAX;
 		}
+		sentenceList.clear();
 		return ret;
 	}
 
@@ -139,16 +144,17 @@ struct PlagerismCalculator
 	{
 		score = 0;
 		vector<int> overlap;
-		//overlap.reserve(source.size()); // defaults to 0 for all positions
+		overlap.resize(source.size()); // defaults to 0 for all positions
 		for (size_t si = 0; si < source.size(); ++si)
 		{
-			for (size_t di = si; di < database.size(); ++di)
+			for (size_t di = 0; di < database.size(); ++di)
 			{
+				int si_temp = si;
 				int di_tmp=di;
-				while (source[si] == database[di_tmp])
+				while (source[si_temp] == database[di_tmp])
 				{
 					di_tmp++;
-					if (++si == source.size())
+					if (++si_temp == source.size())
 						break;
 				}
 				int offset = di_tmp - di;
@@ -160,7 +166,9 @@ struct PlagerismCalculator
 						overlap[i] = 1;
 					}
 				}
+				si = si_temp;
 				if (offset > score) score = offset;
+				if (si >= source.size()) break;
 			}
 		}
 		vector<int> ret;
@@ -168,9 +176,9 @@ struct PlagerismCalculator
 		bool in_plagerism = false;
 		for (size_t i = 0; i < overlap.size(); ++i)
 		{
-			ret.push_back(source[i]);
 			if (in_plagerism)
 			{
+				ret.push_back(source[i]);
 				//Currently inside a plagerized spot
 				if (overlap[i] == 0)
 				{
@@ -188,6 +196,7 @@ struct PlagerismCalculator
 					ret.push_back('[');
 					in_plagerism = true;
 				}
+				ret.push_back(source[i]);
 			}
 		}
 		if (in_plagerism)
@@ -261,12 +270,91 @@ struct StyleCalculator
 	}
 };
 
+SentenceRanking createSentenceRanking(HMMengine &hmm, std::deque<std::vector<int>> &sourceDoc, vector<int> plagarizedSentence, int sourceID, int dbID, int score)
+{
+	SentenceBlob source;
+	source.SentenceID = sourceID;
+	source.SentenceStr = hmm.tokenizer.rebuildSent(plagarizedSentence);
+	if (sourceID > 1)
+		source.PrevSentenceStr = hmm.tokenizer.rebuildSent(sourceDoc[sourceID - 1]);
+	else
+		source.PrevSentenceStr = "";
+
+	if (sourceID > 2)
+		source.PrevPrevSentenceStr = hmm.tokenizer.rebuildSent(sourceDoc[sourceID - 2]);
+	else
+		source.PrevPrevSentenceStr = "";
+
+	if (sourceID + 1 < sourceDoc.size())
+		source.NextSentenceStr = hmm.tokenizer.rebuildSent(sourceDoc[sourceID + 1]);
+	else
+		source.NextSentenceStr = "";
+
+	if (sourceID + 2 < sourceDoc.size())
+		source.NextNextSentenceStr = hmm.tokenizer.rebuildSent(sourceDoc[sourceID + 2]);
+	else
+		source.NextNextSentenceStr = "";
+
+
+	SentenceBlob databaseBlob;
+	int docID = hmm.dataBase.GetDocIDfromSentID(dbID);
+	int sentDocStart, sentDocEnd;
+	std::string styleStr, titleStr;
+	if (docID >= 0)
+	{
+		sentDocStart = hmm.dataBase.documentList[docID].startSentenceID;
+		sentDocEnd = hmm.dataBase.documentList[docID].endSentenceID;
+		styleStr = hmm.dataBase.documentList[docID].Author;
+		titleStr = hmm.dataBase.documentList[docID].Title;
+		databaseBlob.SentenceStr = hmm.tokenizer.rebuildSent(hmm.dataBase.TotalSentenceList[dbID]);
+
+		if (dbID - 1 >= sentDocStart)
+			databaseBlob.PrevSentenceStr = hmm.tokenizer.rebuildSent(hmm.dataBase.TotalSentenceList[dbID - 1]);
+		else
+			databaseBlob.PrevSentenceStr = "";
+
+		if (dbID - 2 >= sentDocStart)
+			databaseBlob.PrevPrevSentenceStr = hmm.tokenizer.rebuildSent(hmm.dataBase.TotalSentenceList[dbID - 2]);
+		else
+			databaseBlob.PrevPrevSentenceStr = "";
+
+		if (dbID + 1 < sentDocEnd)
+			databaseBlob.NextSentenceStr = hmm.tokenizer.rebuildSent(hmm.dataBase.TotalSentenceList[dbID + 1]);
+		else
+			databaseBlob.NextSentenceStr = "";
+
+		if (dbID + 2 < sentDocEnd)
+			databaseBlob.NextNextSentenceStr = hmm.tokenizer.rebuildSent(hmm.dataBase.TotalSentenceList[dbID + 2]);
+		else
+			databaseBlob.NextNextSentenceStr = "";
+	}
+	else
+	{
+		sentDocStart = 0;
+		sentDocEnd = 0;
+		styleStr = "";
+		titleStr = "";
+		databaseBlob.SentenceStr = "";
+		databaseBlob.PrevSentenceStr = "";
+		databaseBlob.PrevPrevSentenceStr = "";
+		databaseBlob.NextSentenceStr = "";
+		databaseBlob.NextNextSentenceStr = "";
+	}
+
+	SentenceRanking sr(styleStr, titleStr, source, databaseBlob, score);
+	return sr;
+}
 
 
 void HMMengine::compareThreadEngine(HMMengine &hmm,EngineStatus* engineStatus, std::string &text)
 {
+	CompareResult cr;
+
+
     std::deque<std::vector<int>> documentTokens = hmm.tokenizer.tokenizeDoc(text);
-	
+
+	engineStatus->setPercentComplete(5);
+
 	PlagerismCalculator plagCalc;
 
     std::map<int,StyleCalculator> styleCalcs;
@@ -290,12 +378,14 @@ void HMMengine::compareThreadEngine(HMMengine &hmm,EngineStatus* engineStatus, s
 	}
 
 	//double WPprob, SentNormProb, DocNormProb;
+	int progressBump = documentTokens.size() / 90;
+	//int progressCount = 0;
 
     for (size_t s = 0; s < documentTokens.size(); s++) {
         size_t sentSize = documentTokens[s].size() - 1;
 		// It is a new sentence, so clear the stylcCalc sentence counters.
-		std::cout << "source: " << hmm.tokenizer.rebuildSent(documentTokens[s]) << std::endl;
-		std::cout << std::endl << "Sent#" << s;
+		//std::cout << "source: " << hmm.tokenizer.rebuildSent(documentTokens[s]) << std::endl;
+		//std::cout << std::endl << "Sent#" << s;
 		for (std::map<int, StyleCalculator>::iterator it = styleCalcs.begin(); it != styleCalcs.end(); ++it)
 		{
 			//// Calculate Sentence Probability
@@ -309,13 +399,13 @@ void HMMengine::compareThreadEngine(HMMengine &hmm,EngineStatus* engineStatus, s
 			//	(hmm.dataBase.wpd.getTotalWordCount() - hmm.dataBase.wpd.getWordStyleCount(it->second.StyleID)) /
 			//	((double)hmm.dataBase.wpd.getTotalWordCount() / stylesCount);
 
-			std::cout << std::fixed << std::setprecision(2) 
-				<< "   " << hmm.dataBase.StyleList[it->second.StyleID].Author << " " << it->second.getSentProb() << " : " << it->second.getDocProb() 
-				<< " (" << it->second.totalStyleCountsInDoc << ":" << it->second.totalCountsInDoc << ") ";
+			//std::cout << std::fixed << std::setprecision(2) 
+			//	<< "   " << hmm.dataBase.StyleList[it->second.StyleID].Author << " " << it->second.getSentProb() << " : " << it->second.getDocProb() 
+			//	<< " (" << it->second.totalStyleCountsInDoc << ":" << it->second.totalCountsInDoc << ") ";
 			it->second.resetSentence();
 		}
 
-		std::cout << std::endl;
+		//std::cout << std::endl;
 
 		// Step trough all of the words this sentence.
         for (size_t w = 0; w < sentSize; w++) 
@@ -353,17 +443,38 @@ void HMMengine::compareThreadEngine(HMMengine &hmm,EngineStatus* engineStatus, s
 		vector<int> result = plagCalc.doCalc(hmm);
 		if (result.size() > 0)
 		{
-			std::cout << "Plagerism sentences: ";
+			int score;
 			for (vector<int>::iterator i = result.begin(); i != result.end(); ++i)
 			{
-				std::cout << *i << "," << std::endl;
-				std::cout << "database: " << hmm.tokenizer.rebuildSent(hmm.dataBase.TotalSentenceList[*i]) << std::endl;
-
+				vector<int> plagerized = plagCalc.compare(documentTokens[s], hmm.dataBase.TotalSentenceList[*i], score);
+				SentenceRanking newRank = createSentenceRanking(hmm, documentTokens, plagerized, s, *i,score);
+				cr.sentenceRankings.push_back(newRank);
 			}
+
+			//std::cout << "Plagerism sentences: ";
+			//int score;
+			//int best_score=0;
+			//for (vector<int>::iterator i = result.begin(); i != result.end(); ++i)
+			//{
+			//	vector<int> plagerized = plagCalc.compare(documentTokens[s], hmm.dataBase.TotalSentenceList[*i], score);
+
+			//	std::cout << *i << ", score =>" << score << std::endl;
+			//	std::cout << "database: " << hmm.tokenizer.rebuildSent(plagerized) << std::endl;
+			//}
 		}
-			
+		// end sentence processing so update the progress bar
+		//++progressCount;
+		if ((s % progressBump)==0)
+		{ 
+			int newPercent = s / progressBump + 5;
+			std::cout << "percentComplete:" << newPercent << "%" << std::endl;
+			engineStatus->setPercentComplete(newPercent);
+		}
     }
+	engineStatus->setResult(cr);
+	engineStatus->setPercentComplete(100);
 }
+
 
 /*
 	std::deque<std::vector<int>> documentTokens = hmm.tokenizer.tokenizeDoc(text);

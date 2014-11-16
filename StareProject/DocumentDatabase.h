@@ -89,6 +89,7 @@ public:
 	int insertStyle(sqlite3* db, std::string author); // adds to both the local data struct and sqlite database
 	int getStyleID(sqlite3* db, std::string author);
 	int getStyleID(sqlite3* db, int docID);
+	int getStyleIDfromDocumentID(int DocID);
 	std::string getAuthor(int StyleID);
 	
 	
@@ -116,6 +117,7 @@ public:
 
 	int getDocumentID(sqlite3* db, int styleID, std::string title);
 	int getDocumentID(sqlite3* db, std::string Author, std::string title);
+	int GetDocIDfromSentID(int sentID);
 
 	//int getSentenceID(int docID);
 	int incrementSentenceID(sqlite3* db, int byAmount);
