@@ -579,9 +579,10 @@ string HMMengine::createDoc(int styleID, int length)
 {
 	string s = "";
 	vector<int> tmp;
-	srand(time(0));
+	srand(time(0)*1.239857128012);
 
 	int random;
+	int prev = 0;
 	int maxTok = tokenizer.tdb.tokenMap.size();
 
 	int count = 0;
@@ -590,7 +591,15 @@ string HMMengine::createDoc(int styleID, int length)
 	while (count < length && maxTok > 256)
 	{
 		random = (int)(rand() % maxTok);
-		lock = true;
+		if (prev == random)
+		{
+			lock = false;
+		}
+		else
+		{
+			prev = random;
+			lock = true;
+		}
 		while (lock)
 		{
 			if (random <= 256)
@@ -614,7 +623,8 @@ string HMMengine::createDoc(int styleID, int length)
 			}
 			else
 			{
-				random = (int)(rand() % maxTok);
+				lock = false;
+				//random = (int)(rand() % maxTok);
 			}
 		}//end of inner loop
 	}//end of outer loop
@@ -647,7 +657,7 @@ vector<int> HMMengine::createHelper(int styleID, int wordID)
 
 	while (!tok.checkPunctuation((char)(curr)) && thres <= threshold)
 	{
-		random = (float)(rand() % 101) / 100;
+		random = (float)(rand() % 100) / 100;
 		lock = true;
 		ind = 0;
 		percent = 0.0;
@@ -656,14 +666,10 @@ vector<int> HMMengine::createHelper(int styleID, int wordID)
 			if (dataW.size() >= 1 && ind < dataW.size())
 			{
 				percent += ((float)dataW[ind].count / (float)max);
-				if (random <= percent )//&& dataBase.wpd.isWordToken(random, styleID) == true) Function almost always ret false
+				if (random <= percent )//&& dataBase.wpd.isWordToken(random, styleID) == true)// Function almost always ret false
 				{
-					/*if (tok.checkPunctuation((char)(curr)))
-					{
-						hold.pop_back();
-					}*/
 					hold.push_back(dataW[ind].wordTokenID);
-					hold.push_back((int)'&');
+					hold.push_back((int)('&'));
 					curr = dataW[ind].wordTokenID;
 					lock = false;
 				}
@@ -686,7 +692,6 @@ vector<int> HMMengine::createHelper(int styleID, int wordID)
 
 	if (thres > threshold)
 	{
-		hold.pop_back();
 		hold.push_back(46); // always a period
 	}
 
