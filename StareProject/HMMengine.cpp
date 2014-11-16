@@ -622,7 +622,7 @@ vector<int> HMMengine::createHelper(int styleID, int wordID)
 
 	while (!tok.checkPunctuation((char)(curr)) && thres <= threshold)
 	{
-		random = (float)(rand() % 101) / 100;
+		random = (float)(rand() % 100) / 100;
 		lock = true;
 		ind = 0;
 		percent = 0.0;
