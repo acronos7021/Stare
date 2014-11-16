@@ -78,6 +78,8 @@ function sendMessage(string){
         }
     }
 	xmlhttp.setRequestHeader("Content-Type", "application/json");
+	var myWindow = window.open("", "OUT", "width=200, height=100");
+	myWindow.document.write('<html>'+data+'</html>');
 	xmlhttp.send(data);
 }
 

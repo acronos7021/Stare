@@ -42,22 +42,25 @@ void serverv2::startServer() {
 //----------------------------------------------------------------------------------------------------
 
 void serverv2::recvData(int client_socket) {
-    char buffer[8000000];
+    char buffer[1000];
     long buffersize = sizeof(buffer);
     long x = buffersize;
-    int bytesRead = 0;
-    int out;
-    //std::cout<< bytesRead <<std::endl;
-    std::cout << "Incoming:" << std::endl;
-    std::cout<< buffer <<std::endl;
-    out = read(client_socket, buffer + bytesRead, x - bytesRead);
-    bytesRead += out;
-    //std::cout << out << std::endl;
-    //std::cout<< buffer <<std::endl;
-    std::string recvDataString = std::string(buffer);
+    int tot = 0;
+    int num =buffersize;
+    std::string input;
+    while (num>=0)
+    {
+        num=recv(client_socket, buffer, 1000, 0);
+        buffer[num] = '\0';
+        input += buffer;
+        if(num==0)
+            break;
+    }
+//    std::string recvDataString = std::string(buffer);
 ///     Get data from the algorithm/database in here. the two lines below are for testing purpose.
     PHPsocket php2(cmd);//cmd);
-    //std::cout << recvDataString << std::endl;
+    std::string recvDataString=input;
+    std::cout << recvDataString << std::endl;
     std::string result = php2.jsonDecoder(recvDataString);
     std::cout << "Outgoing:" << std::endl;
     std::cout << result << std::endl;
@@ -65,8 +68,25 @@ void serverv2::recvData(int client_socket) {
     //std::string dataToSend = "Hello client, I have received your data ";
     dataInChars = result.c_str();
     int dataSendSize = result.length();
-    int sent_ok = send(client_socket, dataInChars, dataSendSize, NULL);
-
+    std::string sentSoFar;
+    int sent_ok=0;
+    while(true) {
+         sent_ok = send(client_socket, dataInChars, dataSendSize, NULL);
+        if(sent_ok <0){
+            std::cout << "Fail" << std::endl;
+            break;
+        }
+        if(sent_ok<dataSendSize){
+            sentSoFar = result.substr(sent_ok);
+            dataInChars = sentSoFar.c_str();
+            std::cout << "Cut" << std::endl;
+        } else{
+            break;
+        }
+    }
+    close(client_socket);
+    std::cout << "done" << std::endl;
+    std::cout << sentSoFar << std::endl;
 }
 
 void serverv2::listening(){

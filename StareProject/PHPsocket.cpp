@@ -188,7 +188,6 @@ std::string PHPsocket::doCompare(Json::Value json)
 	int sessionID;
 	istringstream(ID) >> sessionID;
 	CompareResult result = cmd->compare(sessionID, json["documentText"].asString());
-
 	//Here I check if what compare returns is empty
 	//TODO change this to the boolean.
 	if (result.percentComplete<100){
@@ -223,7 +222,6 @@ std::string PHPsocket::doCompare(Json::Value json)
 		rankingObj["certainty"] = result.sentenceRankings[i].certainty;
 		compare["ranking"].append(rankingObj);
 	}
-	std::cout<< compare.toStyledString() <<std::endl;
 	return compare.toStyledString();
 }
 
