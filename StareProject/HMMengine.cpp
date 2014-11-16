@@ -135,31 +135,66 @@ struct PlagerismCalculator
 		return ret;
 	}
 
-	//std::vector<int> compare(std::vector<int> source, std::vector<int> database,int &score)
-	//{
-	//	score = 0;
-	//	vector<int> overlap;
-	//	overlap.reserve(source.size()); // defaults to 0 for all positions
-	//	for (size_t si = 0; si < source.size(); ++si)
-	//	{
-	//		for (size_t di = si; di < database.size(); ++di)
-	//		{
-	//			int di_tmp=di;
-	//			while (source[si] == database[di_tmp])
-	//			{
-	//				di_tmp++;
-	//				if (++si == source.size())
-	//					break;
-	//			}
-	//			int offset = di_tmp - di;
-	//			if (offset>1)
-	//			{
-	//				std::fill(overlap[si], overlap[si + offset], 1);
-	//			}
-	//			if (offset > score) score = offset;
-	//		}
-	//	}
-	//}
+	std::vector<int> compare(std::vector<int> source, std::vector<int> database,int &score)
+	{
+		score = 0;
+		vector<int> overlap;
+		//overlap.reserve(source.size()); // defaults to 0 for all positions
+		for (size_t si = 0; si < source.size(); ++si)
+		{
+			for (size_t di = si; di < database.size(); ++di)
+			{
+				int di_tmp=di;
+				while (source[si] == database[di_tmp])
+				{
+					di_tmp++;
+					if (++si == source.size())
+						break;
+				}
+				int offset = di_tmp - di;
+				if (offset>1)
+				{
+					//std::fill(overlap[si], overlap[si + offset], 1);
+					for (int i = si; i<si + offset; ++i)
+					{
+						overlap[i] = 1;
+					}
+				}
+				if (offset > score) score = offset;
+			}
+		}
+		vector<int> ret;
+		size_t si = 0;
+		bool in_plagerism = false;
+		for (size_t i = 0; i < overlap.size(); ++i)
+		{
+			ret.push_back(source[i]);
+			if (in_plagerism)
+			{
+				//Currently inside a plagerized spot
+				if (overlap[i] == 0)
+				{
+					//exiting plagerized spot.
+					ret.push_back(']');
+					in_plagerism = false;
+				}
+			}
+			else
+			{
+				//Currently outside plagerized spot
+				if (overlap[i] == 1)
+				{
+					// entering plagerized spot
+					ret.push_back('[');
+					in_plagerism = true;
+				}
+			}
+		}
+		if (in_plagerism)
+			ret.push_back(']');
+
+		return ret;
+	}
 
 	void clear()
 	{
