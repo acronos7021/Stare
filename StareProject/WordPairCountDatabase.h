@@ -125,6 +125,7 @@ public:
 	const std::set<int> getSentenceList(int currWordToken, int nextWordToken);
 	void clearAll();
 
+	const double getStyleProbability(int currWordToken, int nextWordToken, int StyleID);
 	const std::vector<WordNextCountStruct> getNextToken(int currWordID,int StyleID);
 
 	bool isWordToken(int wordID,int styleID);

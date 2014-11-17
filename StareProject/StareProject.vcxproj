@@ -90,6 +90,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PHPsocket.cpp" />
     <ClCompile Include="Stopwatch.cpp" />
+    <ClCompile Include="TestCreate.cpp" />
     <ClCompile Include="TokenDatabase.cpp" />
     <ClCompile Include="Tokenizer.cpp" />
     <ClCompile Include="WordPairCountDatabase.cpp" />
@@ -108,6 +109,7 @@
     <ClInclude Include="PHPsocket.h" />
     <ClInclude Include="sqlite3.h" />
     <ClInclude Include="Stopwatch.h" />
+    <ClInclude Include="TestCreate.h" />
     <ClInclude Include="TokenDatabase.h" />
     <ClInclude Include="Tokenizer.h" />
     <ClInclude Include="WordPairCountDatabase.h" />

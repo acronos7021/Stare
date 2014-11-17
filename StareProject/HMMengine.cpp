@@ -422,140 +422,175 @@ SentenceRanking createSentenceRanking(HMMengine &hmm, std::deque<std::vector<int
 }
 
 
-void HMMengine::compareThreadEngine(HMMengine &hmm,EngineStatus* engineStatus, std::string &text)
+void HMMengine::compareThreadEngine(HMMengine &hmm, EngineStatus* engineStatus, std::string &text)
 {
 	CompareResult cr;
 
 
-    std::deque<std::vector<int>> documentTokens = hmm.tokenizer.tokenizeDoc(text);
+	std::deque<std::vector<int>> documentTokens = hmm.tokenizer.tokenizeDoc(text);
 
 	engineStatus->setPercentComplete(5);
 
 	PlagerismCalculator plagCalc;
 
-    std::map<int,StyleCalculator> styleCalcs;
-    int stylesCount = 0;
-    for (size_t st = 0; st < hmm.dataBase.StyleList.size(); ++st)
-        if (hmm.dataBase.wpd.getWordStyleCount(st) != 0) {
-            stylesCount++;
-            styleCalcs.insert(std::pair<int,StyleCalculator>(st, StyleCalculator(st)));
-        }
-    if (stylesCount<1) return;
-
-	// assign the weight of different styles.  Styles with a larger corpus need a smaller weight.
-	for (std::map<int, StyleCalculator>::iterator it = styleCalcs.begin(); it != styleCalcs.end(); ++it)
+	std::vector<double> styleScores;
+	styleScores.resize(hmm.dataBase.StyleList.size());
+	std::vector<int> styleScoreCounts;
+	styleScoreCounts.resize(hmm.dataBase.StyleList.size());
+	int currWord, nextWord;
+	for (size_t s = 0; s < documentTokens.size(); s++) 
 	{
-		int thisStyleID = it->second.StyleID;
-		int thisStyleWordCount = hmm.dataBase.wpd.getWordStyleCount(it->second.StyleID);
-		int totalWordCount = hmm.dataBase.wpd.getTotalWordCount();
-		double weight = (totalWordCount - thisStyleWordCount) / ((double)totalWordCount / stylesCount);
-		it->second.setWeight(weight);
+		// step through all the sentences in this document.
+		size_t sentSize = documentTokens[s].size() - 1;
 
+		for (size_t w = 0; w < sentSize; w++) 
+		{
+			// Step trough all of the words this sentence.
+			currWord = documentTokens[s][w];
+			if (hmm.dataBase.isWordToken(currWord))
+			{
+				for (size_t styID = 1; styID < hmm.dataBase.StyleList.size(); ++styID)
+				{
+					hmm.dataBase.getNextWordToken(documentTokens[s], w, nextWord);
+					// calculate the score for this Markov
+					double test = hmm.dataBase.wpd.getStyleProbability(currWord, nextWord, styID);
+					styleScores[styID] = styleScores[styID] + test;
+					styleScoreCounts[styID] += 1;
+					//std::cout << std::fixed << std::setprecision(2) << hmm.dataBase.getAuthor(styID) << ":" << styleScores[styID] / styleScoreCounts[styID];
+
+				}
+			}
+		}
+	}
+	for (size_t styID = 1; styID < hmm.dataBase.StyleList.size(); ++styID)
+	{
+		std::cout << std::fixed << std::setprecision(2) << hmm.dataBase.getAuthor(styID) << ":" << styleScores[styID] / styleScoreCounts[styID] << std::endl;
 	}
 
-	//double WPprob, SentNormProb, DocNormProb;
-	int progressBump = documentTokens.size() / 90;
-	//int progressCount = 0;
 
-    for (size_t s = 0; s < documentTokens.size(); s++) {
-        size_t sentSize = documentTokens[s].size() - 1;
-		// It is a new sentence, so clear the stylcCalc sentence counters.
-		//std::cout << "source: " << hmm.tokenizer.rebuildSent(documentTokens[s]) << std::endl;
-		//std::cout << std::endl << "Sent#" << s;
-		for (std::map<int, StyleCalculator>::iterator it = styleCalcs.begin(); it != styleCalcs.end(); ++it)
-		{
-			//// Calculate Sentence Probability
-			//WPprob = (double)it->second.totalStyleCountsInSent / it->second.totalCountsInSent; // (double)wordpairstylecount / totalwpc;
-			//SentNormProb = WPprob *
-			//	(hmm.dataBase.wpd.getTotalWordCount() - hmm.dataBase.wpd.getWordStyleCount(it->second.StyleID)) /
-			//	((double)hmm.dataBase.wpd.getTotalWordCount() / stylesCount);
-			//// Calculate document Probability
-			//WPprob = (double)it->second.totalStyleCountsInDoc / it->second.totalCountsInDoc; // (double)wordpairstylecount / totalwpc;
-			//DocNormProb = WPprob *
-			//	(hmm.dataBase.wpd.getTotalWordCount() - hmm.dataBase.wpd.getWordStyleCount(it->second.StyleID)) /
-			//	((double)hmm.dataBase.wpd.getTotalWordCount() / stylesCount);
+ //   std::map<int,StyleCalculator> styleCalcs;
+ //   int stylesCount = 0;
+ //   for (size_t st = 0; st < hmm.dataBase.StyleList.size(); ++st)
+ //       if (hmm.dataBase.wpd.getWordStyleCount(st) != 0) {
+ //           stylesCount++;
+ //           styleCalcs.insert(std::pair<int,StyleCalculator>(st, StyleCalculator(st)));
+ //       }
+ //   if (stylesCount<1) return;
 
-			//std::cout << std::fixed << std::setprecision(2) 
-			//	<< "   " << hmm.dataBase.StyleList[it->second.StyleID].Author << " " << it->second.getSentProb() << " : " << it->second.getDocProb() 
-			//	<< " (" << it->second.totalStyleCountsInDoc << ":" << it->second.totalCountsInDoc << ") ";
-			it->second.resetSentence();
-		}
+	//// assign the weight of different styles.  Styles with a larger corpus need a smaller weight.
+	//for (std::map<int, StyleCalculator>::iterator it = styleCalcs.begin(); it != styleCalcs.end(); ++it)
+	//{
+	//	int thisStyleID = it->second.StyleID;
+	//	int thisStyleWordCount = hmm.dataBase.wpd.getWordStyleCount(it->second.StyleID);
+	//	int totalWordCount = hmm.dataBase.wpd.getTotalWordCount();
+	//	double weight = (totalWordCount - thisStyleWordCount) / ((double)totalWordCount / stylesCount);
+	//	it->second.setWeight(weight);
 
-		//std::cout << std::endl;
+	//}
 
-		// Step trough all of the words this sentence.
-        for (size_t w = 0; w < sentSize; w++) 
-		{
-            int prevWordToken, nextWordToken, currWordToken;
-            if (hmm.dataBase.getPrevAndNext(s, w, prevWordToken, nextWordToken, documentTokens)) 
-			{
-				currWordToken = documentTokens[s][w];
-				// Should be a valid word token at this time.
-				//std::cout << hmm.tokenizer.tdb.GetString(currWordToken) << ":" << hmm.tokenizer.tdb.GetString(nextWordToken) << std::endl;
-				plagCalc.addWordPair(hmm.dataBase.wpd.getSentenceList(currWordToken, nextWordToken));
-                //std::cout << "Sentence " << s << std::endl;
-                for (std::map<int, StyleCalculator>::iterator it = styleCalcs.begin(); it != styleCalcs.end(); ++it) 
-				{
-                    //std::cout << "How deep does the rabit hole go? " << std::endl;
-                    int totalwpc = hmm.dataBase.wpd.getTotalWordPairCount(currWordToken, nextWordToken);
-                    if (totalwpc > 0) 
-					{
-						int wordpairstylecount = hmm.dataBase.wpd.getWordPairStyleCount(currWordToken, nextWordToken, it->second.StyleID);
-						it->second.incrementStats(wordpairstylecount, totalwpc);
-                        
-                        //std::cout << "wordpairstylecount:" << wordpairstylecount << "    totalwpc:" << totalwpc << std::endl;
-                        //double WPprob = (double)wordpairstylecount / totalwpc;
-                        //double NormProb = WPprob *
-                        //        (hmm.dataBase.wpd.getTotalWordCount() - hmm.dataBase.wpd.getWordStyleCount(it->second.StyleID)) /
-                        //        ((double)hmm.dataBase.wpd.getTotalWordCount() / stylesCount);
-                        //it->second.addToAverage(NormProb);
-                        //std::cout << "    WPprob:" << WPprob << "    NormProb:" << NormProb << std::endl;
-                        //std::cout << "    style:" << it->second.StyleID
-                        //        << "      sentProb:" << it->second.sentProbability << "   DocProb:" << it->second.docProbability << std::endl;
-                    }
-                }
-            }
-        }
-		vector<int> result;// = plagCalc.doCalc(hmm);
-		if (result.size() > 0)
-		{
-			int score;
-			for (vector<int>::iterator i = result.begin(); i != result.end(); ++i)
-			{
-				vector<int> plagerized = plagCalc.compare(documentTokens[s], hmm.dataBase.TotalSentenceList[*i], score);
-				SentenceRanking newRank = createSentenceRanking(hmm, documentTokens, plagerized, s, *i,score);
-				cr.sentenceRankings.push_back(newRank);
+	////double WPprob, SentNormProb, DocNormProb;
+	//int progressBump = documentTokens.size() / 90;
+	////int progressCount = 0;
+
+ //   for (size_t s = 0; s < documentTokens.size(); s++) {
+ //       size_t sentSize = documentTokens[s].size() - 1;
+	//	// It is a new sentence, so clear the stylcCalc sentence counters.
+	//	//std::cout << "source: " << hmm.tokenizer.rebuildSent(documentTokens[s]) << std::endl;
+	//	//std::cout << std::endl << "Sent#" << s;
+	//	for (std::map<int, StyleCalculator>::iterator it = styleCalcs.begin(); it != styleCalcs.end(); ++it)
+	//	{
+	//		//// Calculate Sentence Probability
+	//		//WPprob = (double)it->second.totalStyleCountsInSent / it->second.totalCountsInSent; // (double)wordpairstylecount / totalwpc;
+	//		//SentNormProb = WPprob *
+	//		//	(hmm.dataBase.wpd.getTotalWordCount() - hmm.dataBase.wpd.getWordStyleCount(it->second.StyleID)) /
+	//		//	((double)hmm.dataBase.wpd.getTotalWordCount() / stylesCount);
+	//		//// Calculate document Probability
+	//		//WPprob = (double)it->second.totalStyleCountsInDoc / it->second.totalCountsInDoc; // (double)wordpairstylecount / totalwpc;
+	//		//DocNormProb = WPprob *
+	//		//	(hmm.dataBase.wpd.getTotalWordCount() - hmm.dataBase.wpd.getWordStyleCount(it->second.StyleID)) /
+	//		//	((double)hmm.dataBase.wpd.getTotalWordCount() / stylesCount);
+
+	//		//std::cout << std::fixed << std::setprecision(2) 
+	//		//	<< "   " << hmm.dataBase.StyleList[it->second.StyleID].Author << " " << it->second.getSentProb() << " : " << it->second.getDocProb() 
+	//		//	<< " (" << it->second.totalStyleCountsInDoc << ":" << it->second.totalCountsInDoc << ") ";
+	//		it->second.resetSentence();
+	//	}
+
+	//	//std::cout << std::endl;
+
+	//	// Step trough all of the words this sentence.
+ //       for (size_t w = 0; w < sentSize; w++) 
+	//	{
+ //           int prevWordToken, nextWordToken, currWordToken;
+ //           if (hmm.dataBase.getPrevAndNext(s, w, prevWordToken, nextWordToken, documentTokens)) 
+	//		{
+	//			currWordToken = documentTokens[s][w];
+	//			// Should be a valid word token at this time.
+	//			//std::cout << hmm.tokenizer.tdb.GetString(currWordToken) << ":" << hmm.tokenizer.tdb.GetString(nextWordToken) << std::endl;
+	//			plagCalc.addWordPair(hmm.dataBase.wpd.getSentenceList(currWordToken, nextWordToken));
+ //               //std::cout << "Sentence " << s << std::endl;
+ //               for (std::map<int, StyleCalculator>::iterator it = styleCalcs.begin(); it != styleCalcs.end(); ++it) 
+	//			{
+ //                   //std::cout << "How deep does the rabit hole go? " << std::endl;
+ //                   int totalwpc = hmm.dataBase.wpd.getTotalWordPairCount(currWordToken, nextWordToken);
+ //                   if (totalwpc > 0) 
+	//				{
+	//					int wordpairstylecount = hmm.dataBase.wpd.getWordPairStyleCount(currWordToken, nextWordToken, it->second.StyleID);
+	//					it->second.incrementStats(wordpairstylecount, totalwpc);
+ //                       
+ //                       //std::cout << "wordpairstylecount:" << wordpairstylecount << "    totalwpc:" << totalwpc << std::endl;
+ //                       //double WPprob = (double)wordpairstylecount / totalwpc;
+ //                       //double NormProb = WPprob *
+ //                       //        (hmm.dataBase.wpd.getTotalWordCount() - hmm.dataBase.wpd.getWordStyleCount(it->second.StyleID)) /
+ //                       //        ((double)hmm.dataBase.wpd.getTotalWordCount() / stylesCount);
+ //                       //it->second.addToAverage(NormProb);
+ //                       //std::cout << "    WPprob:" << WPprob << "    NormProb:" << NormProb << std::endl;
+ //                       //std::cout << "    style:" << it->second.StyleID
+ //                       //        << "      sentProb:" << it->second.sentProbability << "   DocProb:" << it->second.docProbability << std::endl;
+ //                   }
+ //               }
+ //           }
+ //       }
+	//	vector<int> result;// = plagCalc.doCalc(hmm);
+	//	if (result.size() > 0)
+	//	{
+	//		int score;
+	//		for (vector<int>::iterator i = result.begin(); i != result.end(); ++i)
+	//		{
+	//			vector<int> plagerized = plagCalc.compare(documentTokens[s], hmm.dataBase.TotalSentenceList[*i], score);
+	//			SentenceRanking newRank = createSentenceRanking(hmm, documentTokens, plagerized, s, *i,score);
+	//			cr.sentenceRankings.push_back(newRank);
 
 
-				std::cout << "source: " << hmm.tokenizer.rebuildSent(documentTokens[s]) << std::endl;
-				std::cout << std::endl << "Sent#" << s << std::endl;
+	//			std::cout << "source: " << hmm.tokenizer.rebuildSent(documentTokens[s]) << std::endl;
+	//			std::cout << std::endl << "Sent#" << s << std::endl;
 
-				std::cout << *i << ", score =>" << score << std::endl;
-				std::cout << "database: " << hmm.tokenizer.rebuildSent(plagerized) << std::endl;
-			}
+	//			std::cout << *i << ", score =>" << score << std::endl;
+	//			std::cout << "database: " << hmm.tokenizer.rebuildSent(plagerized) << std::endl;
+	//		}
 
-			//std::cout << "Plagerism sentences: ";
-			//int score;
-			//int best_score=0;
-			//for (vector<int>::iterator i = result.begin(); i != result.end(); ++i)
-			//{
-			//	vector<int> plagerized = plagCalc.compare(documentTokens[s], hmm.dataBase.TotalSentenceList[*i], score);
+	//		//std::cout << "Plagerism sentences: ";
+	//		//int score;
+	//		//int best_score=0;
+	//		//for (vector<int>::iterator i = result.begin(); i != result.end(); ++i)
+	//		//{
+	//		//	vector<int> plagerized = plagCalc.compare(documentTokens[s], hmm.dataBase.TotalSentenceList[*i], score);
 
-			//	std::cout << *i << ", score =>" << score << std::endl;
-			//	std::cout << "database: " << hmm.tokenizer.rebuildSent(plagerized) << std::endl;
-			//}
-		}
-		// end sentence processing so update the progress bar
-		//++progressCount;
-		if ((s % progressBump)==0)
-		{ 
-			int newPercent = s / progressBump + 5;
-			std::cout << "percentComplete:" << newPercent << "%" << std::endl;
-			engineStatus->setPercentComplete(newPercent);
-		}
-    }
-	engineStatus->setResult(cr);
-	engineStatus->setPercentComplete(100);
+	//		//	std::cout << *i << ", score =>" << score << std::endl;
+	//		//	std::cout << "database: " << hmm.tokenizer.rebuildSent(plagerized) << std::endl;
+	//		//}
+	//	}
+	//	// end sentence processing so update the progress bar
+	//	//++progressCount;
+	//	if ((s % progressBump)==0)
+	//	{ 
+	//		int newPercent = s / progressBump + 5;
+	//		std::cout << "percentComplete:" << newPercent << "%" << std::endl;
+	//		engineStatus->setPercentComplete(newPercent);
+	//	}
+ //   }
+	//engineStatus->setResult(cr);
+	//engineStatus->setPercentComplete(100);
 }
 
 
@@ -767,6 +802,8 @@ void HMMengine::create(MetaData metaData)
 {
 
 }
+
+
 
 
 string HMMengine::createDoc(int styleID, int length)

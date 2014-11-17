@@ -7,6 +7,7 @@ using namespace std;
 //#include "HMMengine.h"
 #include "Console.h"
 #include "CMDparser.h"
+#include "TestCreate.h"
 //#include "DataStructs.h"
 
 //StyleDatabase& db = StyleDatabase();
@@ -17,7 +18,9 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-	
+	TestCreate tc;
+
+	tc.doTest();
 
 	CMDparser cmd;
 

@@ -582,6 +582,25 @@ bool DocumentDatabase::isWordToken(int token)
 		return false;
 }
 
+
+void DocumentDatabase::getNextWordToken(const std::vector<int> &sentence, int currWordIndex, int &nextWordToken)
+{
+	// set default value if next token is not found
+	nextWordToken = -1;
+	// search for next token
+	int lastToken = sentence.size();
+	int nextNum = currWordIndex + 1;
+	while (nextNum < lastToken)
+	{
+		if (isWordToken(sentence[nextNum]))
+		{
+			nextWordToken = sentence[nextNum];
+			break;
+		}
+		++nextNum;
+	}
+}
+
 // returns true if the currWordToken is actually a WordToken
 bool DocumentDatabase::getPrevAndNext(int sentenceNum, int wordNum, int &prevWordToken, int &nextWordToken, const std::deque<std::vector<int>> &document)
 {

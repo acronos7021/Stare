@@ -54,6 +54,7 @@ void WordPairCountDatabase::AddCounts(int currWordToken,int nextWordToken, int S
 		  newWord.insert(std::make_pair(nextWordToken, WordNextCountStruct(nextWordToken, StyleID, 1)));
 		  WordNextCountDatabaseStruct newWordDB;
 		  newWordDB.NextCountMap = newWord;
+		  newWordDB.addStyle(StyleID, 1);
 		  nextTokenStyle.insert(std::make_pair(currWordToken, newWordDB));
 	  }
 	  else
@@ -65,10 +66,12 @@ void WordPairCountDatabase::AddCounts(int currWordToken,int nextWordToken, int S
 			  // nextToken not found
 			  //std::map<int, WordNextCountStruct>  newWord;
 			  //newWord.insert(std::make_pair(nextWordToken, WordNextCountStruct(nextWordToken, StyleID, 1)));
+			  ns->second.addStyle(StyleID, 1);
 			  ns->second.NextCountMap.insert(std::make_pair(nextWordToken, WordNextCountStruct(nextWordToken, StyleID, 1))); //= newWord;// nextTokenStyle.insert(std::make_pair(currWordToken, newWord));
 		  }
 		  else
 		  {
+			  ns->second.addStyle(StyleID, 1);
 			  s->second.addStyle(StyleID, 1);
 		  }
 	  }
@@ -114,7 +117,39 @@ void WordPairCountDatabase::AddCounts(int currWordToken,int nextWordToken, int S
 //	return ret;
 //}
 
-
+const double WordPairCountDatabase::getStyleProbability(int currWordToken, int nextWordToken, int StyleID)
+{
+	std::map<int, WordNextCountDatabaseStruct>::iterator mp = nextTokenStyle.find(currWordToken);
+	if (mp != nextTokenStyle.end())
+	{
+		// found it
+		if ((StyleID >= 0) && (StyleID < mp->second.TotalStyleCounts.size()))
+		{
+			//return mp->second;
+			std::map<int, WordNextCountStruct>::iterator s = mp->second.NextCountMap.find(nextWordToken);
+			if (s != mp->second.NextCountMap.end())
+			{
+				if (StyleID < s->second.StyleCounts.size())
+				{
+					if (mp->second.TotalStyleCounts[StyleID]>0)
+					{
+						double ret = (double)s->second.StyleCounts[StyleID]/mp->second.TotalStyleCounts[StyleID] ;
+						return ret;
+					}
+					else
+						return 0;
+				}
+				else
+					return 0;
+			}
+			else
+				return 0;
+		}
+		else
+			return 0;
+	}
+	return 0;
+}
 
 const std::vector<WordNextCountStruct> WordPairCountDatabase::getNextToken(int currWordID, int StyleID)
 {
