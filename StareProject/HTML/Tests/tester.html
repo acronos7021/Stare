@@ -1,0 +1,72 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>STARE functions test</title>
+ 
+  <link rel="stylesheet" href="//code.jquery.com/qunit/qunit-1.15.0.css">
+  <script src="//code.jquery.com/qunit/qunit-1.15.0.js"></script>
+  <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha256.js"></script>
+  <script src="../functions.js"></script>
+ 
+  <script>
+    //alert(generateID());  
+QUnit.test("generate id", function( assert ) {
+    function testID(){
+        return !isNaN(generateID());
+    }
+    function testTwoId(){
+	var id = generateID();
+	return generateID == id;
+    }
+    assert.equal(testID(), true);
+    assert.equal(testTwoId(), false);
+});
+
+QUnit.test("Output file info", function( assert ) {
+  Output("Sample Message");
+  assert.equal(document.getElementById("messages").innerText, "Sample Message");
+  Output("");
+  assert.equal(document.getElementById("messages").innerText, "");
+});
+
+QUnit.test("Compare Decode Test", function( assert ) {
+  var json = {
+  "clientID": "ID",
+  "command": "compare|checkCompare",
+  "status": "#of characters process",
+  "documentText": "the document text here",
+  "overallCertainty": 100,
+  "ranking": [
+    {
+      "origSnip": ["sentence1","sentence2","sentence3"], 
+      "dataBaseSnip":["sentence1","sentence2","sentence3"],
+      "certainty": "someValue",
+      "documentTitle": "someTitle",
+      "foundDocumentID": "SomeDocID",
+      "foundSentenceID": "someSentID"
+    },
+    {
+      "origSnip": ["sentence1","sentence2","sentence3"], 
+      "dataBaseSnip":["sentence1","sentence2","sentence3"],
+      "certainty": "someValue",
+      "documentTitle": "someTitle",
+      "foundDocumentID": "SomeDocID",
+      "foundSentenceID": "someSentID"
+    }
+  ]
+}
+
+  compareDecode(JSON.stringify(json));
+  assert.equal(document.getElementById("certainty").innerText, 100);
+});
+
+
+  </script>
+</head>
+<body>
+ 
+<div id="qunit"></div>
+<div id="messages"></div>
+<div id="wrapper"></div> 
+</body>
+</html>

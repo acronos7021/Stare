@@ -7,13 +7,14 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Compare - Stare</title>
+    <title>Learn - Stare</title>
 
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
     <link href="css/navbar-fixed-top.css" rel="stylesheet">
+    <link href="css/toastr.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" type="text/css" href="css/style.css" />
 
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
@@ -44,9 +45,9 @@
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
             <li><a href="index.html">Home</a></li>
-            <li class="active"><a href="compareupload.html">Compare</a></li>
+            <li><a href="compareupload.html">Compare</a></li>
             <li><a href="create.html">Create</a></li>
-            <li><a href="learnupload.html">Learn</a></li>
+            <li class="active"><a href="learnupload.html">Learn</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
             <li><a href="">About</a></li>
@@ -57,12 +58,28 @@
     </nav>
 
     <div id="wrapper">
-        <h1>Compare Upload</h1>
+        <h1>Learn Upload</h1>
+        <p>Enter information about your document here:</p>
+        <form role="form" id="learnForm">
+			<div class="form-group">
+				<label for="title">Title</label>
+				<input type="text" class="form-control" id="title" placeholder="Example: 'Great Expectations'">
+			</div>
+			<div class="form-group">
+				<label for="author">Author</label>
+				<input type="text" class="form-control" id="author" placeholder="Example: 'Charles Dickens'">
+			</div>
+			<div class="form-group">
+				<label for="publishYear">Publish Year</label>
+				<input type="number" onkeypress="return /\d/.test(String.fromCharCode(((event||window.event).which||(event||window.event).which)));" class="form-control" id="publishYear" placeholder="Numbers Only, Example: '1988'">
+			</div>
+		</form>
         <div id="uploadbox">
             <form id="uploadform">
                 <label for="fileselect">Drag or Choose a File Here:</label>
                 <input type="file" id="fileselect"><br /><br />
 				<div id="messages"></div>
+				<button type="button" class="btn btn-default" onclick='learn();'>Submit</button>
 			</form>
 		</div>
      </div>
@@ -77,15 +94,16 @@
     <script src="js/ie10-viewport-bug-workaround.js"></script>
         <div id="footer"></div>
     <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha256.js"></script>
+    <script src="js/toastr.js"></script>
     <script src="functions.js"></script>
     <script>
          // call initialization file
         if (window.File && window.FileList && window.FileReader) {
-            InitUpload();
+            InitLearn();
             var saveE;
             var contents;
             var userDocTitle;
-        }
+        } 
 
     </script>
   </body>

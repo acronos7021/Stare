@@ -133,22 +133,39 @@ std::string PHPsocket::jsonDecoder(std::string json)
 		istringstream(ID) >> sessionID;
 		output = doCompare(jsonObject);
 	}
-	
 	else if (command.compare("create")==0) {
 		output = doCreate(jsonObject);
 	}
+    else if (command.compare("learn")==0) {
+        output = doLearn(jsonObject);
+    }
 	
 	return output;
 }
 
-std::string PHPsocket::doCreate(Json::Value json) {
-	
-	CreateResult result = cmd->create(json["clientID"].asInt(), json["style"].asString(), json["numberOfSentences"].asInt());
-	std::string text = result.newDocument;
-	
-	
-   return text;	
+std::string PHPsocket::doLearn(Json::Value json) {
+    Json::Value output;
+    cmd->learn(json["author"].asString(), json["title"].asString(), json["publishDate"].asString(), json["documentText"].asString());
+    output["command"] = "learn";
+    output["result"] = "Success";
+    return output.toStyledString();
 }
+
+std::string PHPsocket::doCreate(Json::Value json) {
+    Json::Value output;
+    std::string ID = json["clientID"].asString();
+    int sessionID;
+    istringstream(ID) >> sessionID;
+
+    std::string numSentStr = json["numberOfSentences"].asString();
+    int numSentences;
+    istringstream(numSentStr) >> numSentences;
+	CreateResult result = cmd->create(sessionID, json["style"].asString(), numSentences);
+    output["command"] = "create";
+	output["document"] = result.newDocument;
+   return output.toStyledString();
+}
+
 std::string PHPsocket::getStyles() {
     
 	vector<std::string> styles = cmd->getStyles();
@@ -171,7 +188,6 @@ std::string PHPsocket::doCompare(Json::Value json)
 	int sessionID;
 	istringstream(ID) >> sessionID;
 	CompareResult result = cmd->compare(sessionID, json["documentText"].asString());
-
 	//Here I check if what compare returns is empty
 	//TODO change this to the boolean.
 	if (result.percentComplete<100){
@@ -206,7 +222,6 @@ std::string PHPsocket::doCompare(Json::Value json)
 		rankingObj["certainty"] = result.sentenceRankings[i].certainty;
 		compare["ranking"].append(rankingObj);
 	}
-
 	return compare.toStyledString();
 }
 
@@ -221,21 +236,14 @@ Json::Value PHPsocket::formCheckCompareReturn(int status)
 
 Json::Value PHPsocket::parseJSON(std::string json)
 {
+    Json::StyledWriter styledWriter;
 	Json::Value root;
 	Json::Reader reader;
-	bool parsedSuccess = reader.parse(json,
-		root,
-		false);
-	if (!parsedSuccess)
-	{
-		// Report failures and their locations 
-		// in the document.
-		std::cout << "Failed to parse JSON" << std::endl
-			<< reader.getFormattedErrorMessages()
-			<< endl;
-		Json::Value jvnull;
-		return jvnull;
-	}
+    bool parsingSuccessful = reader.parse(json, root);
+    if (parsingSuccessful)
+    {
+        std::cout << styledWriter.write(root) << std::endl;
+    }
 	return root;
 }
 

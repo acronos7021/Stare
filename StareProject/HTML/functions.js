@@ -1,10 +1,10 @@
+//Compare functions
 function compareDecode(json) {
     var response = JSON.parse(json);
     
-    var outputHTML = '<html><head><title>STARE</title><link rel="stylesheet" type="text/css" href="style.css" /></head><div id="wrapper"><h1>STARE</h1><p>This is STARE. A plagiarism detector.</p><p>Your document was plagiarized: <b><span id="certainty"></span>%</b></p><div id="plagiarism"><!-- This is where javascript inserts compare --></div></div><script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha256.js"></script><script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script><script src="functions.js"></script></html>';
-    document.open();
-    document.write(outputHTML);
-    document.close();
+    var outputHTML = '<p>Your document was plagiarized: <b><span id="certainty"></span>%</b></p><div id="plagiarism"><!-- This is where javascript inserts compare --></div>';
+    document.getElementById('wrapper').innerHTML = outputHTML;
+    
     //add the overall certainty
     document.getElementById('certainty').innerHTML = response.overallCertainty;
     //Start body of plagarized document
@@ -23,15 +23,15 @@ function compareDecode(json) {
 	        response.ranking[i].origSnip[0] +
 	        '  <div id="popup" style="background-color: yellow;">' +
 	        response.ranking[i].origSnip[1] +
-	        '<span>This section was plagiarized: <b>' + response.ranking[
-	            i].certainty + '%</b></span></div>  ' + response.ranking[
+	        '<span>This section was plagiarized: <br><b>' + Math.round(response.ranking[
+	            i].certainty*100) + '%</b></span></div>  ' + response.ranking[
 	            i].origSnip[2] + '</div></div>';
 	    inside += '<div id="right-column"><div id=doc-box>' +
 	        response.ranking[i].dataBaseSnip[0] +
 	        '  <div id="popup" style="background-color: yellow;">' +
 	        response.ranking[i].dataBaseSnip[1] +
-	        '<span>This section was plagiarized: <b>' + response.ranking[
-	            i].certainty + '%</b></span></div>  ' + response.ranking[
+	        '<span>This section was plagiarized: <br><b>' + Math.round(response.ranking[
+	            i].certainty*100) + '%</b></span></div>  ' + response.ranking[
 	            i].dataBaseSnip[2] + '</div></div></div>';
 	    plagiarism.innerHTML = inside;
 	    document.getElementById('plagiarism').appendChild(plagiarism);
@@ -58,6 +58,14 @@ function checkCompare(id){
 	sendMessage(compare);
 }
 
+function compareSubmitButtonPress(){
+    var id = generateID();
+    document.cookie="id="+id;
+    sendCompare(id, window.contents);
+}
+
+//end compare functions
+
 function sendMessage(string){
     var data=JSON.stringify(string);
 	var xmlhttp=new XMLHttpRequest();
@@ -81,7 +89,6 @@ function callback(response){
             compareDecode(JSON.stringify(json));
             return;
         }
-        //window.location.href = 'output.html'; 
     }
     else if(json.command=="checkCompare"){
         if(json.hasOwnProperty("ranking")){
@@ -92,6 +99,16 @@ function callback(response){
         setTimeout(check, 1000);  //wait a second before trying again
         checkCompare(getCookie("id"));
     }
+    else if(json.command=="getStyles"){
+		fillStyles(json);
+    }
+    else if(json.command=="create"){
+		fillCreate(json);
+    }
+    else if(json.command=="learn"){
+		getBackLearn(json);
+    }
+    
 }
 
 function getCookie(cname) {
@@ -105,32 +122,6 @@ function getCookie(cname) {
         }
     }
     return "";
-}
-
-
-function sendLearn(text, author, title, publishDate) {
-	var learn = {
-		"command": "learn",
-		"documentText": text,
-		"author": author,
-		"title": title,
-		"publishDate": publishDate
-	}
-	
-    //do something to send it off here
-    alert(sendMessage(learn));
-}
-
-function sendCreate(id, styleID, numOfSent) {
-	var create = {
-		"clientID": id,
-		"command": "create",
-		"styleID": styleID,
-		"numberOfSentences": numOfSent
-	}
-	
-    //do something to send it off here
-    alert(sendMessage(create));
 }
 
 function generateID(){
@@ -150,24 +141,187 @@ function Output(msg) {
 	m.innerHTML = msg;
 }
 
-function readSingleFile(evt) {
-    //Retrieve the first (and only!) File from the FileList object
-    var f = evt.target.files[0];
-    var contents;
-    if (f) {
-        var r = new FileReader();
-        r.onload = function(e) {
-            contents = e.target.result;
-            var id = generateID();
-            document.cookie="id="+id;
-            sendCompare(id, contents);
-        }
-        r.readAsText(f);
-    } else {
-        alert("Failed to load file");
+
+//
+// initialize
+function InitUpload() {
+
+    var fileselect = $id("fileselect"),
+        uploadbox = $id("uploadbox"),
+        submitbutton = $id("submitbutton");
+
+    // file select
+    fileselect.addEventListener("change", FileSelectHandler, false);
+
+    // file drop
+    uploadbox.addEventListener("dragover", FileDragHover, false);
+    uploadbox.addEventListener("dragleave", FileDragHover, false);
+    uploadbox.addEventListener("drop", FileSelectHandler, false);
+    uploadbox.style.display = "block";
+}
+
+// file drag hover
+function FileDragHover(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    e.target.className = (e.type == "dragover" ? "hover" : "");
+    saveE=e;
+}
+// file selection
+function FileSelectHandler(e) {
+
+    // cancel event and hover styling
+    FileDragHover(e);
+
+    // fetch FileList object
+    var files = e.target.files || e.dataTransfer.files;
+
+    // process last File object
+    f = files[files.length-1];
+    ParseFile(f);
+    var r = new FileReader();
+    r.onload = function(e) {
+        contents = e.target.result;
     }
+    r.readAsText(f);
 }
 
 
+function fillStyles(json){
+	var select = document.getElementById("styleSelect");
+	for (i=0; i < json.styles.length; ++i){
+		var option = document.createElement('option');
+		option.text = json.styles[i];
+		select.add(option, 0);
+	}
+	
+}
+
+//TODO no comma after getStyles"
+function getStyles(){
+	var styles = {
+		"command": "getStyles",
+	}
+	sendMessage(styles);
+}
+
+function createSubmitButtonPress(){
+    var id = generateID();
+    document.cookie="id="+id;
+    var select = document.getElementById("styleSelect");
+    var selectedText = select.options[select.selectedIndex].text;
+	var create = {
+		"command": "create",
+		"clientID": id,
+		"style": selectedText,
+		"numberOfSentences": document.getElementById('numOfSentences').value
+	}
+	sendMessage(create);
+}
+
+function fillCreate(json){
+	var select = document.getElementById("styleSelect");
+    var selectedText = select.options[select.selectedIndex].text;
+	var outputHTML = '<h2>Style of '+ selectedText +'</h2><p class="lead" style="width:60%; margin: 0 auto;">'+ json.document +'</p>';
+    document.getElementById('wrapper').innerHTML = outputHTML;
+}
 
 
+function getBackLearn(json){
+	if (json.result== "Success"){
+		toastr.options = {
+		  "positionClass": "toast-top-center"
+		}
+        toastr.success(document.getElementById('title').value+' uploaded successfully!', 'STARE Says');
+	}
+	
+}
+
+function learn(){
+	sendLearn(window.contents, document.getElementById('author').value, document.getElementById('title').value, document.getElementById('publishYear').value);
+}
+
+function sendLearn(text, author, title, publishDate) {
+	var learn = {
+		"command": "learn",
+		"documentText": text,
+		"author": author,
+		"title": title,
+		"publishDate": publishDate
+	}
+	
+    sendMessage(learn)
+}
+
+function ParseFile(file) {
+    window.userDocTitle=file.name;
+    	// display text
+    if (file.type.indexOf("text") == 0) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            Output(
+                "<p>Document information: <strong>" + file.name +
+                "</strong> type: <strong>" + file.type +
+                "</strong> size: <strong>" + Math.round(file.size/1024) +
+                "</strong> Kilobytes</p>"+
+                "<p><strong>Preview Uploaded Document:</strong></p><pre>" +
+                e.target.result.replace(/</g, "&lt;").replace(/>/g, "&gt;") +
+                "</pre>"+"<button type='button' class='btn btn-default' id='submitbutton' onclick='compareSubmitButtonPress();'>Submit</button>"
+            );
+        }
+        reader.readAsText(file);
+    }
+}   
+function InitLearn() {
+
+    var fileselect = $id("fileselect"),
+        uploadbox = $id("uploadbox"),
+        submitbutton = $id("submitbutton");
+
+    // file select
+    fileselect.addEventListener("change", learnFileSelectHandler, false);
+
+    // file drop
+    uploadbox.addEventListener("dragover", FileDragHover, false);
+    uploadbox.addEventListener("dragleave", FileDragHover, false);
+    uploadbox.addEventListener("drop", learnFileSelectHandler, false);
+    uploadbox.style.display = "block";
+}
+
+function learnParseFile(file) {
+    window.userDocTitle=file.name;
+    	// display text
+    if (file.type.indexOf("text") == 0) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            Output(
+                "<p>Document information: <strong>" + file.name +
+                "</strong> type: <strong>" + file.type +
+                "</strong> size: <strong>" + Math.round(file.size/1024) +
+                "</strong> Kilobytes</p>"+
+                "<p><strong>Preview Uploaded Document:</strong></p><pre>" +
+                e.target.result.replace(/</g, "&lt;").replace(/>/g, "&gt;") +
+                "</pre>"
+            );
+        }
+        reader.readAsText(file);
+    }
+} 
+
+function learnFileSelectHandler(e) {
+
+    // cancel event and hover styling
+    FileDragHover(e);
+
+    // fetch FileList object
+    var files = e.target.files || e.dataTransfer.files;
+
+    // process last File object
+    f = files[files.length-1];
+    learnParseFile(f);
+    var r = new FileReader();
+    r.onload = function(e) {
+        contents = e.target.result;
+    }
+    r.readAsText(f);
+} 
