@@ -94,8 +94,8 @@ void serverv2::listening(){
     while (true) {
         std::cout << "Waiting for client to connect " << std::endl;
         sockaddr_in sock_in;
-        socklen_t tam = sizeof(sock_in);
-        int client_socket = accept(descriptor, (struct sockaddr*)&sock_in, &tam);
+        socklen_t addressSize = sizeof(sock_in);
+        int client_socket = accept(descriptor, (struct sockaddr*)&sock_in, &addressSize);
         if (client_socket == -1)
         {
             std::cout << "error making connection " << errno;
