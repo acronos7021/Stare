@@ -28,6 +28,8 @@ bool CMDparser::parseCMD(vector<string> cmdList)
 		Compare(cmdList);
 	else if (cmdList[0] == "create")
 		Create(cmdList);
+	else if (cmdList[0] == "test")
+		test();
 	else if (cmdList[0] == "Brandon")
 		Brandon(cmdList);
 	else if (cmdList[0] == "Blake")
@@ -531,6 +533,37 @@ std::vector<std::string> CMDparser::getStyles()
 }
 
 /******************************   PHPconnector functions  ************************************/
+
+void CMDparser::test()
+{
+	std::cout << std::endl << "test the console 'test' command - passed" << std::endl << std::endl;
+	std::cout << std::endl << "Clearing the database for clean test." << std::endl << std::endl;
+	hmm.dataBase.CreateDatabase(false);  // command often fails under windows.  just delete the file manually.
+
+	std::cout << std::endl << "Tokenizing test document" << std::endl;
+	std::deque<std::vector<int>> BrianTokenizedDoc = hmm.tokenizer.tokenizeDoc("This is a test doc.  You still need.  The tokenizer will convert these sentences to tokens");
+
+	std::cout << std::endl << "Inserting metadata Brian's Book" << std::endl;
+	int docID = hmm.dataBase.insertDocument("Brian", "Brian book Title", "2014");
+	std::cout << "Inserting Brian's book text" << std::endl << std::endl;
+	hmm.dataBase.insertDocumentText(docID, BrianTokenizedDoc);
+
+	std::deque<std::vector<int>> BradonTokenizedDoc = hmm.tokenizer.tokenizeDoc("This is a test doc.  You still need.  The tokenizer will convert these sentences to tokens");
+	std::cout << std::endl << "Inserting metadata Brandons's Book" << std::endl;
+	docID = hmm.dataBase.insertDocument("Brandon", "Brandon book Title", "2014");
+	std::cout << "Inserting Brandon's book text" << std::endl << std::endl;
+	hmm.dataBase.insertDocumentText(docID, BradonTokenizedDoc);
+
+	std::cout << std::endl << "Printing the list of styles in the database." << std::endl;
+	vector<string> cmdLst;
+	cmdLst.push_back("show");
+	cmdLst.push_back("Styles");
+	show(cmdLst);
+
+	std::cout << std::endl << "Printing the list of Documents in the database." << std::endl;
+	cmdLst[1] = "Documents";
+	show(cmdLst);
+}
 
 
 

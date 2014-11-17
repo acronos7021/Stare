@@ -516,7 +516,7 @@ void HMMengine::compareThreadEngine(HMMengine &hmm,EngineStatus* engineStatus, s
                 }
             }
         }
-		vector<int> result = plagCalc.doCalc(hmm);
+		vector<int> result;// = plagCalc.doCalc(hmm);
 		if (result.size() > 0)
 		{
 			int score;

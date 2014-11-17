@@ -52,6 +52,7 @@ public:
 	vector<MetaData> getDocuments();
 
 	std::vector<std::string> getStyles();
+	void test();
 
 };
 

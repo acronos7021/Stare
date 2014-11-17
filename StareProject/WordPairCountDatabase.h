@@ -30,6 +30,21 @@ struct WordNextCountStruct
 
 };
 
+struct WordNextCountDatabaseStruct
+{
+	// one currWord and all of the nextWords in the database.
+	// This is the total sum of the counts of the nextWord for currWord in that style
+	std::vector<int> TotalStyleCounts;
+	std::map<int, WordNextCountStruct> NextCountMap;
+
+	void addStyle(int styleID, int set_count)
+	{
+		if ((int)TotalStyleCounts.size() <= styleID)
+			TotalStyleCounts.resize(styleID + 1);
+		TotalStyleCounts[styleID] += set_count;
+	}
+};
+
 
 struct WordPairCountStruct
 {
@@ -117,7 +132,8 @@ public:
 private:
 
 	uint_fast64_t getWordPairBitPack(int currWordToken, int nextWordToken);
-	std::map<int, std::map<int,WordNextCountStruct>> nextTokenStyle; //currTokenID = > vector<WordNextCountStruct>
+	//std::map<int, std::map<int,WordNextCountStruct>> nextTokenStyle; //currTokenID = > vector<WordNextCountStruct>
+	std::map<int, WordNextCountDatabaseStruct> nextTokenStyle; //currTokenID = > vector<WordNextCountStruct>
 	//std::unordered_map<int, std::set<NextWordCountStruct>> nextTokenList;
 	std::unordered_map<uint_fast64_t, WordPairCountStruct> WordPairCount;
 	std::vector<int>  wordStyleCount; // the count of all words in each style
