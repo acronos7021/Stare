@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Compare - Stare</title>
+    <title>Create - Stare</title>
 
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -44,8 +44,8 @@
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
             <li><a href="index.html">Home</a></li>
-            <li class="active"><a href="compareupload.html">Compare</a></li>
-            <li><a href="create.html">Create</a></li>
+            <li><a href="compareupload.html">Compare</a></li>
+            <li class="active"><a href="create.html">Create</a></li>
             <li><a href="learnupload.html">Learn</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
@@ -57,14 +57,19 @@
     </nav>
 
     <div id="wrapper">
-        <h1>Compare Upload</h1>
-        <div id="uploadbox">
-            <form id="uploadform">
-                <label for="fileselect">Drag or Choose a File Here:</label>
-                <input type="file" id="fileselect"><br /><br />
-				<div id="messages"></div>
-			</form>
-		</div>
+        <h1>Create</h1>
+		<form role="form" id="createForm">
+		  <div class="form-group">
+			<label for="styleSelect">Select an Author</label>
+			<select id="styleSelect" class="form-control">
+			</select>
+		  </div>
+		  <div class="form-group">
+		    <label for="numOfSentences">Enter the Number of Sentences</label>
+		    <input type="number" onkeypress="return /\d/.test(String.fromCharCode(((event||window.event).which||(event||window.event).which)));" class="form-control" id="numOfSentences" placeholder="Numbers Only, Example: 50">
+		  </div>
+		  <button type="button" class="btn btn-default" onclick='createSubmitButtonPress();'>Submit</button>
+		</form>
      </div>
 
 
@@ -79,14 +84,7 @@
     <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha256.js"></script>
     <script src="functions.js"></script>
     <script>
-         // call initialization file
-        if (window.File && window.FileList && window.FileReader) {
-            InitUpload();
-            var saveE;
-            var contents;
-            var userDocTitle;
-        }
-
+		getStyles();
     </script>
   </body>
 </html>
