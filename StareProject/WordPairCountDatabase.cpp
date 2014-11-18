@@ -273,7 +273,7 @@ const int WordPairCountDatabase::getWordPairStyleCount(int currWordToken , int n
 
 const std::set<int> WordPairCountDatabase::getSentenceList(int currWordToken, int nextWordToken)
 {
-      uint_fast64_t wordPair = getWordPairBitPack(currWordToken,nextWordToken);//((uint_fast64_t)currWordToken << 32) + (uint_fast64_t)nextWordToken;
+    uint_fast64_t wordPair = getWordPairBitPack(currWordToken,nextWordToken);//((uint_fast64_t)currWordToken << 32) + (uint_fast64_t)nextWordToken;
     std::unordered_map<uint_fast64_t, WordPairCountStruct>::iterator found = WordPairCount.find(wordPair);
     if (found == WordPairCount.end())
     {
@@ -283,7 +283,8 @@ const std::set<int> WordPairCountDatabase::getSentenceList(int currWordToken, in
     }
     else
     {
-	return found->second.SentenceList;
+		std::set<int> ret = found->second.SentenceList;
+		return ret;
 	
     }
 }

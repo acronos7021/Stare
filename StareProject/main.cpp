@@ -18,9 +18,9 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-	TestCreate tc;
+	//TestCreate tc;
 
-	tc.doTest();
+	//tc.doTest();
 
 	CMDparser cmd;
 

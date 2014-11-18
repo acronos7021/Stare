@@ -123,7 +123,7 @@ public:
 	int incrementSentenceID(sqlite3* db, int byAmount);
 
 	bool isWordToken(int token);
-	void getNextWordToken(const std::vector<int> &sentence, int currWordIndex, int &nextWordToken);
+	int getNextWordToken(const std::vector<int> &sentence, int currWordIndex);
 	bool getPrevAndNext(int sentenceNum, int wordNum, int &prevWordToken, int &nextWordToken, const std::deque<std::vector<int>> &document);
 	//void incrementWordStyleCounts(int StyleID, int count);
 	void incrementTokenAndStyleCounts(vector<int> sentence, int StyleID, int SentenceID);

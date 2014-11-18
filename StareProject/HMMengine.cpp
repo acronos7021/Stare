@@ -87,8 +87,12 @@ struct PlagerismCalculator
 	std::vector<int> doCalc(HMMengine &hmm)
 	{
 		std::vector<int> ret;
+		if (sentenceList.size() < 5)
+			return ret;
+
 		std::vector<size_t> sentIndex; // the index of the selected word pair list
 		sentIndex.resize(sentenceList.size());
+
 
 		int biggest_chain = 0;
 
@@ -99,12 +103,13 @@ struct PlagerismCalculator
 		// in sorted order and the processing is always done on the smallest item.
 		sortedWordPairs.resize(sentenceList.size()+1);
 		sortedWordPairs[sentenceList.size()] = -1;
-		int i,newItem,tmpItem,chain;
+		int i,lastItem, newItem,tmpItem,chain;
 
-		for (i = 0; i < sortedWordPairs.size(); ++i)
+		for (i = 0; i < sortedWordPairs.size()-1; ++i)
 		{
 			sortedWordPairs[i] = i;
 		}
+
 
 		for (size_t wp = 0; wp < sentenceList.size(); ++wp)
 		{
@@ -124,22 +129,38 @@ struct PlagerismCalculator
 		}
 
 		// search 
-		while (sortedWordPairs[0] != -1) // search until the list is empty
+		lastItem = -1;
+		newItem = -1;
+		chain = 0;
+		while (sortedWordPairs[1] != -1) // search until the last item
 		{
-			i = 0;
-			chain = 0;
-			while ((sortedWordPairs[i + 1] != -1) && (sentenceList[sortedWordPairs[i]][sentIndex[sortedWordPairs[i]]] == sentenceList[sortedWordPairs[i + 1]][sentIndex[sortedWordPairs[i + 1]]]))
-			{
-				++chain;
-				++i;
-			}
-			if (chain > biggest_chain)
-				biggest_chain = chain;
-			if (chain > 5)
-				ret.push_back(sentenceList[sortedWordPairs[i]][0]);
-
+			//i = 0;
+			//chain = 0;
+			//while ((sortedWordPairs[i + 1] != -1) && (sentenceList[sortedWordPairs[i]][sentIndex[sortedWordPairs[i]]] == sentenceList[sortedWordPairs[i + 1]][sentIndex[sortedWordPairs[i + 1]]]))
+			//{
+			//	++chain;
+			//	++i;
+			//}
+			//if (chain > biggest_chain)
+			//	biggest_chain = chain;
+			//if (chain > 5)
+			//	ret.push_back(sentenceList[sortedWordPairs[i]][0]);
 			while (sentenceList[sortedWordPairs[0]][sentIndex[sortedWordPairs[0]]] <= sentenceList[sortedWordPairs[1]][sentIndex[sortedWordPairs[1]]])
 			{
+				newItem = sentenceList[sortedWordPairs[0]][sentIndex[sortedWordPairs[0]]];
+				if (newItem == lastItem)
+				{
+					++chain;
+				}
+				else
+				{
+					if (chain > biggest_chain)
+						biggest_chain = chain;
+					if (chain > 5)
+						ret.push_back(lastItem);
+					chain = 0;
+				}
+				lastItem = newItem;
 				++sentIndex[sortedWordPairs[0]];
 				if (sentIndex[sortedWordPairs[0]] >= sentenceList[sortedWordPairs[0]].size())
 				{
@@ -150,11 +171,15 @@ struct PlagerismCalculator
 						sortedWordPairs[i] = sortedWordPairs[i + 1];
 						++i;
 					}
+					// see if there is only one word pair left.
+					if (sortedWordPairs[1] == -1)
+					{
+						sentenceList.clear();
+						return ret;
+					}
 				}
 			}
-			// see if there is only one word pair left.
-			if (sortedWordPairs[1] == -1)
-				return ret;
+
 			// list is out of order, so resort list
 			i = 0;
 			while ((sortedWordPairs[i + 1] != -1) && (sentenceList[sortedWordPairs[i]][sentIndex[sortedWordPairs[i]]] > sentenceList[sortedWordPairs[i + 1]][sentIndex[sortedWordPairs[i + 1]]]))
@@ -212,7 +237,7 @@ struct PlagerismCalculator
 		//	currMin = nextMin;
 		//	nextMin = INT_MAX;
 		//}
-		//sentenceList.clear();
+		sentenceList.clear();
 		return ret;
 	}
 
@@ -430,6 +455,7 @@ void HMMengine::compareThreadEngine(HMMengine &hmm, EngineStatus* engineStatus, 
 	std::deque<std::vector<int>> documentTokens = hmm.tokenizer.tokenizeDoc(text);
 
 	engineStatus->setPercentComplete(5);
+	int progressBump = documentTokens.size() / 90;
 
 	PlagerismCalculator plagCalc;
 
@@ -449,23 +475,72 @@ void HMMengine::compareThreadEngine(HMMengine &hmm, EngineStatus* engineStatus, 
 			currWord = documentTokens[s][w];
 			if (hmm.dataBase.isWordToken(currWord))
 			{
+				nextWord = hmm.dataBase.getNextWordToken(documentTokens[s], w);
+				std::set<int> SendList = hmm.dataBase.wpd.getSentenceList(currWord, nextWord);
+				plagCalc.addWordPair(SendList);
 				for (size_t styID = 1; styID < hmm.dataBase.StyleList.size(); ++styID)
 				{
-					hmm.dataBase.getNextWordToken(documentTokens[s], w, nextWord);
 					// calculate the score for this Markov
 					double test = hmm.dataBase.wpd.getStyleProbability(currWord, nextWord, styID);
 					styleScores[styID] = styleScores[styID] + test;
 					styleScoreCounts[styID] += 1;
+					//plagCalc.addWordPair(currWord, nextWord);
 					//std::cout << std::fixed << std::setprecision(2) << hmm.dataBase.getAuthor(styID) << ":" << styleScores[styID] / styleScoreCounts[styID];
 
 				}
 			}
 		}
+
+		vector<int> result = plagCalc.doCalc(hmm);
+		if (result.size() > 0)
+		{
+			int score;
+			for (vector<int>::iterator i = result.begin(); i != result.end(); ++i)
+			{
+				vector<int> plagerized = plagCalc.compare(documentTokens[s], hmm.dataBase.TotalSentenceList[*i], score);
+				SentenceRanking newRank = createSentenceRanking(hmm, documentTokens, plagerized, s, *i, score);
+				cr.sentenceRankings.push_back(newRank);
+
+
+				//std::cout << "source: " << hmm.tokenizer.rebuildSent(documentTokens[s]) << std::endl;
+				//std::cout << std::endl << "Sent#" << s << std::endl;
+
+				//std::cout << *i << ", score =>" << score << std::endl;
+				//std::cout << "database: " << hmm.tokenizer.rebuildSent(plagerized) << std::endl;
+			}
+
+			//std::cout << "Plagerism sentences: ";
+			//int score;
+			//int best_score=0;
+			//for (vector<int>::iterator i = result.begin(); i != result.end(); ++i)
+			//{
+			//	vector<int> plagerized = plagCalc.compare(documentTokens[s], hmm.dataBase.TotalSentenceList[*i], score);
+
+			//	std::cout << *i << ", score =>" << score << std::endl;
+			//	std::cout << "database: " << hmm.tokenizer.rebuildSent(plagerized) << std::endl;
+			//}
+		}
+		// end sentence processing so update the progress bar
+		//++progressCount;
+		if ((s % progressBump) == 0)
+		{
+			int newPercent = s / progressBump + 5;
+			std::cout << "percentComplete:" << newPercent << "%" << std::endl;
+			engineStatus->setPercentComplete(newPercent);
+		}
 	}
+
+
+
+
 	for (size_t styID = 1; styID < hmm.dataBase.StyleList.size(); ++styID)
 	{
 		std::cout << std::fixed << std::setprecision(2) << hmm.dataBase.getAuthor(styID) << ":" << styleScores[styID] / styleScoreCounts[styID] << std::endl;
 	}
+
+	engineStatus->setResult(cr);
+	engineStatus->setPercentComplete(100);
+}
 
 
  //   std::map<int,StyleCalculator> styleCalcs;
@@ -551,47 +626,7 @@ void HMMengine::compareThreadEngine(HMMengine &hmm, EngineStatus* engineStatus, 
  //               }
  //           }
  //       }
-	//	vector<int> result;// = plagCalc.doCalc(hmm);
-	//	if (result.size() > 0)
-	//	{
-	//		int score;
-	//		for (vector<int>::iterator i = result.begin(); i != result.end(); ++i)
-	//		{
-	//			vector<int> plagerized = plagCalc.compare(documentTokens[s], hmm.dataBase.TotalSentenceList[*i], score);
-	//			SentenceRanking newRank = createSentenceRanking(hmm, documentTokens, plagerized, s, *i,score);
-	//			cr.sentenceRankings.push_back(newRank);
 
-
-	//			std::cout << "source: " << hmm.tokenizer.rebuildSent(documentTokens[s]) << std::endl;
-	//			std::cout << std::endl << "Sent#" << s << std::endl;
-
-	//			std::cout << *i << ", score =>" << score << std::endl;
-	//			std::cout << "database: " << hmm.tokenizer.rebuildSent(plagerized) << std::endl;
-	//		}
-
-	//		//std::cout << "Plagerism sentences: ";
-	//		//int score;
-	//		//int best_score=0;
-	//		//for (vector<int>::iterator i = result.begin(); i != result.end(); ++i)
-	//		//{
-	//		//	vector<int> plagerized = plagCalc.compare(documentTokens[s], hmm.dataBase.TotalSentenceList[*i], score);
-
-	//		//	std::cout << *i << ", score =>" << score << std::endl;
-	//		//	std::cout << "database: " << hmm.tokenizer.rebuildSent(plagerized) << std::endl;
-	//		//}
-	//	}
-	//	// end sentence processing so update the progress bar
-	//	//++progressCount;
-	//	if ((s % progressBump)==0)
-	//	{ 
-	//		int newPercent = s / progressBump + 5;
-	//		std::cout << "percentComplete:" << newPercent << "%" << std::endl;
-	//		engineStatus->setPercentComplete(newPercent);
-	//	}
- //   }
-	//engineStatus->setResult(cr);
-	//engineStatus->setPercentComplete(100);
-}
 
 
 /*

@@ -583,10 +583,10 @@ bool DocumentDatabase::isWordToken(int token)
 }
 
 
-void DocumentDatabase::getNextWordToken(const std::vector<int> &sentence, int currWordIndex, int &nextWordToken)
+int DocumentDatabase::getNextWordToken(const std::vector<int> &sentence, int currWordIndex)
 {
 	// set default value if next token is not found
-	nextWordToken = -1;
+	//nextWordToken = -1;
 	// search for next token
 	int lastToken = sentence.size();
 	int nextNum = currWordIndex + 1;
@@ -594,11 +594,13 @@ void DocumentDatabase::getNextWordToken(const std::vector<int> &sentence, int cu
 	{
 		if (isWordToken(sentence[nextNum]))
 		{
-			nextWordToken = sentence[nextNum];
-			break;
+			return sentence[nextNum];
+			//nextWordToken = sentence[nextNum];
+			//break;
 		}
 		++nextNum;
 	}
+	return -1;
 }
 
 // returns true if the currWordToken is actually a WordToken
