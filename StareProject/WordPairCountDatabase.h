@@ -1,11 +1,50 @@
 #include <vector>
 #include <set>
 #include <unordered_map>
+#include <map>
 #include <cstdint>
 #include <memory>
 #include <mutex>
 
 #pragma once
+struct WordNextCountStruct
+{  
+	int wordTokenID;
+	int count;
+	std::vector<int> StyleCounts;
+
+	WordNextCountStruct(int WordTokenID,int StyleID, int set_count)
+	{
+		count = 0;
+		wordTokenID = WordTokenID;
+		addStyle(StyleID, set_count);
+	}
+
+	void addStyle(int styleID, int set_count)
+	{
+		if ((int)StyleCounts.size() <= styleID)
+			StyleCounts.resize(styleID + 1);
+		StyleCounts[styleID] += set_count;
+		count += set_count;
+	}
+
+};
+
+struct WordNextCountDatabaseStruct
+{
+	// one currWord and all of the nextWords in the database.
+	// This is the total sum of the counts of the nextWord for currWord in that style
+	std::vector<int> TotalStyleCounts;
+	std::map<int, WordNextCountStruct> NextCountMap;
+
+	void addStyle(int styleID, int set_count)
+	{
+		if ((int)TotalStyleCounts.size() <= styleID)
+			TotalStyleCounts.resize(styleID + 1);
+		TotalStyleCounts[styleID] += set_count;
+	}
+};
+
 
 struct WordPairCountStruct
 {
@@ -42,6 +81,26 @@ struct WordPairCountStruct
 
 };
 
+//
+//struct NextWordCountStruct
+//{
+//	int TokenID;
+//	int count;  //number of times this exists in the database.
+//
+//	NextWordCountStruct(int t, int c)
+//	{
+//		TokenID = t;
+//		count = c;
+//	}
+//
+//
+//};
+
+//inline bool operator<(const NextWordCountStruct& lhs, const NextWordCountStruct& rhs)
+//{
+//	return lhs.TokenID < rhs.TokenID;
+//}
+
 // This database is not stored anywhere on the hard drive.  It is calculated dynamically
 // when the system starts and as documents are uploaded.
 class WordPairCountDatabase
@@ -62,13 +121,21 @@ public:
 	const int getTotalWordPairCount(int currWordToken , int nextWordToken);
 	// total count of all words of a specific pair and specific style.
 	const int getWordPairStyleCount(int currWordToken , int nextWordToken,int StyleID);
-
+	// list of every occurence of this word pair in the database.
 	const std::set<int> getSentenceList(int currWordToken, int nextWordToken);
 	void clearAll();
+
+	const double getStyleProbability(int currWordToken, int nextWordToken, int StyleID);
+	const std::vector<WordNextCountStruct> getNextToken(int currWordID,int StyleID);
+
+	bool isWordToken(int wordID,int styleID);
 
 private:
 
 	uint_fast64_t getWordPairBitPack(int currWordToken, int nextWordToken);
+	//std::map<int, std::map<int,WordNextCountStruct>> nextTokenStyle; //currTokenID = > vector<WordNextCountStruct>
+	std::map<int, WordNextCountDatabaseStruct> nextTokenStyle; //currTokenID = > vector<WordNextCountStruct>
+	//std::unordered_map<int, std::set<NextWordCountStruct>> nextTokenList;
 	std::unordered_map<uint_fast64_t, WordPairCountStruct> WordPairCount;
 	std::vector<int>  wordStyleCount; // the count of all words in each style
 	int totalWordCount;  // the count of all words in all documents

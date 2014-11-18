@@ -7,6 +7,7 @@
 #include "WordPairCountDatabase.h"
 #include "sqlite3.h"
 #include "DataStructs.h"
+#include "TokenDatabase.h"
 
 struct Documents
 {
@@ -63,6 +64,8 @@ public:
 	DocumentDatabase();
 	~DocumentDatabase();
 
+	const std::string database_name = "AIsql.db3";
+
 	static int databaseInstanceCount;
 	// base class
 	//sqlite3 *db;
@@ -86,6 +89,7 @@ public:
 	int insertStyle(sqlite3* db, std::string author); // adds to both the local data struct and sqlite database
 	int getStyleID(sqlite3* db, std::string author);
 	int getStyleID(sqlite3* db, int docID);
+	int getStyleIDfromDocumentID(int DocID);
 	std::string getAuthor(int StyleID);
 	
 	
@@ -113,11 +117,13 @@ public:
 
 	int getDocumentID(sqlite3* db, int styleID, std::string title);
 	int getDocumentID(sqlite3* db, std::string Author, std::string title);
+	int GetDocIDfromSentID(int sentID);
 
 	//int getSentenceID(int docID);
 	int incrementSentenceID(sqlite3* db, int byAmount);
 
 	bool isWordToken(int token);
+	int getNextWordToken(const std::vector<int> &sentence, int currWordIndex);
 	bool getPrevAndNext(int sentenceNum, int wordNum, int &prevWordToken, int &nextWordToken, const std::deque<std::vector<int>> &document);
 	//void incrementWordStyleCounts(int StyleID, int count);
 	void incrementTokenAndStyleCounts(vector<int> sentence, int StyleID, int SentenceID);

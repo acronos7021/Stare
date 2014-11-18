@@ -6,7 +6,6 @@ TokenDatabase::TokenDatabase()
 	lastToken = 0;
 	lastAllocatedTokenID = 0;
 	currentAllocatedTokenID = 0;
-	LoadTokenMap();
 }
 
 
@@ -81,6 +80,8 @@ int TokenDatabase::GetToken(std::string word)
 std::string TokenDatabase::GetString(int TokenID)
 {
 	std::string word;
+	if ((TokenID < 0) || (TokenID >= reverseTokenMap.size()))
+		return "";
 	try
 	{
 		word = reverseTokenMap.find(TokenID)->second;

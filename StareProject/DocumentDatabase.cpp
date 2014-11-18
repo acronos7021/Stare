@@ -3,6 +3,7 @@
 #include <cstring>
 #include <set>
 
+
 #include "DocumentDatabase.h"
 #include "WordPairCountDatabase.h"
 #include "sqlite3.h"
@@ -27,8 +28,13 @@ DocumentDatabase::~DocumentDatabase()
 
 sqlite3* DocumentDatabase::openDB()
 {
+
 	// Convert the dbName string to a format sqlite3_open needs
 	//const char * c = dbName.c_str();
+
+
+
+
 	sqlite3 *db;
 	if (sqlite3_open("AIsql.db3", &db) != SQLITE_OK)
 		throw std::runtime_error("SQLite database failed to open");
@@ -71,6 +77,16 @@ void DocumentDatabase::addToDocumentList(int DocumentID, std::string Author, std
 
 void DocumentDatabase::initTables()
 {
+	// check to see if the database exists
+	ifstream fin(database_name.c_str());
+	if (fin.fail())
+	{
+		// can't find the database so create it.
+		CreateDatabase(false);
+	}
+	fin.close();
+
+	std::cout << std::endl << "  Initializing Database  " << std::endl;
 	sqlite3* db = openDB();
 	sqlite3_stmt* stmt;
 	std::string selectStr = "SELECT StyleID,Author FROM Styles";
@@ -122,6 +138,9 @@ void DocumentDatabase::initTables()
 		sqlite3_finalize(stmt2);
 	}
 
+	// keeps a status bar going
+	int statUpdate = 0;
+
 	sqlite3_stmt* stmt3;
 	// ORDER BY DocumentID allows to find the start and end of a document
 	// ORDER BY sentenceID ensures the sentences are in the correct order
@@ -135,7 +154,6 @@ void DocumentDatabase::initTables()
 		int currSentID = -1;
 		int sentID = -1;
 		int lastWordToken = -1;
-		int rowcount = 0;
 		vector<int> sentenceTokenIDs;
 		while (1)
 		{
@@ -159,9 +177,15 @@ void DocumentDatabase::initTables()
 					// Starting a new document
 					documentList[docID].startSentenceID = sentID;
 					currDocID = docID;
+					std::cout << std::endl << "Loading: " << documentList[docID].Author << ":" << documentList[docID].Title << std::endl;
+
 				}
 				if ((sentID != currSentID) && (currSentID != -1)) 
 				{ 
+					if (sentID < currSentID)
+					{
+						std::cout << "It Happened ";
+					}
 					// starting a new sentence 
 					vector<int> dummy;
 					if (currSentID == (int)TotalSentenceList.size())
@@ -189,18 +213,25 @@ void DocumentDatabase::initTables()
 				int currToken = sqlite3_column_int(stmt3, 3);
 				sentenceTokenIDs.push_back(currToken);
 				///wpd.AddTokenCount(lastWordToken, currToken, styleID);
-				rowcount++;
 					// if sentences are out of order, the new id's need to be made
+
 			}
 			if (res == SQLITE_DONE || res == SQLITE_ERROR)
 			{
 				break;
+			}
+			++statUpdate;
+			if (statUpdate > 1000)
+			{
+				statUpdate = 0;
+				std::cout << ".";
 			}
 		}
 
 		sqlite3_finalize(stmt3);
 	}
 	close(db);
+	std::cout << "." << std::endl;
 }
 
 
@@ -232,6 +263,20 @@ void DocumentDatabase::incrementTokenAndStyleCounts( vector<int> sentence, int S
 
     }
 
+}
+
+
+
+int DocumentDatabase::getStyleIDfromDocumentID(int DocID)
+{
+	if ((DocID < 0) || (DocID >= documentList.size()))
+		return -1;
+	for (int i = 0; i < StyleList.size(); ++i)
+	{
+		if (StyleList[i].Author == documentList[DocID].Author)
+			return StyleList[i].StyleID;
+	}
+	return -1;
 }
 
 
@@ -294,6 +339,22 @@ void DocumentDatabase::createWordStyleCounts( int StyleID, std::string author)
 	TotalWordCountsByStyle[StyleID] = StyleCounts(StyleID, author, 0);
 }
 */
+
+int DocumentDatabase::GetDocIDfromSentID(int sentID)
+{
+	if ((sentID < 0) || (sentID >= TotalSentenceList.size()))
+		return -1;
+	else
+	{
+		for (int i = 0; i < documentList.size(); ++i)
+		{
+			if ((sentID >= documentList[i].startSentenceID) && (sentID < documentList[i].endSentenceID))
+				return i;
+		}
+	}
+	return -1;
+}
+
 
 int DocumentDatabase::getDocumentID(sqlite3* db, std::string Author, std::string title)
 {
@@ -468,7 +529,7 @@ int DocumentDatabase::incrementSentenceID(sqlite3* db, int byAmount)
 			// The variable exists in the database, so read it and update it.
 			// we know there is something here or it wouldn't have given SQLITE_OK, so just read first item.
 			currentSentenceID = sqlite3_column_int(select_statement, 0);
-			std::string updateStr = "UPDATE Variables SET LastSentenceID = LastSentenceID + " + byAmount;
+			std::string updateStr = "UPDATE Variables SET LastSentenceID = LastSentenceID + " + std::to_string(byAmount);
 			sqlite3_exec(db, updateStr.c_str(), NULL, NULL, NULL);
 		}
 		else
@@ -519,6 +580,27 @@ bool DocumentDatabase::isWordToken(int token)
 		return true;
 	else
 		return false;
+}
+
+
+int DocumentDatabase::getNextWordToken(const std::vector<int> &sentence, int currWordIndex)
+{
+	// set default value if next token is not found
+	//nextWordToken = -1;
+	// search for next token
+	int lastToken = sentence.size();
+	int nextNum = currWordIndex + 1;
+	while (nextNum < lastToken)
+	{
+		if (isWordToken(sentence[nextNum]))
+		{
+			return sentence[nextNum];
+			//nextWordToken = sentence[nextNum];
+			//break;
+		}
+		++nextNum;
+	}
+	return -1;
 }
 
 // returns true if the currWordToken is actually a WordToken
@@ -646,12 +728,15 @@ void DocumentDatabase::insertDocumentText(int DocumentID, std::deque<std::vector
 			sqlite3_bind_int(HMMtokenPaths_stmt, 1, StyleID);
 			sqlite3_bind_int(HMMtokenPaths_stmt, 2, DocumentID);
 			sqlite3_bind_int(HMMtokenPaths_stmt, 3, SentenceID);
-			if (currWordToken != -1) sqlite3_bind_int(HMMtokenPaths_stmt, 4, currWordToken);
-			else sqlite3_bind_null(HMMtokenPaths_stmt, 4);
-			if (nextWordToken != -1) sqlite3_bind_int(HMMtokenPaths_stmt, 5, nextWordToken);
-			else sqlite3_bind_null(HMMtokenPaths_stmt, 5);
-			if (prevWordToken != -1) sqlite3_bind_int(HMMtokenPaths_stmt, 6, prevWordToken);
-			else sqlite3_bind_null(HMMtokenPaths_stmt, 6);
+			sqlite3_bind_int(HMMtokenPaths_stmt, 4, currWordToken);
+			sqlite3_bind_int(HMMtokenPaths_stmt, 5, nextWordToken);
+			sqlite3_bind_int(HMMtokenPaths_stmt, 6, prevWordToken);
+			//if (currWordToken != -1) sqlite3_bind_int(HMMtokenPaths_stmt, 4, currWordToken);
+			//else sqlite3_bind_null(HMMtokenPaths_stmt, 4);
+			//if (nextWordToken != -1) sqlite3_bind_int(HMMtokenPaths_stmt, 5, nextWordToken);
+			//else sqlite3_bind_null(HMMtokenPaths_stmt, 5);
+			//if (prevWordToken != -1) sqlite3_bind_int(HMMtokenPaths_stmt, 6, prevWordToken);
+			//else sqlite3_bind_null(HMMtokenPaths_stmt, 6);
 			sqlite3_step(HMMtokenPaths_stmt);
 			//int sentenceID = (int)sqlite3_last_insert_rowid(db);
 			//wpd.AddCounts(currWordToken,nextWordToken,StyleID,sentenceID);
@@ -669,6 +754,7 @@ void DocumentDatabase::insertDocumentText(int DocumentID, std::deque<std::vector
 	sqlite3_finalize(HMMtokenPaths_stmt);
 	close(db);
 }
+
 
 void DocumentDatabase::CreateDatabase(bool confirmation)
 {
