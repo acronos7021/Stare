@@ -73,6 +73,8 @@ public:
 	//@return: a string that is a reconstructed sentence
 	//@logic: it reconstructs a sentence based on a vector of word IDs
 	std::string rebuildSent(std::vector<int> sent);
+	std::string rebuildSent2(std::vector<int> sent);
+	
 
 	//@param: void
 	//@return: a vector of string / ID from the master list
