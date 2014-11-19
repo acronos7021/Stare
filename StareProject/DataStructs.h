@@ -3,6 +3,8 @@ using namespace std;
 
 #include <string>
 #include <vector>
+#include <iomanip>
+#include <iostream>
 //#include "Database.h"
 
 
@@ -56,6 +58,16 @@ struct SentenceBlob
 	string SentenceStr;
 	string NextSentenceStr;
 	string NextNextSentenceStr;
+	
+	void print()
+	{
+	    std::cout << "sentenceID #" << SentenceID << std::endl;
+	    std::cout << "pp: " << PrevPrevSentenceStr<< std::endl;
+	    std::cout << "p: " << PrevSentenceStr<< std::endl;
+	    std::cout << "o: " << SentenceStr<< std::endl;
+	    std::cout << "n: " << NextSentenceStr<< std::endl;
+	    std::cout << "nn: " << NextNextSentenceStr<< std::endl;
+	}
 };
 
 // The comparison results for a single sentence.
@@ -83,6 +95,11 @@ struct StyleCertaintyItem
 	int StyleID;
 	string StyleName;
 	double certainty;
+	
+	void print()
+	{
+	    std::cout << std::fixed << std::setprecision(2) << StyleID << " - " << StyleName << " : " << certainty << std::endl;
+	}
 };
 
 
@@ -95,6 +112,62 @@ struct CompareResult
 	vector<StyleCertaintyItem> documentCertainties;
 	// a list of the sentence that look suspicious throughout the document
 	vector<SentenceRanking> sentenceRankings;
+	
+	void print()
+	{
+	    std::cout << "************************SentenceRanking***Begin Print ************************************" << std::endl;
+	    std::cout << "Percent Complete: " << percentComplete << "%" << std::endl;
+	    for (int i = 0; i < sentenceRankings.size(); i++)
+	    {
+		std::cout << " ************************  Orignial Sentence  *************************" << std::endl;
+		sentenceRankings[i].sourceSentences.print();
+		std::cout << " ************************  Copied From "<< sentenceRankings[i].foundDocumentName << "****************************" << std::endl;
+		std::cout << "  " << sentenceRankings[i].foundDocumentStyle << " : " << sentenceRankings[i].foundDocumentName << std::endl;
+		sentenceRankings[i].foundSentences.print();
+	    }
+	    for (int i =0;i<documentCertainties.size();i++)
+	    {
+		documentCertainties[i].print();
+	    }
+	    std::cout << " *************************** End Print ********************************" << std::endl;
+	    
+	}
+	/*
+	CompareResult copy()
+	{
+	    CompareResult cr;
+	    cr.percentComplete = percentComplete;
+	    
+	    for (int i = 0; i < sentenceRankings.size(); i++)
+	    {
+		
+	        SentenceBlob sourceBlob;
+		sourceBlob.PrevPrevSentenceStr = sentenceRankings[i].sourceSentences.PrevPrevSentenceStr;  // The sentence id on the server that most closely matches the source sentence.
+		sourceBlob.PrevSentenceStr = sentenceRankings[i].sourceSentences.PrevSentenceStr;  // The sentence id on the server that most closely matches the source sentence.
+		sourceBlob.SentenceStr = sentenceRankings[i].sourceSentences.SentenceStr;  // The sentence id on the server that most closely matches the source sentence.
+		sourceBlob.NextSentenceStr = sentenceRankings[i].sourceSentences.NextSentenceStr;  // The sentence id on the server that most closely matches the source sentence.
+		sourceBlob.NextNextSentenceStr = sentenceRankings[i].sourceSentences.NextNextSentenceStr;  // The sentence id on the server that most closely matches the source sentence.
+		
+	        SentenceBlob databaseBlob;
+		databaseBlob.PrevPrevSentenceStr = sentenceRankings[i].foundSentences.PrevPrevSentenceStr;  // The sentence id on the server that most closely matches the source sentence.
+		databaseBlob.PrevSentenceStr = sentenceRankings[i].foundSentences.PrevSentenceStr;  // The sentence id on the server that most closely matches the source sentence.
+		databaseBlob.SentenceStr = sentenceRankings[i].foundSentences.SentenceStr;  // The sentence id on the server that most closely matches the source sentence.
+		databaseBlob.NextSentenceStr = sentenceRankings[i].foundSentences.NextSentenceStr;  // The sentence id on the server that most closely matches the source sentence.
+		databaseBlob.NextNextSentenceStr = sentenceRankings[i].foundSentences.NextNextSentenceStr;  // The sentence id on the server that most closely matches the source sentence.
+		
+		cr.sentenceRankings.push_back(SentenceRanking(sentenceRankings[i].foundDocumentStyle, sentenceRankings[i].foundDocumentName, sourceBlob, databaseBlob, sentenceRankings[i].certainty));
+	    }
+	    for (int i =0;i<documentCertainties.size();i++)
+	    {
+		StyleCertaintyItem ci;
+		ci.certainty = documentCertainties[i].certainty;
+		ci.StyleName = documentCertainties[i].StyleName;
+		ci.StyleID = documentCertainties[i].StyleID;
+		cr.documentCertainties.push_back(ci);
+	    }
+	    return cr;
+	    
+	}*/
 };
 
 

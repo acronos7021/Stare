@@ -276,7 +276,7 @@ struct PlagerismCalculator
 				if (overlap[i] == 0)
 				{
 					//exiting plagerized spot.
-					ret.push_back(']');
+					//ret.push_back(']');
 					in_plagerism = false;
 				}
 			}
@@ -286,14 +286,14 @@ struct PlagerismCalculator
 				if (overlap[i] == 1)
 				{
 					// entering plagerized spot
-					ret.push_back('[');
+					//ret.push_back('[');
 					in_plagerism = true;
 				}
 				ret.push_back(source[i]);
 			}
 		}
 		if (in_plagerism)
-			ret.push_back(']');
+			//ret.push_back(']');
 
 		return ret;
 	}
@@ -506,6 +506,8 @@ void HMMengine::compareThreadEngine(HMMengine* hmm, EngineStatus* engineStatus, 
 				vector<int> plagerized = plagCalc.compare(documentTokens[s], hmm->dataBase.TotalSentenceList[*i], score);
 				SentenceRanking newRank = createSentenceRanking(hmm, documentTokens, plagerized, s, *i, score);
 				cr.sentenceRankings.push_back(newRank);
+				
+
 
 
 				//std::cout << "source: " << hmm.tokenizer.rebuildSent(documentTokens[s]) << std::endl;
@@ -541,10 +543,18 @@ void HMMengine::compareThreadEngine(HMMengine* hmm, EngineStatus* engineStatus, 
 	for (size_t styID = 1; styID < hmm->dataBase.StyleList.size(); ++styID)
 	{
 		std::cout << std::fixed << std::setprecision(2) << hmm->dataBase.getAuthor(styID) << ":" << styleScores[styID] / styleScoreCounts[styID] << std::endl;
+		double thisScore = (double) styleScores[styID]/styleScoreCounts[styID];
+		StyleCertaintyItem ci;
+		ci.certainty = thisScore;
+		ci.StyleName = hmm->dataBase.getAuthor(styID);
+		ci.StyleID = styID;
+		cr.documentCertainties.push_back(ci);
 	}
 	std::cout << "compare processing complete" << std::endl;
 	engineStatus->setResult(cr);
 	engineStatus->setPercentComplete(100);
+	CompareResult newCR = engineStatus->getResult();
+	newCR.print();
 }
 
 void HMMengine::compareWithFile(HMMengine &hmm, MetaData metaData)
@@ -583,7 +593,8 @@ void HMMengine::compareWithFile(HMMengine &hmm, MetaData metaData)
 	//int progressBump = documentTokens.size() / 90;
 	////int progressCount = 0;
 
- //   for (size_t s = 0; s < documentTokens.size(); s++) {
+ //   for (size_t s = 0; s < documentTokens.size(); s++) {	    std::cout << "testing sentence insertions" << std::endl;
+
  //       size_t sentSize = documentTokens[s].size() - 1;
 	//	// It is a new sentence, so clear the stylcCalc sentence counters.
 	//	//std::cout << "source: " << hmm.tokenizer.rebuildSent(documentTokens[s]) << std::endl;

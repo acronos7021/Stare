@@ -464,7 +464,9 @@ CompareResult CMDparser::compare(int clientID, string text)
 			{
 				// the process is complete, so return it
 				std::cout << "Process is complete, return CR and delete process" << std::endl;
+				std::cout<< "printing CR";
 				cr = engineProcesses[i]->getResult();
+				cr.print();
 				cr.percentComplete = 100;
 				// delete the object
 				delete(engineProcesses[i]);
