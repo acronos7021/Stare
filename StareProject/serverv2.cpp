@@ -66,27 +66,50 @@ void serverv2::recvData(int client_socket) {
     std::cout << result << std::endl;
     //std::cout << recvDataString << std::endl;
     //std::string dataToSend = "Hello client, I have received your data ";
-    dataInChars = result.c_str();
-    int dataSendSize = result.length();
-    std::string sentSoFar;
-    int sent_ok=0;
-    while(true) {
-         sent_ok = send(client_socket, dataInChars, dataSendSize, NULL);
-        if(sent_ok <0){
-            std::cout << "Fail" << std::endl;
-            break;
-        }
-        if(sent_ok<dataSendSize){
-            sentSoFar = result.substr(sent_ok);
-            dataInChars = sentSoFar.c_str();
-            std::cout << "Cut" << std::endl;
-        } else{
-            break;
-        }
+    std::string sentSoFar = result;
+    while (sentSoFar.size()>0)
+    {
+        std::cout << "beginning send" << std::endl;
+	std::cout << "send size" << sentSoFar.size() << std::endl;
+	int sent_ok = send(client_socket, sentSoFar.c_str(), sentSoFar.size(), NULL);
+	std::cout << sent_ok << "bytes sent. checking if that is everything" << std::endl;
+	if (sent_ok<sentSoFar.size())
+	{
+	    std::cout << "nope.  We still have " << sentSoFar.size() - sent_ok << " bytes left" << std::endl;
+	    sentSoFar = sentSoFar.substr(sent_ok);
+	}
+	else
+	  sentSoFar = "";
     }
+    std::cout << "transmission complete, closing connection";
     close(client_socket);
-    std::cout << "done" << std::endl;
-    std::cout << sentSoFar << std::endl;
+    
+    
+    
+    
+    
+//    dataInChars = result.c_str();
+//    int dataSendSize = result.length();
+//    std::string sentSoFar;
+//    int sent_ok=0;
+//    while(true) {
+//	std::cout << "Loading up a packet to send" << std::endl;
+  //       sent_ok = send(client_socket, dataInChars, dataSendSize, NULL);
+//        if(sent_ok <0){
+//            std::cout << "Fail" << std::endl;
+//            break;
+//        }
+//        if(sent_ok<dataSendSize){
+//            sentSoFar = result.substr(sent_ok);
+//            dataInChars = sentSoFar.c_str();
+//            std::cout << "Cut" << std::endl;
+//        } else{
+//            break;
+//        }
+//    }
+//    close(client_socket);
+//    std::cout << "done" << std::endl;
+//    std::cout << sentSoFar << std::endl;
 }
 
 void serverv2::listening(){
