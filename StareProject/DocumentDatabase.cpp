@@ -284,7 +284,7 @@ int DocumentDatabase::getStyleIDfromDocumentID(int DocID)
 	return -1;
 }
 
-
+ 
 /* Retrieve the Author Style */
 
 int DocumentDatabase::getStyleID(std::string author)

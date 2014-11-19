@@ -564,7 +564,7 @@ CreateResult CMDparser::create(int clientID, string author, int numOfSentences)
     int styleID = hmm.dataBase.getStyleID(author);
     cr.newDocument = hmm.createDoc(styleID,numOfSentences);
     return cr;
-}
+} 
 
 
 

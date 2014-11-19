@@ -75,7 +75,7 @@ public:
 	void close(sqlite3 *db);
 	bool isOpen;
 
-	void initTables();
+	void initTables(); 
 	
 	// Stores the entire database of all sentences(tokenized) in all documents in the database
 	// this is essentially the processed version of HMMtokenPath
