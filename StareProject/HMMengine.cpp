@@ -2,6 +2,7 @@
 #include <thread>
 
 
+
 HMMengine::HMMengine()
 {
 	//dataBase = db;
@@ -251,19 +252,40 @@ struct PlagerismCalculator
 						break;
 				}
 				int offset = di_tmp - di;
-				if (offset>1)
+				if (offset>7)
 				{
 					//std::fill(overlap[si], overlap[si + offset], 1);
 					for (int i = si; i<si + offset; ++i)
 					{
 						overlap[i] = 1;
 					}
+					if (offset > score) score = offset;
 				}
 				si = si_temp;
-				if (offset > score) score = offset;
 				if (si >= source.size()) break;
 			}
 		}
+		
+	      // scan through and eliminate any short runs.
+	      int startRun = 0;
+	      for (int i =0; i < overlap.size(); ++i)
+	      {
+		   
+	      }
+	      
+		
+//		std::string s;
+//		s.resize(overlap.size());
+//		for (int i=0;i<overlap.size(); ++i)
+//		{
+//		    if (overlap[i] == 0) s[i] = '.';
+//		    else s[i] = '*';
+//		}
+//		std::cout << "overlap: " << s << std::endl;
+//		
+//		std::cin  >> s;
+		
+		
 		vector<int> ret;
 		size_t si = 0;
 		bool in_plagerism = false;
@@ -277,6 +299,10 @@ struct PlagerismCalculator
 				{
 					//exiting plagerized spot.
 					//ret.push_back(']');
+					ret.push_back('<');
+					ret.push_back('/');
+					ret.push_back('b');
+					ret.push_back('>');
 					in_plagerism = false;
 				}
 			}
@@ -287,13 +313,24 @@ struct PlagerismCalculator
 				{
 					// entering plagerized spot
 					//ret.push_back('[');
+					ret.push_back('<');
+					ret.push_back('b');
+					ret.push_back('>');
 					in_plagerism = true;
 				}
 				ret.push_back(source[i]);
 			}
 		}
 		if (in_plagerism)
-			//ret.push_back(']');
+		{
+		      //ret.push_back(']');
+		      ret.push_back('<');
+		      ret.push_back('/');
+		      ret.push_back('b');
+		      ret.push_back('>');
+
+		  
+		}
 
 		return ret;
 	}
@@ -445,7 +482,7 @@ void HMMengine::compareThreadEngine(HMMengine* hmm, EngineStatus* engineStatus, 
 	CompareResult cr;
 
 	std::cout << "Beginning Compare of text" << std::endl;
-	std::cout << text << std::endl;
+	//std::cout << text << std::endl;
 	
 	std::deque<std::vector<int>> documentTokens = hmm->tokenizer.tokenizeDoc(text);
       
@@ -453,7 +490,7 @@ void HMMengine::compareThreadEngine(HMMengine* hmm, EngineStatus* engineStatus, 
 
 	if (documentTokens.size()<=0) return;
 	engineStatus->setPercentComplete(5);
-	std::cout << "Setting Percent complete" << std::endl;
+	//std::cout << "Setting Percent complete" << std::endl;
 
 	int progressBump = documentTokens.size() / 90;
 	if (progressBump<=0) progressBump = 1;
@@ -466,11 +503,11 @@ void HMMengine::compareThreadEngine(HMMengine* hmm, EngineStatus* engineStatus, 
 	styleScoreCounts.resize(hmm->dataBase.StyleList.size());
 	int currWord, nextWord;
 
-	std::cout << "Initialization complete" << std::endl;
+	//std::cout << "Initialization complete" << std::endl;
 
 	for (size_t s = 0; s < documentTokens.size(); s++) 
 	{
-		std::cout << "processing sentence: " << s << std::endl;
+		//std::cout << "processing sentence: " << s << std::endl;
 	  
 		// step through all the sentences in this document.
 		size_t sentSize = documentTokens[s].size() - 1;
@@ -496,7 +533,7 @@ void HMMengine::compareThreadEngine(HMMengine* hmm, EngineStatus* engineStatus, 
 				}
 			}
 		}
-		std::cout << "plagCalc.doCalc()" << std::endl;
+		//std::cout << "plagCalc.doCalc()" << std::endl;
 
 		vector<int> result = plagCalc.doCalc();
 		if (result.size() > 0)
@@ -504,10 +541,14 @@ void HMMengine::compareThreadEngine(HMMengine* hmm, EngineStatus* engineStatus, 
 			int score;
 			for (vector<int>::iterator i = result.begin(); i != result.end(); ++i)
 			{
+			  	//std::cout << "source: " << hmm->tokenizer.rebuildSent(documentTokens[s]) << std::endl;
+				//std::cout << "database: " << hmm->tokenizer.rebuildSent( hmm->dataBase.TotalSentenceList[*i]) << std::endl;
 				vector<int> plagerized = plagCalc.compare(documentTokens[s], hmm->dataBase.TotalSentenceList[*i], score);
-				SentenceRanking newRank = createSentenceRanking(hmm, documentTokens, plagerized, s, *i, score);
-				cr.sentenceRankings.push_back(newRank);
-				
+				if (score>5)
+				{
+				    SentenceRanking newRank = createSentenceRanking(hmm, documentTokens, plagerized, s, *i, score);
+				    cr.sentenceRankings.push_back(newRank);
+				}				
 
 
 
@@ -531,7 +572,7 @@ void HMMengine::compareThreadEngine(HMMengine* hmm, EngineStatus* engineStatus, 
 		}
 		// end sentence processing so update the progress bar
 		//++progressCount;
-		std::cout << "Update progress "<< progressBump << std::endl;
+		//std::cout << "Update progress "<< progressBump << std::endl;
 		if ((s % progressBump) == 0)
 		{
 			int newPercent = s / progressBump + 5;
@@ -548,7 +589,7 @@ void HMMengine::compareThreadEngine(HMMengine* hmm, EngineStatus* engineStatus, 
 	if (totalScore==0) 
 	{
 	    totalScore = 1;
-	    std::cout << "totalScore: " << totalScore << std::endl;
+	    //std::cout << "totalScore: " << totalScore << std::endl;
 	}
 	for (size_t styID = 1; styID < hmm->dataBase.StyleList.size(); ++styID)
 	{

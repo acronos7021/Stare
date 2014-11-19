@@ -562,9 +562,9 @@ CreateResult CMDparser::create(int clientID, string author, int numOfSentences)
     CreateResult cr;
     cr.percentComplete = 0;
     int styleID = hmm.dataBase.getStyleID(author);
-    std::cout << "StyleID for "<< author << " is " << styleID << std::endl;
+    //std::cout << "StyleID for "<< author << " is " << styleID << std::endl;
     cr.newDocument = hmm.createDoc(styleID,numOfSentences);
-    std::cout << "The created string is: " << std::endl;
+    //std::cout << "The created string is: " << std::endl;
     std::cout << cr.newDocument;
     return cr;
 } 
