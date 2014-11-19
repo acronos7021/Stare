@@ -24,14 +24,14 @@ function compareDecode(json) {
 	        '  <div id="popup" style="background-color: yellow;">' +
 	        response.ranking[i].origSnip[1] +
 	        '<span>This section was plagiarized: <br><b>' + Math.round(response.ranking[
-	            i].certainty*100) + '%</b></span></div>  ' + response.ranking[
+	            i].certainty) + '%</b></span></div>  ' + response.ranking[
 	            i].origSnip[2] + '</div></div>';
 	    inside += '<div id="right-column"><div id=doc-box>' +
 	        response.ranking[i].dataBaseSnip[0] +
 	        '  <div id="popup" style="background-color: yellow;">' +
 	        response.ranking[i].dataBaseSnip[1] +
 	        '<span>This section was plagiarized: <br><b>' + Math.round(response.ranking[
-	            i].certainty*100) + '%</b></span></div>  ' + response.ranking[
+	            i].certainty) + '%</b></span></div>  ' + response.ranking[
 	            i].dataBaseSnip[2] + '</div></div></div>';
 	    plagiarism.innerHTML = inside;
 	    document.getElementById('plagiarism').appendChild(plagiarism);
