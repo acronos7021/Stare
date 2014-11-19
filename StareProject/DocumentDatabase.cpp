@@ -289,9 +289,16 @@ int DocumentDatabase::getStyleIDfromDocumentID(int DocID)
 
 int DocumentDatabase::getStyleID(std::string author)
 {
-      sqlite3* db = openDB(); 
-      getStyleID(db,author);
-      close(db);
+//      sqlite3* db = openDB(); 
+//      getStyleID(db,author);
+//      close(db);
+      
+      for (int i =0; i < StyleList.size(); ++i)
+      {
+	  if (StyleList[i].Author == author)
+	      return i;
+      }
+      return 0;
 }
 
 
