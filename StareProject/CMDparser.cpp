@@ -423,13 +423,7 @@ CompareResult CMDparser::compare(int clientID, string text)
 }
 */
 
-void testThread(HMMengine* hmm,EngineStatus* es, std::string test)
-{
-    std::cout << "starting test thread" << std::endl;
-    for (int i =0 ; i <10 ; i++)
-      std::cout<< i << " ";
-    std::cout << "test thread ending" << std::endl;
-}
+
 
 CompareResult CMDparser::compare(int clientID, string text)
 {
@@ -440,7 +434,11 @@ CompareResult CMDparser::compare(int clientID, string text)
 	CompareResult cr;
 	cr.percentComplete = 0;
 	int foundProcessIndex = -1; // if not found
-	std::cout << "received compare request" << std::endl;
+	std::cout << "received compare request from: " << clientID << std::endl;
+	std::cout << "Current number of threads:" << engineProcesses.size() << std::endl;
+	std::cout << "list: " << std::endl;
+	for (size_t p = 0; p < engineProcesses.size(); ++p)
+	    std::cout << "    " << engineProcesses[p]->getClientID() << std::endl;
 	for (unsigned int i = 0; i < engineProcesses.size(); i++)
 	{
 		if (engineProcesses[i]->getClientID() == clientID)
@@ -480,13 +478,15 @@ CompareResult CMDparser::compare(int clientID, string text)
 			// this is a new request so we should get started.
 			EngineStatus* engineStatus = new EngineStatus(clientID);
 			engineProcesses.push_back(engineStatus);
+			std::cout << "Currently there are " << engineProcesses.size() << " active processes";
 			//std::thread t(testThread, hmm, engineStatus, text);
 			std::thread t(&HMMengine::compareThreadEngine,&hmm,engineStatus, text); //
-			//t.detach();
-			t.join();
+			t.detach();
+			//t.join();
 			std::cout << "post detach" << std::endl;
 		}
 	}
+	std::cout << "percentComplete" << cr.percentComplete << std::endl;
 	return cr;
 
 
