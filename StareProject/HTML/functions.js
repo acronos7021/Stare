@@ -52,8 +52,8 @@ function sendCompare(clientID, text) {
 
 function checkCompare(id){
 	var compare = {
-		"clientID": clientID,
-		"command": "checkCompare",
+		"clientID": id,
+		"command": "checkCompare"
 	}
 	sendMessage(compare);
 }
@@ -96,7 +96,7 @@ function callback(response){
             return;
         }
         //update the progress bar here
-        setTimeout(check, 1000);  //wait a second before trying again
+
         checkCompare(getCookie("id"));
     }
     else if(json.command=="getStyles"){
@@ -128,7 +128,7 @@ function generateID(){
 	var d = new Date();
 	var n=CryptoJS.lib.WordArray.random(128)+d.getTime();
 	var id = CryptoJS.SHA256(n);
-	return d.getTime();
+	return Math.round(d.getTime()/10000000);
 }
 
 // getElementById

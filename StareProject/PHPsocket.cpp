@@ -190,8 +190,9 @@ std::string PHPsocket::doCompare(Json::Value json)
 	CompareResult result = cmd->compare(sessionID, json["documentText"].asString());
 	//Here I check if what compare returns is empty
 	//TODO change this to the boolean.
+	std::cout << "ID: " << sessionID << std::endl;
 	if (result.percentComplete<100){
-		int progress = cmd->checkCompareStatus(sessionID);
+		int progress = result.percentComplete;
 		Json::Value output = formCheckCompareReturn(progress);
 		return output.toStyledString();
 	}
