@@ -79,6 +79,7 @@ void serverv2::recvData(int client_socket) {
         if(sent_ok<dataSendSize){
             sentSoFar = result.substr(sent_ok);
             dataInChars = sentSoFar.c_str();
+	    std::cout << sentSoFar << std::endl;
             std::cout << "Cut" << std::endl;
         } else{
             break;
