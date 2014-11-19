@@ -182,29 +182,10 @@ std::string PHPsocket::getStyles() {
 	return outer.toStyledString();
 }
 
-std::string PHPsocket::doCompare(Json::Value json)
+
+
+std::string PHPsocket::JSONtoStringCompare(CompareResult result)
 {
-	std::string ID = json["clientID"].asString();
-	int sessionID;
-	istringstream(ID) >> sessionID;
-	CompareResult result = cmd->compare(sessionID, json["documentText"].asString());
-	//Here I check if what compare returns is empty
-	//TODO change this to the boolean.
-	std::cout << "ID: " << sessionID << std::endl;
-	if (result.percentComplete<100){
-	    if (result.percentComplete==-1){
-	      Json::Value output;
-	      output["command"] = "doNothing";
-	      return output.toStyledString();
-	    }
-		int progress = result.percentComplete;
-		Json::Value output = formCheckCompareReturn(progress);
-		return output.toStyledString();
-	}
-	
-
-	//make JSON here, to send back to the browser
-
 	Json::Value compare;
 	compare["command"] = "checkCompare";
 	//TODO change this to output overall certainty, when I know how.
@@ -236,8 +217,68 @@ std::string PHPsocket::doCompare(Json::Value json)
 		rankingObj["certainty"] = result.sentenceRankings[i].certainty;
 		compare["ranking"].append(rankingObj);
 	}
-	return compare.toStyledString();
+	return compare.toStyledString();  
 }
+
+
+std::string PHPsocket::doCompare(Json::Value json)
+{
+	std::string ID = json["clientID"].asString();
+	int sessionID;
+	istringstream(ID) >> sessionID;
+	CompareResult result = cmd->compare(sessionID, json["documentText"].asString());
+	//Here I check if what compare returns is empty
+	//TODO change this to the boolean.
+	std::cout << "ID: " << sessionID << std::endl;
+	if (result.percentComplete<100){
+	    if (result.percentComplete==-1){
+	      Json::Value output;
+	      output["command"] = "doNothing";
+	      return output.toStyledString();
+	    }
+		int progress = result.percentComplete;
+		Json::Value output = formCheckCompareReturn(progress);
+		return output.toStyledString();
+	}
+	
+
+	//make JSON here, to send back to the browser
+
+	return JSONtoStringCompare(result);
+}	
+//	Json::Value compare;
+//	compare["command"] = "checkCompare";
+//	//TODO change this to output overall certainty, when I know how.
+//	for(unsigned int i = 0; i< result.documentCertainties.size(); ++i)
+//	{
+//	    Json::Value docCertainty;
+//	    docCertainty["styleName"]=result.documentCertainties[i].StyleName;   
+//	    docCertainty["certainty"]=result.documentCertainties[i].certainty;   
+//	    compare["docCertainties"].append(docCertainty);
+//	}
+//	
+//	for (unsigned int i = 0; i < result.sentenceRankings.size(); ++i)
+//	{
+//		Json::Value rankingObj;
+//		Json::Value origSnip;
+//		Json::Value dataBaseSnip;
+//
+//		origSnip.append(result.sentenceRankings[i].sourceSentences.PrevSentenceStr);
+//		origSnip.append(result.sentenceRankings[i].sourceSentences.SentenceStr);
+//		origSnip.append(result.sentenceRankings[i].sourceSentences.NextSentenceStr);
+//		rankingObj["origSnip"] = origSnip;
+//
+//		dataBaseSnip.append(result.sentenceRankings[i].foundSentences.PrevSentenceStr);
+//		dataBaseSnip.append(result.sentenceRankings[i].foundSentences.SentenceStr);
+//		dataBaseSnip.append(result.sentenceRankings[i].foundSentences.NextSentenceStr);
+//		rankingObj["dataBaseSnip"] = dataBaseSnip;
+//
+//		rankingObj["documentTitle"] = result.sentenceRankings[i].foundDocumentName;
+//		rankingObj["certainty"] = result.sentenceRankings[i].certainty;
+//		compare["ranking"].append(rankingObj);
+//	}
+//	return compare.toStyledString();
+//}
 
 
 Json::Value PHPsocket::formCheckCompareReturn(int status)

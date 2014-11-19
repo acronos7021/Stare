@@ -24,6 +24,7 @@ public:
     std::string doLearn(Json::Value json);
 	std::string jsonDecoder(std::string json);
 	std::string getStyles();
+	static std::string JSONtoStringCompare(CompareResult result);
 	std::string doCreate(Json::Value json);
 	std::string sanitize(std::string);
 	std::string desanitize(std::string);

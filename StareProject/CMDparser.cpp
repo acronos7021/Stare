@@ -10,6 +10,7 @@ using namespace std;
 #include "CMDparser.h"
 #include "Tokenizer.h"
 #include "HMMengine.h"
+#include "PHPsocket.h"
 
 // initialize static variable
 int CMDparser::cmdParserInstanceCount = 0;
@@ -151,6 +152,7 @@ void CMDparser::Compare(vector<string> cmdList)
 	//hmm(db, tokenizer);
 	hmm.compareWithFile(hmm,metaData);
 }
+
 void CMDparser::Create(vector<string> cmdList)
 {
 	//if (cmdList.size() != 3)
@@ -445,6 +447,11 @@ CompareResult CMDparser::compare(int clientID, string text)
       CompareResult cr =  engineStatus.getResult();
       cr.percentComplete=100;
       cr.print();
+      // write cr to file
+      std::string file_name = "..//HTML//output//" + to_string(clientID);
+      ofstream result_file(file_name);
+      result_file << PHPsocket::JSONtoStringCompare(cr);
+      result_file.close();
       return cr;
   
   
