@@ -287,6 +287,14 @@ int DocumentDatabase::getStyleIDfromDocumentID(int DocID)
 
 /* Retrieve the Author Style */
 
+int DocumentDatabase::getStyleID(std::string author)
+{
+      sqlite3* db = openDB(); 
+      getStyleID(db,author);
+      close(db);
+}
+
+
 int DocumentDatabase::getStyleID(sqlite3* db, std::string author)
 {
 	sqlite3_stmt* stmt;

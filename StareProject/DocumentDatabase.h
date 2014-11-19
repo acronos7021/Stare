@@ -88,6 +88,7 @@ public:
 
 	void addToStyleList(int StyleID, std::string author); // adds to the local data struct.
 	int insertStyle(sqlite3* db, std::string author); // adds to both the local data struct and sqlite database
+	int getStyleID(std::string author);
 	int getStyleID(sqlite3* db, std::string author);
 	int getStyleID(sqlite3* db, int docID);
 	int getStyleIDfromDocumentID(int DocID);

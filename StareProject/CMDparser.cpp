@@ -561,8 +561,9 @@ CreateResult CMDparser::create(int clientID, string author, int numOfSentences)
 {
     CreateResult cr;
     cr.percentComplete = 0;
-    cr.newDocument = "Now is the time for all good men to come to the aid of their country.";
-	return cr;
+    int styleID = hmm.dataBase.getStyleID(author);
+    cr.newDocument = hmm.createDoc(styleID,numOfSentences);
+    return cr;
 }
 
 
