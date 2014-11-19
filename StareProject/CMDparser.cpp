@@ -440,10 +440,19 @@ CompareResult CMDparser::compare(int clientID, string text)
 
 CompareResult CMDparser::compare(int clientID, string text)
 {
+      EngineStatus engineStatus(clientID);
+      hmm.compareThreadEngine(&hmm,&engineStatus, text);
+      CompareResult cr =  engineStatus.getResult();
+      cr.print();
+      return cr;
+  
+  
 		//HMMengine hmm;
 		//hmm.compare(MetaData("", "", "", text));
 
 	// search for the active process
+  
+  /*
 	CompareResult cr;
 	cr.percentComplete = 0;
 	int foundProcessIndex = -1; // if not found
@@ -456,7 +465,24 @@ CompareResult CMDparser::compare(int clientID, string text)
 	    std::cout << "    " << engineProcesses[p]->getClientID() << std::endl;
 	for (unsigned int i = 0; i < engineProcesses.size(); i++)
 	{
-		if (engineProcesses[i]->getClientID() == clientID)
+		if (engineProcesses[i]->getClieOutgoing:
+{
+   "command" : "checkCompare",
+   "overallCertainty" : "N/A",
+   "ranking" : [
+      {
+         "certainty" : 27,
+         "dataBaseSnip" : [ "", "", "" ],
+         "documentTitle" : "",
+         "origSnip" : [
+            "--whoever you\nare, give it back!",
+            "\"\n\n\n\nO For a Muse of Fire, that would ascend\nThe brightest Heauen of Inuention\n",
+            ""
+         ]
+      }
+   ]
+}
+ntID() == clientID)
 		{
 			// We found it.
 			foundProcessIndex = i;
@@ -509,7 +535,7 @@ CompareResult CMDparser::compare(int clientID, string text)
 	return cr;
 
 
-
+*/
 
 
 

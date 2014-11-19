@@ -540,11 +540,20 @@ void HMMengine::compareThreadEngine(HMMengine* hmm, EngineStatus* engineStatus, 
 		}
 	}
 
-
+	double totalScore = 0;
+	for (size_t styID = 1; styID < hmm->dataBase.StyleList.size(); ++styID)
+	{
+		totalScore += (double) styleScores[styID]/styleScoreCounts[styID];
+	}
+	if (totalScore==0) 
+	{
+	    totalScore = 1;
+	    std::cout << "totalScore: " << totalScore << std::endl;
+	}
 	for (size_t styID = 1; styID < hmm->dataBase.StyleList.size(); ++styID)
 	{
 		std::cout << std::fixed << std::setprecision(2) << hmm->dataBase.getAuthor(styID) << ":" << styleScores[styID] / styleScoreCounts[styID] << std::endl;
-		double thisScore = (double) styleScores[styID]/styleScoreCounts[styID];
+		double thisScore = ((double) styleScores[styID]/styleScoreCounts[styID])/totalScore;
 		StyleCertaintyItem ci;
 		ci.certainty = thisScore;
 		ci.StyleName = hmm->dataBase.getAuthor(styID);
