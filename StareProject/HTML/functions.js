@@ -2,11 +2,15 @@
 function compareDecode(json) {
     var response = JSON.parse(json);
     
-    var outputHTML = '<p>Your document was plagiarized: <b><span id="certainty"></span>%</b></p><div id="plagiarism"><!-- This is where javascript inserts compare --></div>';
+    var outputHTML = '<div id="authorsCert"></div><div id="plagiarism"><!-- This is where javascript inserts compare --></div>';
     document.getElementById('wrapper').innerHTML = outputHTML;
     
+    var authorsCert="";
     //add the overall certainty
-    document.getElementById('certainty').innerHTML = response.overallCertainty;
+    for (i=0; i < response.docCertainties.length; ++i){
+	authorsCert+='<p>'+ response.docCertainties[i].styleName +': <b><span id="certainty">'+ Math.round(response.docCertainties[i].certainty*100) +'%</span></b></p>';
+    }
+    document.getElementById('authorsCert').innerHTML = authorsCert;
     //Start body of plagarized document
 	for (i=0; i < response.ranking.length; ++i){
 	    var plagiarism = document.createElement('div');

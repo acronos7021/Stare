@@ -208,7 +208,14 @@ std::string PHPsocket::doCompare(Json::Value json)
 	Json::Value compare;
 	compare["command"] = "checkCompare";
 	//TODO change this to output overall certainty, when I know how.
-	compare["overallCertainty"] = "N/A";
+	for(unsigned int i = 0; i< result.documentCertainties.size(); ++i)
+	{
+	    Json::Value docCertainty;
+	    docCertainty["styleName"]=result.documentCertainties[i].StyleName;   
+	    docCertainty["certainty"]=result.documentCertainties[i].certainty;   
+	    compare["docCertainties"].append(docCertainty);
+	}
+	
 	for (unsigned int i = 0; i < result.sentenceRankings.size(); ++i)
 	{
 		Json::Value rankingObj;
