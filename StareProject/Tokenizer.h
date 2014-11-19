@@ -74,6 +74,11 @@ public:
 	//@logic: it reconstructs a sentence based on a vector of word IDs
 	std::string rebuildSent(std::vector<int> sent);
 
+	//@param: vector<int> sent
+	//@return: a string that is a reconstructed sentence
+	//@logic: it reconstructs a sentence based on a vector of word IDs for Create
+	std::string rebuildSent2(std::vector<int> sent);
+
 	//@param: void
 	//@return: a vector of string / ID from the master list
 	//@logic: called after a document has been tokenize; it returns the current sentence you are on based on the index

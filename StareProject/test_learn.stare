@@ -1,8 +1,105 @@
+learn "../StareProject/Documents/RomeoAndJuliet.txt" "Shakespere" "Romeo and Juliet" "1619"
 learn "../StareProject/Documents/HenryV.txt" "Shakespere" "Henry V" "1619"
-learn "../StareProject/Documents/RomeoAndJuliet.txt" "Shakespere" "Romeo and Juliet" "1597"
-learn "../StareProject/Documents/ATaleOfTwoCities.txt" "Charles Dickens" "A Tale of Two Cities" "1859" 
-learn "../StareProject/Documents/GreatExpectations.txt" "Charles Dickens" "Great Expectations" "1860" 
-learn "../StareProject/Documents/The Scarlet Letter.txt" "Nathaniel Hawthorne" "The Scarlet Letter" "1850"
-learn "../StareProject/Documents/The Little Masterpieces.txt" "Nathaniel Hawthorne" "The Little Masterpieces" "2012"
-learn "../StareProject/Documents/The Journal to Stella.txt" "Jonathan Swift" "The Journal to Stella" "1766"
-learn "../StareProject/Documents/Guilliver Travels.txt" "Jonathan Swift" "Guilliver Travels" "1726"
+learn "../StareProject/Documents/Hamlet.txt" "Shakespere" "Hamlet" "1619"
+learn "../StareProject/Documents/Othello.txt" "Shakespere" "Othello" "1619"
+learn "../StareProject/Documents/TheSonnets.txt" "Shakespere" "The Sonnets" "1619"
+learn "../StareProject/Documents/AMidsummerNightsDream.txt" "Shakespere" "A Midsummer Nights Dream" "1619"
+learn "../StareProject/Documents/MuchAdoAboutNothing.txt" "Shakespere" "Much Ado About Nothing" "1619"
+learn "../StareProject/Documents/Macbeth.txt" "Shakespere" "Macbeth" "1619"
+learn "../StareProject/Documents/TheTamingOfTheShrew.txt" "Shakespere" "The Taming Of The Shrew" "1619"
+learn "../StareProject/Documents/TheTempest.txt" "Shakespere" "The Tempest" "1619"
+learn "../StareProject/Documents/TheMerchantOfVenice.txt" "Shakespere" "The Merchant Of Venice" "1619"
+learn "../StareProject/Documents/RichardIII.txt" "Shakespere" "Richard III" "1619"
+learn "../StareProject/Documents/HenryIVpart1.txt" "Shakespere" "Henry IV part1" "1619"
+learn "../StareProject/Documents/HenryIVpart2.txt" "Shakespere" "Henry IV part2" "1619"
+
+
+
+
+learn "../StareProject/Documents/ATaleOfTwoCities.txt" "Charles Dickens" "Tale of two cities" "2002"
+learn "../StareProject/Documents/GreatExpectations.txt" "Charles Dickens" "Great Expectations" "2002"
+learn "../StareProject/Documents/OliverTwist.txt" "Charles Dickens" "Oliver Twist" "2002"
+learn "../StareProject/Documents/DavidCopperfield.txt" "Charles Dickens" "David Copperfields" "2002"
+learn "../StareProject/Documents/AChristmasCarol.txt" "Charles Dickens" "A Christmas Carol" "2002"
+learn "../StareProject/Documents/ThePickwickPapers.txt" "Charles Dickens" "The Pickwick Papers" "2002"
+learn "../StareProject/Documents/HardTimes.txt" "Charles Dickens" "Hard Times" "2002"
+learn "../StareProject/Documents/BleakHouse.txt" "Charles Dickens" "Bleak House" "2002"
+learn "../StareProject/Documents/LittleDorrit.txt" "Charles Dickens" "Little Dorrit" "2002"
+learn "../StareProject/Documents/OurMutualFriend.txt" "Charles Dickens" "Our Mutual Friend" "2002"
+
+
+
+learn "../StareProject/Documents/AdventuresOfHuckleberryFinn.txt" "Mark Twain" "Adventures of Huckleberry Finn" "2002"
+learn "../StareProject/Documents/LifeOnTheMississippi.txt" "Mark Twain" "Life On The Mississippi" "2002"
+learn "../StareProject/Documents/AconnecticutYankeeInKingArthursCourt.txt" "Mark Twain" "A connecticut Yankee In King Arthurs Court" "2002"
+learn "../StareProject/Documents/TheAdventuresOfTomSawyer.txt" "Mark Twain" "The Adventures Of Tom Sawyer" "2002"
+learn "../StareProject/Documents/ThePrinceAndThePauper.txt" "Mark Twain" "The Prince And The Pauper" "2002"
+learn "../StareProject/Documents/TheInnocentsAbroad.txt" "Mark Twain" "The Innocents Abroad" "2002"
+learn "../StareProject/Documents/RoughingIt.txt" "Mark Twain" "Roughing It" "2002"
+learn "../StareProject/Documents/AtrampAbroad.txt" "Mark Twain" "A tramp Abroad" "2002"
+learn "../StareProject/Documents/AdogsTale.txt" "Mark Twain" "A dogs Tale" "2002"
+learn "../StareProject/Documents/SketchesNewAndOld.txt" "Mark Twain" "Sketches New And Old" "2002"
+
+learn "../StareProject/Documents/MobyDick.txt" "Herman Melville" "Moby Dick" "2002"
+learn "../StareProject/Documents/BartlebyTheScrivener.txt" "Herman Melville" "BartlebyTheScrivener" "2002"
+learn "../StareProject/Documents/ThePiazzaTales.txt" "Herman Melville" "The Piazza Tales" "2002"
+learn "../StareProject/Documents/Typee.txt" "Herman Melville" "Typee" "2002"
+learn "../StareProject/Documents/TheConfidence-ManHisMasquerade.txt" "Herman Melville" "The Confidence- Man His Masquerade" "2002"
+learn "../StareProject/Documents/Battle-Pieces.txt" "Herman Melville" "Battle-Pieces" "2002"
+learn "../StareProject/Documents/Pierre.txt" "Herman Melville" "Pierre" "2002"
+learn "../StareProject/Documents/IsraelPotter.txt" "Herman Melville" "Israel Potter" "2002"
+learn "../StareProject/Documents/WhiteJacket.txt" "Herman Melville" "White Jacket" "2002"
+learn "../StareProject/Documents/Omoo.txt" "Herman Melville" "Omoo" "2002"
+
+learn "../StareProject/Documents/The WonderBook for Girls & Boys.txt" "Nathaniel Hawthorne" "The wonderbook for girls and boys" "2002"
+learn "../StareProject/Documents/The Little Masterpieces.txt" "Nathaniel Hawthorne" "The Little Masterpieces" "2002"
+learn "../StareProject/Documents/Mosses from an Old Manse, and Other Stories.txt" "Nathaniel Hawthorne" "Mosses from an Old Manse, and Other Stories" "2002"
+learn "../StareProject/Documents/Tanglewood Tales.txt" "Nathaniel Hawthorne" "Tanglewood Tales" "2002"
+learn "../StareProject/Documents/The Blithedale Romance.txt" "Nathaniel Hawthorne" "The Blithedale Romance" "2002"
+learn "../StareProject/Documents/The House of the Seven Gables.txt" "Nathaniel Hawthorne" "The House of the Seven Gables" "2002"
+learn "../StareProject/Documents/The Man of Adamant.txt" "Nathaniel Hawthorne" "The Man of Adamant" "2002"
+learn "../StareProject/Documents/The Marble Faun; Or, The Romance of Monte Beni Volume 1.txt" "Nathaniel Hawthorne" "The Marble Faun Or The Romance of Monte Beni Volume 1" "2002"
+learn "../StareProject/Documents/The Scarlet Letter.txt" "Nathaniel Hawthorne" "The Scarlet Letter" "2002"
+learn "../StareProject/Documents/Twice Told Tales.txt" "Nathaniel Hawthorne" "Twice Told Tales" "2002"
+
+learn "../StareProject/Documents/A Modest Proposal.txt" "Jonathan Swift" "A Modest Proposal" "1999"
+learn "../StareProject/Documents/A Tale of a Tub.txt" "Jonathan Swift" "A Tale of a Tub" "1999"
+learn "../StareProject/Documents/Guilliver's Travels.txt" "Jonathan Swift" "Guilliver's Travels" "1999"
+learn "../StareProject/Documents/The Battle of the Books, and other Short Pieces.txt" "Jonathan Swift" "The Battle of the Books, and other Short Pieces" "1999"
+learn "../StareProject/Documents/The Bickerstaff-Partridge Papers.txt" "Jonathan Swift" "The Bickerstaff-Partridge Papers" "1999"
+learn "../StareProject/Documents/The Journal to Stella.txt" "Jonathan Swift" "The Journal to Stella" "1999"
+learn "../StareProject/Documents/The Poems of Jonathan Swift, D.D. Volume 01.txt" "Jonathan Swift" "The Poems of Jonathan Swift, D.D. Volume 01" "1999"
+learn "../StareProject/Documents/The Prose Works of Jonathan Swift, D.D. Volume 03.txt" "Jonathan Swift" "The Prose Works of Jonathan Swift, D.D. Volume 03" "1999"
+learn "../StareProject/Documents/The Prose Works of Jonathan Swift, D.D. Volume 07.txt" "Jonathan Swift" "The Prose Works of Jonathan Swift, D.D. Volume 07" "1999"
+learn "../StareProject/Documents/The Prose Works of Jonathan Swift, D.D. Volume 09.txt" "Jonathan Swift" "The Prose Works of Jonathan Swift, D.D. Volume 09" "1999"
+
+learn "../StareProject/Documents/Ancestors.txt" "Gertrude Atherton" "Ancestors" "2002"
+learn "../StareProject/Documents/The Living Present.txt" "Gertrude Atherton" "The Living Present" "2002"
+learn "../StareProject/Documents/The Avalanche.txt" "Gertrude Atherton" "The Avalanche" "2002"
+learn "../StareProject/Documents/A Daughter of the Vine.txt" "Gertrude Atherton" "A Daughter of the Vine" "2002"
+learn "../StareProject/Documents/Sleeping Fires.txt" "Gertrude Atherton" "Sleeping Fires" "2002"
+learn "../StareProject/Documents/The Californians.txt" "Gertrude Atherton" "The Californians" "2002"
+learn "../StareProject/Documents/The Valiant Runaways.txt" "Gertrude Atherton" "The Valiant Runaways" "2002"
+learn "../StareProject/Documents/Rezanov.txt" "Gertrude Atherton" "Rezanov" "2002"
+learn "../StareProject/Documents/Mrs. Balfame.txt" "Gertrude Atherton" "Mrs. Balfame" "2002"
+learn "../StareProject/Documents/The Conqueror.txt" "Gertrude Atherton" "The Conqueror" "2002"
+
+learn "../StareProject/Documents/Avojalka.txt" "Berthold Auerbach" "Avojalka" "2002"
+learn "../StareProject/Documents/Black Forest Village Stories.txt" "Berthold Auerbach" "Black Forest Village Stories" "2002"
+learn "../StareProject/Documents/Christian Gellert Last Christmas.txt" "Berthold Auerbach" "Christian Gellert Last Christmas" "2002"
+learn "../StareProject/Documents/Edelweiss.txt" "Berthold Auerbach" "Edelweiss" "2002"
+learn "../StareProject/Documents/Joseph in the Snow and The Clockmaker.txt" "Berthold Auerbach" "Joseph in the Snow and The Clockmaker" "2002"
+learn "../StareProject/Documents/Landolin.txt" "Berthold Auerbach" "Landolin" "2002"
+learn "../StareProject/Documents/On the Heights.txt" "Berthold Auerbach" "On the Heights" "2002"
+learn "../StareProject/Documents/Villa Eden.txt" "Berthold Auerbach" "Villa Eden" "2002"
+learn "../StareProject/Documents/Waldfried.txt" "Berthold Auerbach" "Waldfried" "2002"
+learn "../StareProject/Documents/Joseph in the Snow and The Clockmaker Volume 2.txt" "Berthold Auerbach" "Joseph in the Snow and The Clockmaker Volume 2" "2002"
+
+
+
+
+
+
+
+
+

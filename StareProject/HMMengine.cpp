@@ -581,8 +581,9 @@ string HMMengine::createDoc(int styleID, int length)
 			if (dataBase.wpd.isWordToken(random, styleID) == true)
 			{
 				tmp = createHelper(styleID, random);
-				s += tokenizer.rebuildSent(tmp);
-				s += " ";
+				s += tokenizer.rebuildSent2(tmp);
+				//s.pop_back();
+				//s += '.';
 				lock = false;
 				count++;
 			}
@@ -634,7 +635,7 @@ vector<int> HMMengine::createHelper(int styleID, int wordID)
 				if (random <= percent )//&& dataBase.wpd.isWordToken(random, styleID) == true)// Function almost always ret false
 				{
 					hold.push_back(dataW[ind].wordTokenID);
-					hold.push_back((int)('&'));
+					//hold.push_back((int)('&'));
 					curr = dataW[ind].wordTokenID;
 					lock = false;
 				}
@@ -657,7 +658,7 @@ vector<int> HMMengine::createHelper(int styleID, int wordID)
 
 	if (thres > threshold)
 	{
-		hold.push_back(46); // always a period
+		//hold.push_back(46); // always a period
 	}
 
 	return hold;

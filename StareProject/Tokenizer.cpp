@@ -93,6 +93,15 @@ string Tokenizer::rebuildSent(vector<int>sent)
 	return ss.str();
 }
 
+string Tokenizer::rebuildSent2(vector<int>sent)
+{
+	stringstream ss;
+	for (unsigned int i = 0; i < sent.size(); i++)
+	{
+		ss << tdb.GetString(sent[i]) << " ";
+	}
+	return ss.str();
+}
 
 void Tokenizer::save_BAV(std::string filename)
 {

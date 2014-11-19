@@ -1,4 +1,3 @@
-
 #include "WordPairCountDatabase.h"
 #include "Tokenizer.h"
 
@@ -7,8 +6,6 @@
 WordPairCountDatabase::~WordPairCountDatabase()
 {
 }
-
-
 
 
 uint_fast64_t WordPairCountDatabase::getWordPairBitPack(int currWordToken, int nextWordToken)
