@@ -192,10 +192,16 @@ std::string PHPsocket::doCompare(Json::Value json)
 	//TODO change this to the boolean.
 	std::cout << "ID: " << sessionID << std::endl;
 	if (result.percentComplete<100){
+	    if (result.percentComplete==-1){
+	      Json::Value output;
+	      output["command"] = "doNothing";
+	      return output.toStyledString();
+	    }
 		int progress = result.percentComplete;
 		Json::Value output = formCheckCompareReturn(progress);
 		return output.toStyledString();
 	}
+	
 
 	//make JSON here, to send back to the browser
 

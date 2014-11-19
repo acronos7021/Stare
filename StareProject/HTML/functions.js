@@ -109,6 +109,11 @@ function callback(response){
     else if(json.command=="learn"){
 		getBackLearn(json);
     }
+    else if(json.command=="doNothing"){
+		alert("Doing Nothing.");
+		return;
+    }
+
     
 }
 
