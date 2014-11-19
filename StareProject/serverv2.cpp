@@ -66,6 +66,7 @@ void serverv2::recvData(int client_socket) {
     std::cout << result << std::endl;
     //std::cout << recvDataString << std::endl;
     //std::string dataToSend = "Hello client, I have received your data ";
+
     std::string sentSoFar = result;
     while (sentSoFar.size()>0)
     {
