@@ -2,6 +2,7 @@
 #include "sqlite3.h"
 #include <string>
 #include <map>
+#include <stdexcept>
 //#include <unordered_map>
 #include <vector>
 
