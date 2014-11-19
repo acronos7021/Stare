@@ -11,6 +11,19 @@ using namespace std;
 #include "Tokenizer.h"
 #include "HMMengine.h"
 
+// initialize static variable
+int CMDparser::cmdParserInstanceCount = 0;
+
+CMDparser::CMDparser()
+{
+    cmdParserInstanceCount++;
+}
+
+CMDparser::~CMDparser()
+{
+    cmdParserInstanceCount--;
+}
+
 
 bool CMDparser::parseCMD(vector<string> cmdList)
 {
@@ -437,6 +450,8 @@ CompareResult CMDparser::compare(int clientID, string text)
 	std::cout << "received compare request from: " << clientID << std::endl;
 	std::cout << "Current number of threads:" << engineProcesses.size() << std::endl;
 	std::cout << "list: " << std::endl;
+	
+	std::cout << "the current CMDparser instance count is " << cmdParserInstanceCount << std::endl;
 	for (size_t p = 0; p < engineProcesses.size(); ++p)
 	    std::cout << "    " << engineProcesses[p]->getClientID() << std::endl;
 	for (unsigned int i = 0; i < engineProcesses.size(); i++)
@@ -448,6 +463,7 @@ CompareResult CMDparser::compare(int clientID, string text)
 			if (engineProcesses[i]->getPercentComplete() == 100)
 			{
 				// the process is complete, so return it
+				std::cout << "Process is complete, return CR and delete process" << std::endl;
 				cr = engineProcesses[i]->getResult();
 				// delete the object
 				delete(engineProcesses[i]);

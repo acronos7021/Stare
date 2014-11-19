@@ -13,6 +13,11 @@ using namespace std;
 class CMDparser
 {
 public:
+	static int cmdParserInstanceCount;  
+  
+	CMDparser();
+	~CMDparser();
+	
 	HMMengine hmm;  
 	vector<EngineStatus*> engineProcesses;
 
