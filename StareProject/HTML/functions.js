@@ -98,7 +98,7 @@ function callback(response){
         }
         //update the progress bar here
 
-        checkCompare(getCookie("id"));
+        //checkCompare(getCookie("id"));
     }
     else if(json.command=="getStyles"){
 		fillStyles(json);
