@@ -391,6 +391,7 @@ SentenceRanking createSentenceRanking(HMMengine* hmm, std::deque<std::vector<int
 
 	SentenceBlob databaseBlob;
 	int docID = hmm->dataBase.GetDocIDfromSentID(dbID);
+	
 	int sentDocStart, sentDocEnd;
 	std::string styleStr, titleStr;
 	if (docID >= 0)
@@ -433,7 +434,7 @@ SentenceRanking createSentenceRanking(HMMengine* hmm, std::deque<std::vector<int
 		databaseBlob.NextSentenceStr = "";
 		databaseBlob.NextNextSentenceStr = "";
 	}
-
+	
 	SentenceRanking sr(styleStr, titleStr, source, databaseBlob, score);
 	return sr;
 }
