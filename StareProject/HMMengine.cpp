@@ -54,15 +54,7 @@ int HMMengine::learn(MetaData metaData)
 	return documentID;
 }
 
-void HMMengine::compareWithFile(HMMengine &hmm, MetaData metaData)
-{
-	// This is due to an early misunderstanding between Sam and Brian.  Should be fixed.
-	std::string documentText = tokenizer.readFile(metaData.DocumentText);
-        //std::thread t(hmm.compareThreadEngine, hmm, engineStatus, text);
-	EngineStatus empty(0);
-	compareThreadEngine(hmm,&empty,documentText);
-}
-//HMMengine &hmm, 
+
 
 
 
@@ -84,7 +76,7 @@ struct PlagerismCalculator
 	}
 
 	// returns the sentences with the closest match.
-	std::vector<int> doCalc(HMMengine &hmm)
+	std::vector<int> doCalc()//HMMengine &hmm)
 	{
 		std::vector<int> ret;
 		if (sentenceList.size() < 5)
@@ -371,61 +363,61 @@ struct StyleCalculator
 	}
 };
 
-SentenceRanking createSentenceRanking(HMMengine &hmm, std::deque<std::vector<int>> &sourceDoc, vector<int> plagarizedSentence, int sourceID, int dbID, int score)
+SentenceRanking createSentenceRanking(HMMengine* hmm, std::deque<std::vector<int>> &sourceDoc, vector<int> plagarizedSentence, int sourceID, int dbID, int score)
 {
 	SentenceBlob source;
 	source.SentenceID = sourceID;
-	source.SentenceStr = hmm.tokenizer.rebuildSent(plagarizedSentence);
+	source.SentenceStr = hmm->tokenizer.rebuildSent(plagarizedSentence);
 	if (sourceID > 1)
-		source.PrevSentenceStr = hmm.tokenizer.rebuildSent(sourceDoc[sourceID - 1]);
+		source.PrevSentenceStr = hmm->tokenizer.rebuildSent(sourceDoc[sourceID - 1]);
 	else
 		source.PrevSentenceStr = "";
 
 	if (sourceID > 2)
-		source.PrevPrevSentenceStr = hmm.tokenizer.rebuildSent(sourceDoc[sourceID - 2]);
+		source.PrevPrevSentenceStr = hmm->tokenizer.rebuildSent(sourceDoc[sourceID - 2]);
 	else
 		source.PrevPrevSentenceStr = "";
 
 	if (sourceID + 1 < sourceDoc.size())
-		source.NextSentenceStr = hmm.tokenizer.rebuildSent(sourceDoc[sourceID + 1]);
+		source.NextSentenceStr = hmm->tokenizer.rebuildSent(sourceDoc[sourceID + 1]);
 	else
 		source.NextSentenceStr = "";
 
 	if (sourceID + 2 < sourceDoc.size())
-		source.NextNextSentenceStr = hmm.tokenizer.rebuildSent(sourceDoc[sourceID + 2]);
+		source.NextNextSentenceStr = hmm->tokenizer.rebuildSent(sourceDoc[sourceID + 2]);
 	else
 		source.NextNextSentenceStr = "";
 
 
 	SentenceBlob databaseBlob;
-	int docID = hmm.dataBase.GetDocIDfromSentID(dbID);
+	int docID = hmm->dataBase.GetDocIDfromSentID(dbID);
 	int sentDocStart, sentDocEnd;
 	std::string styleStr, titleStr;
 	if (docID >= 0)
 	{
-		sentDocStart = hmm.dataBase.documentList[docID].startSentenceID;
-		sentDocEnd = hmm.dataBase.documentList[docID].endSentenceID;
-		styleStr = hmm.dataBase.documentList[docID].Author;
-		titleStr = hmm.dataBase.documentList[docID].Title;
-		databaseBlob.SentenceStr = hmm.tokenizer.rebuildSent(hmm.dataBase.TotalSentenceList[dbID]);
+		sentDocStart = hmm->dataBase.documentList[docID].startSentenceID;
+		sentDocEnd = hmm->dataBase.documentList[docID].endSentenceID;
+		styleStr = hmm->dataBase.documentList[docID].Author;
+		titleStr = hmm->dataBase.documentList[docID].Title;
+		databaseBlob.SentenceStr = hmm->tokenizer.rebuildSent(hmm->dataBase.TotalSentenceList[dbID]);
 
 		if (dbID - 1 >= sentDocStart)
-			databaseBlob.PrevSentenceStr = hmm.tokenizer.rebuildSent(hmm.dataBase.TotalSentenceList[dbID - 1]);
+			databaseBlob.PrevSentenceStr = hmm->tokenizer.rebuildSent(hmm->dataBase.TotalSentenceList[dbID - 1]);
 		else
 			databaseBlob.PrevSentenceStr = "";
 
 		if (dbID - 2 >= sentDocStart)
-			databaseBlob.PrevPrevSentenceStr = hmm.tokenizer.rebuildSent(hmm.dataBase.TotalSentenceList[dbID - 2]);
+			databaseBlob.PrevPrevSentenceStr = hmm->tokenizer.rebuildSent(hmm->dataBase.TotalSentenceList[dbID - 2]);
 		else
 			databaseBlob.PrevPrevSentenceStr = "";
 
 		if (dbID + 1 < sentDocEnd)
-			databaseBlob.NextSentenceStr = hmm.tokenizer.rebuildSent(hmm.dataBase.TotalSentenceList[dbID + 1]);
+			databaseBlob.NextSentenceStr = hmm->tokenizer.rebuildSent(hmm->dataBase.TotalSentenceList[dbID + 1]);
 		else
 			databaseBlob.NextSentenceStr = "";
 
 		if (dbID + 2 < sentDocEnd)
-			databaseBlob.NextNextSentenceStr = hmm.tokenizer.rebuildSent(hmm.dataBase.TotalSentenceList[dbID + 2]);
+			databaseBlob.NextNextSentenceStr = hmm->tokenizer.rebuildSent(hmm->dataBase.TotalSentenceList[dbID + 2]);
 		else
 			databaseBlob.NextNextSentenceStr = "";
 	}
@@ -447,25 +439,38 @@ SentenceRanking createSentenceRanking(HMMengine &hmm, std::deque<std::vector<int
 }
 
 
-void HMMengine::compareThreadEngine(HMMengine &hmm, EngineStatus* engineStatus, std::string &text)
+void HMMengine::compareThreadEngine(HMMengine* hmm, EngineStatus* engineStatus, std::string text)
 {
 	CompareResult cr;
 
+	std::cout << "Beginning Compare of text" << std::endl;
+	std::cout << text << std::endl;
+	
+	std::deque<std::vector<int>> documentTokens = hmm->tokenizer.tokenizeDoc(text);
+      
+	
 
-	std::deque<std::vector<int>> documentTokens = hmm.tokenizer.tokenizeDoc(text);
-
+	if (documentTokens.size()<=0) return;
 	engineStatus->setPercentComplete(5);
+	std::cout << "Setting Percent complete" << std::endl;
+
 	int progressBump = documentTokens.size() / 90;
+	if (progressBump<=0) progressBump = 1;
 
 	PlagerismCalculator plagCalc;
 
 	std::vector<double> styleScores;
-	styleScores.resize(hmm.dataBase.StyleList.size());
+	styleScores.resize(hmm->dataBase.StyleList.size());
 	std::vector<int> styleScoreCounts;
-	styleScoreCounts.resize(hmm.dataBase.StyleList.size());
+	styleScoreCounts.resize(hmm->dataBase.StyleList.size());
 	int currWord, nextWord;
+
+	std::cout << "Initialization complete" << std::endl;
+
 	for (size_t s = 0; s < documentTokens.size(); s++) 
 	{
+		std::cout << "processing sentence: " << s << std::endl;
+	  
 		// step through all the sentences in this document.
 		size_t sentSize = documentTokens[s].size() - 1;
 
@@ -473,15 +478,15 @@ void HMMengine::compareThreadEngine(HMMengine &hmm, EngineStatus* engineStatus, 
 		{
 			// Step trough all of the words this sentence.
 			currWord = documentTokens[s][w];
-			if (hmm.dataBase.isWordToken(currWord))
+			if (hmm->dataBase.isWordToken(currWord))
 			{
-				nextWord = hmm.dataBase.getNextWordToken(documentTokens[s], w);
-				std::set<int> SendList = hmm.dataBase.wpd.getSentenceList(currWord, nextWord);
+				nextWord = hmm->dataBase.getNextWordToken(documentTokens[s], w);
+				std::set<int> SendList = hmm->dataBase.wpd.getSentenceList(currWord, nextWord);
 				plagCalc.addWordPair(SendList);
-				for (size_t styID = 1; styID < hmm.dataBase.StyleList.size(); ++styID)
+				for (size_t styID = 1; styID < hmm->dataBase.StyleList.size(); ++styID)
 				{
 					// calculate the score for this Markov
-					double test = hmm.dataBase.wpd.getStyleProbability(currWord, nextWord, styID);
+					double test = hmm->dataBase.wpd.getStyleProbability(currWord, nextWord, styID);
 					styleScores[styID] = styleScores[styID] + test;
 					styleScoreCounts[styID] += 1;
 					//plagCalc.addWordPair(currWord, nextWord);
@@ -490,14 +495,15 @@ void HMMengine::compareThreadEngine(HMMengine &hmm, EngineStatus* engineStatus, 
 				}
 			}
 		}
+		std::cout << "plagCalc.doCalc()" << std::endl;
 
-		vector<int> result = plagCalc.doCalc(hmm);
+		vector<int> result = plagCalc.doCalc();
 		if (result.size() > 0)
 		{
 			int score;
 			for (vector<int>::iterator i = result.begin(); i != result.end(); ++i)
 			{
-				vector<int> plagerized = plagCalc.compare(documentTokens[s], hmm.dataBase.TotalSentenceList[*i], score);
+				vector<int> plagerized = plagCalc.compare(documentTokens[s], hmm->dataBase.TotalSentenceList[*i], score);
 				SentenceRanking newRank = createSentenceRanking(hmm, documentTokens, plagerized, s, *i, score);
 				cr.sentenceRankings.push_back(newRank);
 
@@ -522,6 +528,7 @@ void HMMengine::compareThreadEngine(HMMengine &hmm, EngineStatus* engineStatus, 
 		}
 		// end sentence processing so update the progress bar
 		//++progressCount;
+		std::cout << "Update progress "<< progressBump << std::endl;
 		if ((s % progressBump) == 0)
 		{
 			int newPercent = s / progressBump + 5;
@@ -531,16 +538,25 @@ void HMMengine::compareThreadEngine(HMMengine &hmm, EngineStatus* engineStatus, 
 	}
 
 
-
-
-	for (size_t styID = 1; styID < hmm.dataBase.StyleList.size(); ++styID)
+	for (size_t styID = 1; styID < hmm->dataBase.StyleList.size(); ++styID)
 	{
-		std::cout << std::fixed << std::setprecision(2) << hmm.dataBase.getAuthor(styID) << ":" << styleScores[styID] / styleScoreCounts[styID] << std::endl;
+		std::cout << std::fixed << std::setprecision(2) << hmm->dataBase.getAuthor(styID) << ":" << styleScores[styID] / styleScoreCounts[styID] << std::endl;
 	}
-
+	std::cout << "compare processing complete" << std::endl;
 	engineStatus->setResult(cr);
 	engineStatus->setPercentComplete(100);
 }
+
+void HMMengine::compareWithFile(HMMengine &hmm, MetaData metaData)
+{
+	// This is due to an early misunderstanding between Sam and Brian.  Should be fixed.
+	std::string documentText = tokenizer.readFile(metaData.DocumentText);
+        //std::thread t(hmm.compareThreadEngine, hmm, engineStatus, text);
+	EngineStatus empty(0);
+	compareThreadEngine(&hmm,&empty,documentText);
+}
+//HMMengine &hmm, 
+
 
 
  //   std::map<int,StyleCalculator> styleCalcs;

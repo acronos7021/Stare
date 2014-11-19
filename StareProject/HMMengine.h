@@ -21,7 +21,7 @@ public:
 	int learnFromFile(MetaData metaData);
 	void compare(MetaData metaData);
 	void compareThread(EngineStatus* engineStatus, std::string &text);
-	static void compareThreadEngine(HMMengine &hmm, EngineStatus* engineStatus, std::string &text);
+	static void compareThreadEngine(HMMengine* hmm, EngineStatus* engineStatus, std::string text);
 	void compareWithFile(HMMengine &hmm, MetaData metaData);
 
 	void create(MetaData metaData);

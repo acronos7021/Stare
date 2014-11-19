@@ -293,45 +293,6 @@ bool CMDparser::isAlphaNumeric(char c)
 //	return"This is sentence 1.  This is sentence 2. This is sentence 3.  This is sentence 4.";
 //} 
 
-CompareResult CMDparser::compare(int clientID, string text)
-{
-	//HMMengine hmm;
-	//hmm.compare(MetaData("", "", "", text));
-	vector<SentenceRanking> test;
-
-	SentenceBlob sbSource;
-	sbSource.NextNextSentenceStr = "Sentence 9";
-	sbSource.NextSentenceStr = "Sentence 8";
-	sbSource.SentenceStr = "Sentence 7";
-	sbSource.PrevSentenceStr = "Sentence 6";
-	sbSource.PrevPrevSentenceStr = "Sentence 5";
-	sbSource.SentenceID = 7;
-
-	SentenceBlob sbFound;
-	sbFound.NextNextSentenceStr = "Sentence 9";
-	sbFound.NextSentenceStr = "Sentence 8";
-	sbFound.SentenceStr = "Sentence 7";
-	sbFound.PrevSentenceStr = "Sentence 6";
-	sbFound.PrevPrevSentenceStr = "Sentence 5";
-	sbFound.SentenceID = 7;
-
-	test.push_back(SentenceRanking("Dickens", "A tale of two cities", sbSource, sbFound, .57));
-	test.push_back(SentenceRanking("Mark Twain", "Huckleberry Finn", sbSource, sbFound, .57));
-
-	StyleCertaintyItem style1;
-	style1.certainty = .73;
-	style1.StyleID = 2;
-	style1.StyleName = "Mark Twain";
-
-	vector<StyleCertaintyItem> ci;
-	ci.push_back(style1);
-
-	CompareResult cr;
-	cr.documentCertainties = ci;
-	cr.sentenceRankings = test;
-        cr.percentComplete = 100;
-	return cr;
-}
 
 //string CMDparser::create(int clientID, string author, int numOfSentences)
 //{
@@ -423,12 +384,63 @@ void CMDparser::learn(string author, string title, string date, string text)
 /*
 CompareResult CMDparser::compare(int clientID, string text)
 {
+	//HMMengine hmm;
+	//hmm.compare(MetaData("", "", "", text));
+	vector<SentenceRanking> test;
+
+	SentenceBlob sbSource;
+	sbSource.NextNextSentenceStr = "Sentence 9";
+	sbSource.NextSentenceStr = "Sentence 8";
+	sbSource.SentenceStr = "Sentence 7";
+	sbSource.PrevSentenceStr = "Sentence 6";
+	sbSource.PrevPrevSentenceStr = "Sentence 5";
+	sbSource.SentenceID = 7;
+
+	SentenceBlob sbFound;
+	sbFound.NextNextSentenceStr = "Sentence 9";
+	sbFound.NextSentenceStr = "Sentence 8";
+	sbFound.SentenceStr = "Sentence 7";
+	sbFound.PrevSentenceStr = "Sentence 6";
+	sbFound.PrevPrevSentenceStr = "Sentence 5";
+	sbFound.SentenceID = 7;
+
+	test.push_back(SentenceRanking("Dickens", "A tale of two cities", sbSource, sbFound, .57));
+	test.push_back(SentenceRanking("Mark Twain", "Huckleberry Finn", sbSource, sbFound, .57));
+
+	StyleCertaintyItem style1;
+	style1.certainty = .73;
+	style1.StyleID = 2;
+	style1.StyleName = "Mark Twain";
+
+	vector<StyleCertaintyItem> ci;
+	ci.push_back(style1);
+
+	CompareResult cr;
+	cr.documentCertainties = ci;
+	cr.sentenceRankings = test;
+        cr.percentComplete = 100;
+	return cr;
+}
+*/
+
+void testThread(HMMengine* hmm,EngineStatus* es, std::string test)
+{
+    std::cout << "starting test thread" << std::endl;
+    for (int i =0 ; i <10 ; i++)
+      std::cout<< i << " ";
+    std::cout << "test thread ending" << std::endl;
+}
+
+CompareResult CMDparser::compare(int clientID, string text)
+{
 		//HMMengine hmm;
 		//hmm.compare(MetaData("", "", "", text));
 
 	// search for the active process
 	CompareResult cr;
+	cr.percentComplete = 0;
 	int foundProcessIndex = -1; // if not found
+	std::cout << "received compare request" << std::endl;
 	for (unsigned int i = 0; i < engineProcesses.size(); i++)
 	{
 		if (engineProcesses[i]->getClientID() == clientID)
@@ -446,7 +458,7 @@ CompareResult CMDparser::compare(int clientID, string text)
 			else
 			{
 				//process is not complete, so return status.
-				CompareResult cr;
+				//CompareResult cr;
 				cr.percentComplete = engineProcesses[i]->getPercentComplete();
 			}
 		}
@@ -454,18 +466,25 @@ CompareResult CMDparser::compare(int clientID, string text)
 	if (foundProcessIndex == -1)
 	{
 		// it was not found in the list.
+		std::cout << "the session ID was not found" << std::endl;
 		if (text == "")
 		{
+			std::cout << "Error:  No text was sent.  Either timed out or the first request was sent empty. " << std::endl;
 			// this is an error.  Either it timed out, they never sent it before.  
-			CompareResult cr;
+			//CompareResult cr;
 			cr.percentComplete = -1;
 		}
 		else
 		{
+			std::cout << "New request initiated" << std::endl;
 			// this is a new request so we should get started.
 			EngineStatus* engineStatus = new EngineStatus(clientID);
 			engineProcesses.push_back(engineStatus);
-			//std::thread t(hmm.compareThreadEngine, hmm, engineStatus, text);
+			//std::thread t(testThread, hmm, engineStatus, text);
+			std::thread t(&HMMengine::compareThreadEngine,&hmm,engineStatus, text); //
+			//t.detach();
+			t.join();
+			std::cout << "post detach" << std::endl;
 		}
 	}
 	return cr;
@@ -490,7 +509,7 @@ CompareResult CMDparser::compare(int clientID, string text)
 	//return hmm.compare()
 
 }
-*/
+
 
 CreateResult CMDparser::create(int clientID, string author, int numOfSentences)
 {

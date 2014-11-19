@@ -11,7 +11,7 @@ using namespace std;
 
 //StyleDatabase& db = StyleDatabase();
 
-
+/*
 void BrianMain(CMDparser *cmd)
 {
 
@@ -27,14 +27,17 @@ void BrianMain(CMDparser *cmd)
 
 
 }
-
+*/
 
 int main(int argc, char *argv[])
 {
 	
 	CMDparser cmd;
 	
-	BrianMain(&cmd);
+	cmd.hmm.dataBase.initTables();
+	cmd.hmm.tokenizer.tdb.LoadTokenMap();
+	
+	//BrianMain(&cmd);
 	
 	serverv2 PHPconnect;
 	PHPconnect.initEngine(&cmd);

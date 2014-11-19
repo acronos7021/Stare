@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <deque>
+#include <stdexcept>
 #include "WordPairCountDatabase.h"
 #include "sqlite3.h"
 #include "DataStructs.h"
