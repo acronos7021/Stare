@@ -165,19 +165,23 @@ void DocumentDatabase::initTables()
 				int docID = sqlite3_column_int(stmt3, 1);
 				//int docIndex = getDocumentListIndex(docID);
 				int lastSentID = sentID;
+				int lastDocID = docID;
 				sentID = sqlite3_column_int(stmt3, 2);
 				if (docID != currDocID)
 				{
-					if (currDocID != -1)
-					{
-						// otherwise it is the first document so there is no previous document to end
-						if (docID >= 0) // check if the documentID is invalid
-							documentList[docID].endSentenceID = lastSentID; // use the sentID from last time.
-					}
-					// Starting a new document
-					documentList[docID].startSentenceID = sentID;
-					currDocID = docID;
-					std::cout << std::endl << "Loading: " << documentList[docID].Author << ":" << documentList[docID].Title << std::endl;
+				    documentList[docID].startSentenceID = sentID;
+				    std::cout << std::endl << "Loading: " << documentList[docID].Author << ":" << documentList[docID].Title << std::endl;	
+				    currDocID = docID;
+//				  if (currDocID != -1)
+//					{
+//						// otherwise it is the first document so there is no previous document to end
+//						if (docID >= 0) // check if the documentID is invalid
+//							documentList[docID].endSentenceID = lastSentID; // use the sentID from last time.
+//					}
+//					// Starting a new document
+//					documentList[docID].startSentenceID = sentID;
+//					currDocID = docID;
+
 
 				}
 				if ((sentID != currSentID) && (currSentID != -1)) 
@@ -207,6 +211,7 @@ void DocumentDatabase::initTables()
 					}
 					incrementTokenAndStyleCounts(sentenceTokenIDs, styleID,currSentID);
 					currSentID = sentID;
+					documentList[currDocID].endSentenceID = currSentID;
 					sentenceTokenIDs.clear();
 				}
 				currSentID = sentID;
@@ -342,16 +347,21 @@ void DocumentDatabase::createWordStyleCounts( int StyleID, std::string author)
 
 int DocumentDatabase::GetDocIDfromSentID(int sentID)
 {
-	if ((sentID < 0) || (sentID >= TotalSentenceList.size()))
-		return -1;
-	else
+	if ((sentID >= 0) && (sentID < TotalSentenceList.size()))
 	{
-		for (int i = 0; i < documentList.size(); ++i)
-		{
-			if ((sentID >= documentList[i].startSentenceID) && (sentID < documentList[i].endSentenceID))
-				return i;
-		}
+	      for (int i = 0; i < documentList.size(); ++i)
+	      {
+		      if ((sentID >= documentList[i].startSentenceID) && (sentID < documentList[i].endSentenceID))
+			      return i;
+	      }
 	}
+	
+	std::cout << "Invalid document ID# " << sentID << ".  Printing the list of all Document ranges. " << std::endl;
+	for (int i = 0; i < documentList.size(); ++i)
+	{
+	     std::cout << documentList[i].Title << "  " << documentList[i].startSentenceID << " : " << documentList[i].endSentenceID << std::endl;
+	}
+	
 	return -1;
 }
 

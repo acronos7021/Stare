@@ -443,6 +443,7 @@ CompareResult CMDparser::compare(int clientID, string text)
       EngineStatus engineStatus(clientID);
       hmm.compareThreadEngine(&hmm,&engineStatus, text);
       CompareResult cr =  engineStatus.getResult();
+      cr.percentComplete=100;
       cr.print();
       return cr;
   
